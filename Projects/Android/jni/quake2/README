@@ -1,0 +1,507 @@
+        Minor OS-oriented changes to id Software's Quake2 3.21: 
+                        "Sorry, real life (tm) got in the way,0.16"
+
+***************************************************************************
+Important Note:  If you received an installer which installed the Quake II
+demo levels, you may not distribute that installer or the demo levels in
+anyway except electronically.  The Quake II demo levels are still Copyright
+Id Software and are not covered by the Gnu Public License which governs the
+source code.  Id has been kind enough to allow us to distribute these
+levels with an installer to show users just how cool Quake II is in the
+jopes that it will lead them to buy full versions.  Please do not harm
+our relationship with Id by distributing the demo installer electronically.
+***************************************************************************
+
+(NOTE: throughout this document, references to i386 [debugi386, releasei386,
+ gamei386.so] are used.  If your architecture is not i386, just substitute
+ that for i386.  The Makefile gives some hints as to what is supported.)
+
+For this to be of any use, you _must_ own a copy of Quake 2.  The demo would
+also work, but you might as well buy the full thing now.
+
+These modifications are intended for Linux users, as I do not have have
+access to other platforms.
+
+Be sure to install SDL 1.2 (http://www.libsdl.org) if you want to use the
+softsdl or sdlgl drivers, or the sdlquake2 binary.
+
+'make' will, by default, build both the debug and release files.
+To build just the optimized binaries: make build_release
+The resulting binaries are then put in releasei386.
+
+Known Bugs
+------------
+
+
+Makefile options:
+-----------------
+(quake2 and gamei386.so are always built, but the following options can be
+ changed by editing the Makefile)
+BUILD_SDLQUAKE2		Build sdlquake2, a quake2 binary that uses SDL for
+                        CD audio and sound access (default = YES).
+BUILD_SVGA              Build ref_soft.so, a quake2 video driver that uses
+                        SVGAlib (default = NO).
+BUILD_X11               Build ref_softx.so, a quake2 video driver that uses
+                        X11 (default = YES).
+BUILD_GLX               Build ref_glx.so, a quake2 video driver that uses
+                        X11's GLX (default = YES).
+BUILD_FXGL              Build ref_gl.so [might be renamed to fxgl later], 
+                        a quake2 video driver that uses fxMesa (default =
+                        NO).  This option is currently untested because I do 
+                        not have a Voodoo 1 or 2.
+BUILD_SDL               Build ref_softsdl.so, a quake2 video driver that
+                        uses SDL (default = YES).
+BUILD_SDLGL             Build ref_sdlgl.so, a quake2 video driver that uses
+                        OpenGL with SDL (default = YES).
+BUILD_CTFDLL            Build the Threewave CTF gamei386.so (default = NO).
+BUILD_XATRIX            Build the Xatrix gamei386.so for the "The Reckoning"
+                        Mission Pack (default = NO). [see notes below]
+BUILD_ROGUE             Build the Rogue gamei386.so for the "Ground Zero"
+                        Mission Pack (default = NO). [see notes below]
+HAVE_IPV6		Build quake2 with IPv6 support (currently only
+                        tested on FreeBSD, see below for info) (default = NO).
+BUILD_JOYSTICK		Build quake2 with support for SDL and Linux joysticks,
+			[default = YES].
+BUILD_ARTS		Build support for the aRts sound system 
+			(src/linux/snd_arts.c) [default = NO]
+BUILD_ALSA		Build support for the ALSA sound system [default = NO]
+BUILD_DEDICATED		Build the quake 2 dedicated server q2ded.
+BUILD_QMAX		Build the eye-candy oriented Quame2 Max (see below)
+BUILD_AA		Build the aalib text mode renderer.
+BUILD_RETEXTURE		Build support for retextured textures, see:
+http://http://3d.kicks-ass.net/texturepaks/
+
+To install the Quake2 demo data:
+--------------------------------
+(installdir is whereever you want to install quake2)
+1. download ftp://ftp.idsoftware.com/idstuff/quake2/q2-314-demo-x86.exe
+2. unzip -L q2-314-demo-x86.exe into a temp directory
+3. cp baseq2/pak0.pak to <installdir>/baseq2/pak0.pak
+
+Continue with the "To Install This Program" directions bellow
+
+To install the Quake2 gamedata from game CD:
+-------------------------------
+(installdir is wherever you want to install quake2, and cdromdir is wherever
+you mount the Quake 2 CD-ROM)
+1. copy <cdromdir>/Install/Data/baseq2/pak0.pak to <installdir>/baseq2/
+2. copy <cdromdir>/Install/Data/baseq2/video/ to <installdir>/baseq2/
+   (optional)
+3. download q2-3.20-x86-full.exe from
+   ftp://ftp.idsoftware.com/idstuff/quake2/ or a mirror site, and extract the 
+   contents to a temporary directory (use unzip -L, as this is a standard zip
+   file).
+4. copy <q2-3.20-x86-full.exe temp directory>/baseq2/pak1.pak to
+   <installdir>/baseq2/
+5. copy <q2-3.20-x86-full.exe temp directory>/baseq2/pak2.pak to
+   <installdir>/baseq2/
+6. copy <q2-3.20-x86-full.exe temp directory>/baseq2/players/ to 
+   <installdir>/baseq2/
+7. if you really want to use the crakhor model, you can find the
+   skins/sounds on websites like http://www.mike-d.com/games/modskins.html
+   (optional)
+
+To install this program:
+------------------------
+(builddir is either debugi386 or releasei386)
+0. edit Makefile if needed, then 'make'
+1. copy <builddir>/gamei386.so to <installdir>/baseq2/
+2. copy <builddir>/ref_*.so to <installdir>
+3. copy <builddir>/quake2 to <installdir>
+4. copy <builddir>/sdlquake2 to <installdir> (optional)
+5. copy <builddir>/ctf/gamei386.so to <installdir>/ctf/ (optional)
+
+To install the "The Reckoning" Mission Pack (Xatrix):
+-----------------------------------------------------
+(cdromdir is wherever you mount The Reckoning CD-ROM)
+1. enable BUILD_XATRIX in Makefile
+2. download xatrixsrc320.shar.Z from
+   ftp://ftp.idsoftware.com/idstuff/quake2/source/ or a mirror site, extract
+   it (it's a compressed shell script) and place the contents in 
+   <quake2-rX.X.X>/src/xatrix/
+3. make
+4. copy <builddir>/xatrix/gamei386.so to <installdir>/xatrix/
+5. copy <cdromdir>/Data/all/pak0.pak to <installdir>/xatrix/
+6. copy <cdromdir>/Data/max/xatrix/video/ to <installdir>/xatrix/ (optional)
+7. when starting quake2, use "+set game xatrix" on the command line
+
+To install the "Ground Zero" Mission Pack (Rogue):
+--------------------------------------------------
+(cdromdir is wherever you mount the Ground Zero CD-ROM)
+1. enable BUILD_ROGUE in Makefile
+2. download roguesrc320.shar.Z from
+   ftp://ftp.idsoftware.com/idstuff/quake2/source or a mirror site, extract
+   it (it's a compressed shell script) and place the contents in
+   <quake2-rX.X.X>/src/rogue/
+3. make
+4. if the compilation fails, change line 31 of src/rogue/g_local.h from:
+#define _isnan(a) ((a)==NAN)
+   to:
+#define _isnan(a) isnan(a)
+   and try again.
+4.5 if the compilation fails on the include, change #include <nan.h> to 
+#include <bits/nan.h>
+5. copy <builddir>/rogue/gamei386.so to <installdir>/rogue/
+6. copy <cdromdir>/Data/all/pak0.pak to <installdir>/rogue/
+7. copy <cdromdir>/Data/max/Rogue/video/ to <installdir>/rogue/ (optional)
+8. when starting quake2, use "+set game rogue" on the command line
+
+To Build Quake2 Max.
+-------------------
+Quake2 Max is a set of GL improvements to the Quake2 source base by
+psychospaz, <http://modscape.telefragged.com/q2max/> the 0.25 version
+has been merged into the Quake2 for Linux source tree.  To build the 
+added visual candy:
+1. make clean
+2. set BUILD_QMAX to YES in the makefile
+3. make
+
+You will also need to download http://www.icculus.org/quake2/files/maxpak.pak
+and place it in your quake2/baseq2 directory.
+
+Please note that the resulting Quake2 binaries and video drivers are 
+incompatible with binaries and drivers built with BUILD_QMAX set to NO.
+
+For right now, the driver gets built as ref_glx.so and ref_sdlgl.so.  
+In the future this will change so that both drivers can be build in parallel.
+
+
+AALib Video Driver
+------------------
+The AALib video driver is written by jfedor@jfedor.org it provides text 
+rendering for Quake2.  It requires the aalib package to build, which is
+available at http://aa-project.sourceforge.net.
+
+Retexturing Support
+------------------
+There has been an effort to retexture Quake2 with 24-bit textures to replace
+8-bit ones.  The resulting textures look *good* but take up more space and
+makes quake2 run slower.  
+
+If you wish to run retextured quake2 you need to download pak1x (currently 0-6) from  http://3d.kicks-ass.net/texturepaks/
+
+Thanks to Karen Pouelle for the code to support this.
+
+To run:
+-------
+cd <installdir> && ./quake2
+Or:
+quake2 +set basedir <installdir>
+
+Add +set game <moddir> to load a mod (like the mission packs).
+
+/etc/quake2.conf is no longer used; instead, the ref_*.so files are loaded
+from basedir (basedir is "." by default, and can only be set at the command
+line).
+
+Configuration files and such are saved in ~/.quake2/, so <installdir> can be
+made read-only or whatever.
+
+WARNING: Please do not make quake2 or any of the libraries suid root!  Doing
+so is at your own risk.
+
+NOTE: Save games will not work across different versions or builds, because
+of the way they are stored.
+
+
+Binary-Only Mods:
+-----------------
+Chances are that they will not work.  I suspect that it has something to do
+with the mods being built with older versions of gcc/glibc2.  EraserBot, for
+example, has source available except for one file, p_trail.o.  Trying to
+use an EraserBot gamei386.so results in a crash somewhere inside p_trail.o.
+
+Dedicated Server:
+-----------------
+Dedicated Server support has been added (thanks to Wesley Bear) just modify 
+the Makefile so that BUILD_DEDICATED=YES (default NO) that should build a 
+q2ded binary in the release directory.
+
+CTF Server:
+-----------
+To run Capture The Flag, you need to do the following:
+1) download q2-3.20-x86-full-ctf.exe from 
+ftp://ftp.idsoftware.com/idstuff/quake2
+2) unzip that file (using unzip -L) in a temp directory
+3) copy ctf to <installdir>/ctf
+4) build the ctf shared library (BUILD_CTF=YES in the Makefile)
+5) cp releas<arch>/ctf/game<arch>.so to <installdir>/ctf/game<arch>.so
+6) quake2 +set game ctf +set dedicated 1
+7) on the console enter "map Q2CTF1" that will load up the first ctf
+map, then connect using a client with multi-player.  For the other maps use
+Q2CTF2, etc.
+
+*Note if you are using the demo version and not the full version, some
+textures are missing from the CTF levels*
+
+IPv6 Support:
+-------------
+Currently experimental, so it may or may not work.  Here is some information
+about it from Florent Parent:
+
+quake2 +set dedicated 1
+        Runs server listening on both IPv4 and IPv6 sockets
+
+quake2 +set dedicated 1 +set multicast <interface>
+        IPv6 server joins quake2 multicast group ff12::666
+
+quake2 +set dedicated 1 +set ip <IPv6 address> +set multicast <interface>
+        IPv6 server only. Listens on <IPv6 address>
+        Examples of <IPv6 address>:
+        3ffe:b00:c18::666              (global IPv6 address)
+        fe80::202:b3ff:fe04:1234%fxp0  (link-local address. scope required)
+        ::                             (unspecified, binds on all IPv6 
+                                        addresses)
+quake2 +set dedicated 1 +set ip <IPv4 address>
+        IPv4 server only. Listens on <IPv4 address>
+        0.0.0.0 can be used to bind on all IPv4 addresses
+
+Joystick Support:
+-----------------
+***Important note**** 
+5/12/04
+The joystick code has been modified to be more in line
+with the joystick functionality detailed in src/docs/joystick.txt
+*********************
+
+Joystick should function on all compatible SDL platforms using the sdlquake2
+binary as well as on linux using the linux kernel joystick API.  If you want
+to build with joystick support (the default) set BUILD_JOYSTICK to YES in
+the Makefile.  
+
+Have a look at src/docs/joystick.txt for the details
+
+There is a single linux specific option: 
+	* joy_dev : this sets the device name of the joystick to use (/dev/js*)
+
+
+Windows Support:
+----------------
+In order to compile the source:
+
+If you don't already have it, you'll need to download:
+http://oss.sgi.com/projects/ogl-sample/ABI/glext.h
+
+Commonly used commands:
+-----------------------
+cd_nocd 0               // disable CD audio
+s_initsound 0           // disable sound
+_windowed_mouse 0       // disable mouse-grabbing
+gl_ext_multitexture 0   // disable OpenGL Multitexturing (requires a
+                           vid_restart)
+vid_ref <driver>        // select a video driver (softx is the original
+                           X11-only, softsdl is SDL software, sdlgl is 
+                           SDL OpenGL)
+vid_fullscreen 0        // disable fullscreen mode
+vid_restart             // restart video driver
+snd_restart             // restart sound driver
+basedir <dir>           // point quake2 to where the data is
+gl_driver <libGL.so>    // point quake2 to your libGL
+dedicated 1             // run quake2 as a dedicated server
+game <subdir>           // load the quake2 mod in that directory
+sensitivity <int>       // Adjust the sensivity (accelleration) of the mouse.
+crosshair <int>		// Choose your crosshair [1-3] Normal [1-9] Q2Max
+crosshair_scale <int>   // Scale your crosshair (Q2Max only for now...)
+skydistance <int>	// Modify the skybox distance (useful for large maps)
+
+When using these commands on the quake2 command line, use +set to cause the
+variables be set before the config files are loaded (important for
+gl_driver). e.g.
+./quake2 +set vid_ref glx +set gl_driver /usr/lib/libGL.so.1
+Note that variables like basedir and game _require_ using +set to ensure
+the desired functionality.
+
+If quake2 crashes when trying to load an OpenGL based driver (glx, sdlgl),
+make sure its not loading the wrong libGL.
+
+Have a NVIDIA card and it _still_ crashes? Try 
+export LD_PRELOAD=/usr/lib/libGL.so, and run quake2 again.
+
+Is lighting slow in OpenGL (while firing, explosions, etc.)? Disable
+multitexturing (gl_ext_multitexture 0; vid_restart).
+
+More information can be found in src/docs/.
+
+Known Bugs and Workarounds:
+---------------------------
+FAQ:
+----
+Q: Quake2 crashes when starting a new game.
+A: It's most likely that the gamei386.so was not installed correctly.
+   Do not use the version that comes with the 3.20 release!  See the
+   installation instructions above.
+
+Q: Quake2 doesn't want to load mods correctly with +game.
+A: Use +set game.
+
+Q: ErasorBot doesn't work.
+A: Not all the source was released for ErasorBot.  See explanation above.
+
+Website:
+--------
+I'll post any updates I make at http://www.icculus.org/quake2/ 
+
+Mailing List and Contact:
+-------------------------
+to subscribe: send a blank email to quake2-subscribe@icculus.org
+to post: send email to quake2@icculus.org
+
+SVN access:
+---------------------
+svn co svn://svn.icculus.org/quake2/trunk/ quake2
+
+Bugzilla:
+---------
+https://bugzilla.icculus.org
+
+TODO:
+-----
+Fix save games.
+Verify that FXGL works.
+Fullscreen/DGA support in X11 driver.
+Make a list of tested mods.
+Make Q2 as Arch/OS independent as possible.
+
+Many Thanks to all these people:
+--------------------------------
+John Allensworth
+Stephen Anthony
+William Aoki
+Michele Balistreri
+Wesley Bear
+Robert Bäuml
+Vincent Cojot
+Michel Dänzer
+Jay Dolan (ALSA Support)
+Ryan C. Gordon
+Angelo Grossini
+Nicolai Haehnle
+Thijmen Klok
+Hampton Maxwell
+Ludwig Nussel
+Peter van Paassen
+Florent Parent
+Victor Shkamerda
+Zachary 'zakk' Slater
+Matti Valtonen
+Rusty Mellinger
+Karen Pouelle
+Toni Spets
+Nicolas Regnault
+Nick Warne
+
+v 0.17 [??/??/??]
+Added skybox cvar (Nick Warne)
+Fixed ALSA Support (Jay Dolan)
+
+v 0.16 [09/13/04]
+Load more pakfiles [Toni Spets]
+Load bigger PCX images [Toni Spets]
+Railgun easter egg bug fixed [Nick Warne]
+Preliminary x86_64 support [Nicolas Regnault]
+Red/Blue 3D support <http://www.jfedor.org>
+Retexturing support (thanks to Karen Pouelle)
+Better FreeBSD support (thanks to /danfe)
+Added ALSA sound support
+Advanced Joystick Support
+Some miscelaneous fixes which I've forgotten about
+
+
+v 0.15 [10/08/02]
+Solaris updates from Vincent
+TiBook and Vaio video modes
+Stencil Shadows in non-quake2-max
+Spark o' death bug fixed (thanks to Rusty Mellinger!)
+Crosshair scale support for q2-max
+
+v 0.14 [9/5/02]
+Massive Solaris updates including packaging code [Vincent Cojot]
+Explosions are back after Brendan accidentally removed them in 0.13
+
+v 0.13: [7/10/02]
+-----
+Added Quake2-Max GL extensions <http://modscape.telefragged.com/q2max/>
+Added aalib video renderer <http://www.jfedor.org/>
+
+v 0.12: [6/11/02]
+-----
+Added Joystick support to GLX, start migration to unified X event handling
+Modified video driver selection to reflect drivers actually present (Stephen 
+Anthony)
+
+v 0.11: [5/10/02]
+-----
+Added dedicated server support [Wesley Bear]
+Fixed a bug in key repeat handling under X11.
+Added gamma adjustment on the fly [Victor Shkamerda]
+Added aRts sound support [Michele Balistreri]
+
+v 0.10: [4/01/02] (no fooling...)
+-----
++ Extensive improvments to Solaris support (thanks to Vincent Cojot!)
++ Joystick support
++ Fixed R_CON_PASSWORD server security hole.
+
+v0.9: [03/10/02]
+-----
++ X selection support (softx/glx only).
++ Mouse Wheel support (softx/glx).
++ CD Audio fixes. (W.P. van Paassen)
++ Swapped SDL buttons 2/3 to be correct.
++ Big Gun+save game crash fixed.
++ FreeBSD support (Hampton Maxwell).
++ Mouse buttons 4/5 supported (sdl only). (Angelo Grossini)
++ IPv6 support. (Florent Parent)
++ Documentation updates.
+
+v0.0.8: [01/04/02]
+-------
++ Fixed C-only ref_soft building.
++ SDL CD audio looping fix (Robert Bäuml)
++ ~/.quake2/<game> added to the search path for mods. (Ludwig Nussel)
++ Minor change to fix compilation with OpenGL 1.3 headers.
++ Fixed changing video drivers using the menu.
++ Fixed autoexec.cfg on startup.
++ Sparc Linux support (Vincent Cojot)
+
+v0.0.7: [12/28/01]
+-------
++ Merged in Quake2 3.21 source.
+
+v0.0.6: [12/27/01]
+-------
++ Made Makefile somewhat easier to configure.
++ X11 GLX driver now included.
++ Added "ctrl-g" (toggle mouse grab) and "alt-enter" (toggle fullscreen)
+  to SDL drivers.
++ SDL audio and cdrom support. (Robert Bäuml)
++ ~/.quake2/ support (Stephen Anthony, Ludwig Nussel)
++ LinuxPPC support (William Aoki)
+
+v0.0.5: [12/23/01]
+-------
++ Better SDL de/initialization (fixes crashes for some people).
++ Removed trailing '\r's from files; removed a few files.
+
+v0.0.4: [12/23/01]
+-------
++ Mouse Wheel (SDL buttons 4 and 5).
++ Fixed bug with changing the sound options in game (using the menus).
++ Fixed Makefile to build both build_debug and build_release by default.
+
+v0.0.3: [12/22/01]
+-------
++ Fixed the texture wrapping with movies.
++ Enabled the OpenGL extensions under Linux.
++ Added support for GL_ARB_multitexture.
+
+v0.0.2: [12/22/01]
+-------
++ Added ref_sdlgl.so (SDL OpenGL Renderer).
++ v0.0.1 Bugfixes.
+
+v0.0.1: [12/22/01]
+-------
++ Updates to Linux Makefile (it was missing a few files).
++ Added ref_softsdl.so (Software SDL Renderer).
+- OpenGL not yet supported.

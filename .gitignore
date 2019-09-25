@@ -1,52 +1,47 @@
-# Prerequisites
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows shortcuts
+*.lnk
+
+# build files
+*.o
 *.d
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
+#binaries
 *.so
-*.so.*
-*.dylib
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+#libs
+*.a
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+#files created by build
+*.apk
+*.ap_
+*.class
+projects/Android/build/*
+assets/oculussig*
+Projects/Android/.externalNativeBuild/ndkBuild/debug/arm64-v8a/android_gradle_build.json
+*.json
+Projects/Android/.externalNativeBuild/ndkBuild/debug/arm64-v8a/ndkBuild_build_command.txt
+Projects/Android/.externalNativeBuild/ndkBuild/debug/arm64-v8a/ndkBuild_build_output.txt
+Projects/Android/.externalNativeBuild/ndkBuild/release/arm64-v8a/ndkBuild_build_command.txt
+Projects/Android/.externalNativeBuild/ndkBuild/release/armeabi-v7a/ndkBuild_build_output.txt
+*.bin
+Projects/Android/.gradle/4.4/fileHashes/fileHashes.lock
+*.ser
+Projects/Android/.idea/codeStyles/Project.xml
+*.xml
+Projects/Android/.externalNativeBuild/ndkBuild/debug/armeabi-v7a/ndkBuild_build_command.txt
+Projects/Android/.externalNativeBuild/ndkBuild/release/armeabi-v7a/ndkBuild_build_command.txt
+Projects/Android/.externalNativeBuild/ndkBuild/debug/armeabi-v7a/ndkBuild_build_output.txt
+Projects/Android/.externalNativeBuild/ndkBuild/release/arm64-v8a/ndkBuild_build_output.txt
+Projects/Android/.gradle/4.6/fileHashes/fileHashes.lock
+Projects/Android/.gradle/vcsWorkingDirs/gc.properties
+drbeef-release-key.keystore

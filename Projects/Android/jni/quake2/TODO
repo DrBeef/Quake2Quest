@@ -1,0 +1,2 @@
+Bugs:
+* In  SDL Mode, Switching resolutions loses the joystick.
