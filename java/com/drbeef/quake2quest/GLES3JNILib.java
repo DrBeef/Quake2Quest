@@ -4,6 +4,8 @@ package com.drbeef.quake2quest;
 import android.app.Activity;
 import android.view.Surface;
 
+import java.nio.ByteBuffer;
+
 // Wrapper for native library
 
 public class GLES3JNILib
@@ -20,4 +22,7 @@ public class GLES3JNILib
 	public static native void onSurfaceCreated( long handle, Surface s );
 	public static native void onSurfaceChanged( long handle, Surface s );
 	public static native void onSurfaceDestroyed( long handle );
+
+	//Audio
+	public static native int Quake2PaintAudio( ByteBuffer buf );
 }

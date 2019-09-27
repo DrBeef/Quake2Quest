@@ -1325,43 +1325,12 @@ void SCR_UpdateScreen (void)
 	** brain  Dont do that... i know what i am up to
 	*/
 
-/*
-#ifdef REDBLUE
-	if ( cl_stereo_separation->value > 10.0 )
-		Cvar_SetValue( "cl_stereo_separation", 10.0 );
-#else
-	if ( cl_stereo_separation->value > 1.0 )
-		Cvar_SetValue( "cl_stereo_separation", 1.0 );
-#endif
-	else if ( cl_stereo_separation->value < 0 )
-		Cvar_SetValue( "cl_stereo_separation", 0.0 );
-*/
-
-
-
-
-#ifdef REDBLUE
-	if ( !cl_stereo->value )
-	  Cvar_SetValue( "cl_stereo", 1 );
 
 
 	numframes = 2;
-	separation[0] = -cl_stereo_separation->value / 2.0;
-	separation[1] =  cl_stereo_separation->value / 2.0;
-#else
-	if ( cl_stereo->value )
-	{
-		numframes = 2;
-		separation[0] = -cl_stereo_separation->value / 2;
-		separation[1] =  cl_stereo_separation->value / 2;
-	}
-	else
-	{
-		separation[0] = 0;
-		separation[1] = 0;
-		numframes = 1;
-	}
-#endif
+	separation[0] = -1.3f;
+	separation[1] =  1.3f;
+
 	for ( i = 0; i < numframes; i++ )
 	{
 	  re.BeginFrame( separation[i] );
@@ -1501,11 +1470,8 @@ void SCR_UpdateForEye (int eye)
 		return;				// not initialized yet
 
 
-	//TODO: Replace with world scale
-    float sep = -3.5;
-    separation = (sep / 2) * (1 - (2*eye));
-    //separation = (cl_stereo_separation->value / 2) * (1 - (2*eye));
-
+	//World scale based separation
+	separation = ((-vr_worldscale->value * 0.065f) / 2) * (1 - (2*eye));
 
 	re.BeginFrame( separation );
 

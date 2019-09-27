@@ -1327,6 +1327,13 @@ void VR_Init()
     vr_height_adjust = Cvar_Get( "vr_height_adjust", "0.0", CVAR_ARCHIVE);
     vr_flashlight_model = Cvar_Get( "vr_flashlight_model", "1", CVAR_ARCHIVE);
 	vr_mirror_weapons = Cvar_Get( "vr_mirror_weapons", "0", CVAR_ARCHIVE);
+
+    //The Engine (which is a derivative of Quake) uses a very specific unit size:
+    //Wolfenstein 3D, DOOM and QUAKE use the same coordinate/unit system:
+    //8 foot (96 inch) height wall == 64 units, 1.5 inches per pixel unit
+    //1.0 pixel unit / 1.5 inch == 0.666666 pixel units per inch
+    //This make a world scale of: 26.2467
+	vr_worldscale = Cvar_Get( "vr_worldscale", "26.2467", CVAR_ARCHIVE);
 }
 
 void * AppThreadFunction( void * parm )
@@ -1905,3 +1912,21 @@ JNIEXPORT void JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onSurfaceDestroye
 	ANativeWindow_release( appThread->NativeWindow );
 	appThread->NativeWindow = NULL;
 }
+
+/*************************
+ * Audio stuff
+ *************************/
+
+JNIEXPORT jint JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_Quake2PaintAudio( JNIEnv* env, jobject thiz, jobject buf )
+{
+	extern int paint_audio (void *unused, void * stream, int len);
+
+	void *stream;
+	int len;
+
+	stream = (*env)->GetDirectBufferAddress( env,  buf);
+	len = (*env)->GetDirectBufferCapacity( env,  buf);
+
+	return paint_audio ( NULL, stream, len );
+}
+

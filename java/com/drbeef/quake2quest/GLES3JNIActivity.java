@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -17,7 +18,11 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -47,7 +52,7 @@ import android.support.v4.content.ContextCompat;
 	private SurfaceHolder mSurfaceHolder;
 	private long mNativeHandle;
 
-	private final boolean m_asynchronousTracking = false;
+	private boolean please_exit = false;
 	
 	@Override protected void onCreate( Bundle icicle )
 	{
@@ -210,6 +215,57 @@ import android.support.v4.content.ContextCompat;
 	}
 
 
+	private static Object quake2Lock = new Object();
+
+	private static int sQuake2PaintAudio( ByteBuffer buf ){
+		int ret;
+		synchronized(quake2Lock) {
+			ret = GLES3JNILib.Quake2PaintAudio(buf);
+		}
+		return ret;
+	}
+
+	/*----------------------------
+	 * Audio
+	 *----------------------------*/
+
+	public void audio_thread() throws IOException{
+
+		int audioSize = (2048*4);
+
+		ByteBuffer audioBuffer = ByteBuffer.allocateDirect(audioSize);
+
+		byte[] audioData = new byte[audioSize];
+
+		int sampleFreq = 22050;
+		AudioTrack oTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleFreq,
+				AudioFormat.CHANNEL_OUT_STEREO,
+				AudioFormat.ENCODING_PCM_16BIT,
+				AudioTrack.getMinBufferSize(sampleFreq, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT),
+				AudioTrack.MODE_STREAM);
+
+		Log.i("Quake2", "start audio");
+
+		// Start playing data that is written
+		oTrack.play();
+
+		long tstart = SystemClock.uptimeMillis();
+
+		while (!please_exit){
+
+			sQuake2PaintAudio( audioBuffer );
+
+			audioBuffer.position(0);
+			audioBuffer.get(audioData);
+
+			// Write the byte array to the track
+			oTrack.write(audioData, 0, audioData.length);
+		}
+
+		// Done writing to the track
+		oTrack.stop();
+	}
+
 	@Override protected void onStart()
 	{
 		Log.v( TAG, "GLES3JNIActivity::onStart()" );
@@ -237,6 +293,7 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onStop()" );
 		GLES3JNILib.onStop( mNativeHandle );
+		please_exit = true;
 		super.onStop();
 	}
 
@@ -251,6 +308,8 @@ import android.support.v4.content.ContextCompat;
 
 		GLES3JNILib.onDestroy( mNativeHandle );
 
+		please_exit = true;
+
 		super.onDestroy();
 		mNativeHandle = 0;
 	}
@@ -262,6 +321,16 @@ import android.support.v4.content.ContextCompat;
 		{
 			GLES3JNILib.onSurfaceCreated( mNativeHandle, holder.getSurface() );
 			mSurfaceHolder = holder;
+
+			//Start Audio Thread
+			new Thread( new Runnable(){
+				public void run() {
+					try {
+						audio_thread();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}}).start();
 		}
 	}
 
