@@ -1,9 +1,7 @@
 Quake2Quest
 ==========
 
-Welcome to the first (and only I think!) 6DoF implementation of the Quake2 Engine, using DarkPlaces as a base for this port.
-
-I am quite pleased with how this has turned out. Getting this to work as a 6DoF game was a bit of a faff, and it isn't perfect (see known issues), but I think you'll agree it's good enough and also very good fun to play.
+Welcome to the first (and only I think!) 6DoF implementation of the Quake 2 Engine
 
 The easiest way to install this on your Quest is using SideQuest, a Desktop app designed to simplify sideloading apps and games ( even beat saber songs on quest ) on Standalone Android Headsets like Oculus Quest and Oculus Go. It supports drag and drop for installing APK files!
 
@@ -42,16 +40,6 @@ Controls:
 * Grip Buttons - Switch next/previous weapon
 * Right-thumbstick click change the laser-sight mode 
 
-Inputting Text:
----------------
-
-- Press Y to bring up the "keyboard" and Y again to exit text entry mode
-- Push left or right thumbstick to select the character in that location in the little diagram, selected character is shown for left right controller below the character layout diagram
-- Press grip trigger on each controller to cycle through the available characters for that controller
-- Press X to toggle SHIFT on and off
-- Press Trigger on the appropriate controller to type the selected character (or select center character if no thumbstick direction is pushed)
-- Press B to Delete characters
-- Press A for Enter/Return
 
 
 Things to note / FAQs:
