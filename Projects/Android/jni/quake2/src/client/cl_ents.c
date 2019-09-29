@@ -1356,10 +1356,6 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 	if (!cl_gun->value)
 		return;
 
-	// don't draw gun if in wide angle view
-	if (ps->fov > 90)
-		return;
-
 	memset (&gun, 0, sizeof(gun));
 
 	if (gun_model)
@@ -1372,11 +1368,14 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 	// set up gun position
 	for (i=0 ; i<3 ; i++)
 	{
-		gun.origin[i] = cl.refdef.vieworg[i] + ops->gunoffset[i]
+		gun.origin[i] = cl.refdef.vieworg[i] + ps->gunoffset[i];
+		gun.angles[i] = ps->gunangles[i];
+
+/*		gun.origin[i] = cl.refdef.vieworg[i] + ops->gunoffset[i]
 			+ cl.lerpfrac * (ps->gunoffset[i] - ops->gunoffset[i]);
 		gun.angles[i] = cl.refdef.viewangles[i] + LerpAngle (ops->gunangles[i],
 			ps->gunangles[i], cl.lerpfrac);
-	}
+*/	}
 
 	if (gun_frame)
 	{

@@ -41,7 +41,7 @@ vec3_t positionDeltaThisFrame;
 #define ADJUSTED 0
 #define UNADJUSTED 1
 #define MELEE 2
-vec3_t weaponangles[3];
+vec3_t weaponangles;
 vec3_t weaponoffset;
 vec3_t weaponvelocity;
 

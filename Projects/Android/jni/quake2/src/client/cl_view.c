@@ -520,6 +520,12 @@ V_RenderView
 
 ==================
 */
+
+extern vec3_t hmdPosition;
+extern cvar_t *vr_worldscale;
+
+#define QUAKE_MARINE_HEIGHT   1.57
+
 void V_RenderView( float stereo_separation )
 {
 
@@ -574,6 +580,11 @@ void V_RenderView( float stereo_separation )
 		  VectorAdd( cl.refdef.vieworg, tmp, cl.refdef.vieworg );
 		}
 
+        //subtract standard height of player
+        cl.refdef.vieworg[2] -= (QUAKE_MARINE_HEIGHT * vr_worldscale->value);
+        //add player actual real world height
+        cl.refdef.vieworg[2] += (hmdPosition[1] * vr_worldscale->value);
+
 		// never let it sit exactly on a node line, because a water plane can
 		// dissapear when viewed with the eye exactly on it.
 		// the server protocol only specifies to 1/8 pixel, so add 1/16 in each axis
@@ -626,7 +637,7 @@ void V_RenderView( float stereo_separation )
 	SCR_AddDirtyPoint (scr_vrect.x+scr_vrect.width-1,
 		scr_vrect.y+scr_vrect.height-1);
 
-	SCR_DrawCrosshair (stereo_separation );
+	//SCR_DrawCrosshair (stereo_separation );
 }
 
 

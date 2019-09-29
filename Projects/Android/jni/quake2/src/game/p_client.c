@@ -1572,36 +1572,37 @@ void PrintPmove (pmove_t *pm)
 vec3_t origin_b;
 vec3_t angles_b;
 
-extern vec3_t weaponangles[3];
+extern vec3_t weaponangles;
 extern vec3_t weaponoffset;
 
-static void SV_SetWeapon_ClientOrigin(edict_t *ent)
+extern cvar_t *vr_worldscale;
+
+static void convertFromVRtoQ2(vec3_t in, vec3_t out)
+{
+    vec3_t vrSpace;
+    VectorSet(vrSpace, -in[2], in[0], in[1]);
+    VectorScale(vrSpace, vr_worldscale->value, out);
+    out[2] += 16;
+}
+
+static void SV_SetWeapon_Client6DOF(edict_t *ent)
 {
 	//Backup origin
 	VectorCopy(ent->s.origin, origin_b);
-	VectorCopy(ent->s.angles, angles_b);
+	VectorCopy(ent->client->v_angle, angles_b);
 
-/*	//Check gun origin validity
-	for (int i = 0; i < 3; ++i)
-	{
-		//Check for valid number
-		if (PRVM_IS_NAN(gunorg[i]) || (fabsf(gunorg[i]) > 1000000.0f)) {
-			Con_Printf("Got a NaN origin for weapon on entity #%i (%s)\n", PRVM_NUM_FOR_EDICT(ent),
-					   PRVM_GetString(prog, PRVM_serveredictstring(ent, classname)));
-
-			//Just drop out, normal origin will be used in this case
-			return;
-		}
-	}
-*/
-	VectorAdd(weaponoffset, ent->s.origin, ent->s.origin);
-	VectorCopy(weaponangles[0], ent->s.angles); // use adjusted angles
+	vec3_t origin;
+	vec3_t offset;
+    convertFromVRtoQ2(weaponoffset, offset);
+	VectorCopy(ent->s.origin, origin);
+	VectorAdd(offset, origin, ent->s.origin);
+	VectorCopy(weaponangles, ent->client->v_angle); // use adjusted angles
 }
 
-static void SV_Restore_ClientOrigin(edict_t *ent)
+static void SV_Restore_Client6DOF(edict_t *ent)
 {
 	VectorCopy(origin_b, ent->s.origin);
-	VectorCopy(angles_b, ent->s.angles);
+	VectorCopy(angles_b, ent->client->v_angle);
 }
 
 /*
@@ -1766,11 +1767,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		} else if (!client->weapon_thunk) {
 			client->weapon_thunk = true;
 
-			SV_SetWeapon_ClientOrigin(ent);
+			SV_SetWeapon_Client6DOF(ent);
 
 			Think_Weapon (ent);
 
-			SV_Restore_ClientOrigin(ent);
+			SV_Restore_Client6DOF(ent);
 		}
 	}
 
@@ -1823,11 +1824,11 @@ void ClientBeginServerFrame (edict_t *ent)
 
 	// run weapon animations if it hasn't been done by a ucmd_t
 	if (!client->weapon_thunk && !client->resp.spectator) {
-		SV_SetWeapon_ClientOrigin(ent);
+		SV_SetWeapon_Client6DOF(ent);
 
 		Think_Weapon (ent);
 
-		SV_Restore_ClientOrigin(ent);
+		SV_Restore_Client6DOF(ent);
 	}
 	else
 		client->weapon_thunk = false;

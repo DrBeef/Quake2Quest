@@ -238,11 +238,11 @@ void SV_CalcViewOffset (edict_t *ent)
 	{
 		VectorClear (angles);
 
-		ent->client->ps.viewangles[ROLL] = 40;
-		ent->client->ps.viewangles[PITCH] = -15;
+		ent->client->ps.viewangles[ROLL] = 0;
+		ent->client->ps.viewangles[PITCH] = 0;
 		ent->client->ps.viewangles[YAW] = ent->client->killer_yaw;
 	}
-	else
+/*	else
 	{
 		// add angles based on weapon kick
 
@@ -287,7 +287,7 @@ void SV_CalcViewOffset (edict_t *ent)
 		if (bobcycle & 1)
 			delta = -delta;
 		angles[ROLL] += delta;
-	}
+	}*/
 
 //===================================
 
@@ -312,11 +312,11 @@ void SV_CalcViewOffset (edict_t *ent)
 	if (bob > 6)
 		bob = 6;
 	//gi.DebugGraph (bob *2, 255);
-	v[2] += bob;
+	//v[2] += bob;
 
 	// add kick offset
 
-	VectorAdd (v, ent->client->kick_origin, v);
+	//VectorAdd (v, ent->client->kick_origin, v);
 
 	// absolutely bound offsets
 	// so the view can never be outside the player box
@@ -337,6 +337,27 @@ void SV_CalcViewOffset (edict_t *ent)
 	VectorCopy (v, ent->client->ps.viewoffset);
 }
 
+
+extern cvar_t *vr_worldscale;
+extern vec3_t weaponangles;
+extern vec3_t weaponoffset;
+
+static void convertFromVRtoQ2(vec3_t in, vec3_t out)
+{
+	vec3_t vrSpace;
+	VectorSet(vrSpace, -in[2], in[0], in[1]);
+	VectorScale(vrSpace, vr_worldscale->value, out);
+	out[2] += 16;
+}
+
+static void SetWeapon_Client6DOF(edict_t *ent)
+{
+	vec3_t origin;
+	vec3_t offset;
+	convertFromVRtoQ2(weaponoffset, ent->client->ps.gunoffset);
+	VectorCopy(weaponangles, ent->client->ps.gunangles);
+}
+
 /*
 ==============
 SV_CalcGunOffset
@@ -344,7 +365,7 @@ SV_CalcGunOffset
 */
 void SV_CalcGunOffset (edict_t *ent)
 {
-	int		i;
+/*	int		i;
 	float	delta;
 
 	// gun angles from bobbing
@@ -386,6 +407,9 @@ void SV_CalcGunOffset (edict_t *ent)
 		ent->client->ps.gunoffset[i] += right[i]*gun_x->value;
 		ent->client->ps.gunoffset[i] += up[i]* (-gun_z->value);
 	}
+ */
+
+	SetWeapon_Client6DOF(ent);
 }
 
 

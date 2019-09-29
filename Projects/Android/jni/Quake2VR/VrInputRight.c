@@ -136,9 +136,7 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
 
             //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
             const ovrQuatf quatRemote = rightRemoteTracking_new.HeadPose.Pose.Orientation;
-            QuatToYawPitchRoll(quatRemote, vr_weapon_pitchadjust->value, weaponangles[ADJUSTED]);
-            QuatToYawPitchRoll(quatRemote, 0.0f, weaponangles[UNADJUSTED]);
-            QuatToYawPitchRoll(quatRemote, -30.0f, weaponangles[MELEE]);
+            QuatToYawPitchRoll(quatRemote, vr_weapon_pitchadjust->value, weaponangles);
 
 
             if (vr_weapon_stabilised->value &&
@@ -151,21 +149,12 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles[ADJUSTED], degrees(atanf(y / zxDist)), (cl.viewangles[YAW] - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ADJUSTED][ROLL]);
-                    VectorSet(weaponangles[UNADJUSTED], degrees(atanf(y / zxDist)), (cl.viewangles[YAW] - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[UNADJUSTED][ROLL]);
-                    VectorSet(weaponangles[MELEE], degrees(atanf(y / zxDist)), (cl.viewangles[YAW] - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[MELEE][ROLL]);
+                    VectorSet(weaponangles, degrees(atanf(y / zxDist)), (cl.viewangles[YAW] - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ROLL]);
                 }
             }
             else
             {
-                weaponangles[ADJUSTED][YAW] += (cl.viewangles[YAW] - hmdorientation[YAW]);
-                weaponangles[ADJUSTED][PITCH] *= -1.0f;
-
-                weaponangles[UNADJUSTED][YAW] += (cl.viewangles[YAW] - hmdorientation[YAW]);
-                weaponangles[UNADJUSTED][PITCH] *= -1.0f;
-
-                weaponangles[MELEE][YAW] += (cl.viewangles[YAW] - hmdorientation[YAW]);
-                weaponangles[MELEE][PITCH] *= -1.0f;
+                weaponangles[YAW] += (cl.viewangles[YAW] - hmdorientation[YAW]);
             }
 
             //Use (Action)
@@ -237,7 +226,7 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
             //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
             //player is facing for positional tracking
             float multiplier = vr_positional_factor->value / (cl_forwardspeed->value *
-					((leftTrackedRemoteState_new.Buttons & ovrButton_Trigger) ? /*cl_movespeedkey->value*/ 1.0f : 1.0f));
+					((leftTrackedRemoteState_new.Buttons & ovrButton_Trigger) ? 1.5f : 1.0f));
 
             vec2_t v;
             rotateAboutOrigin(-positionDeltaThisFrame[0] * multiplier,
