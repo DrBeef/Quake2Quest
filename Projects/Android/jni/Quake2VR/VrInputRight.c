@@ -106,7 +106,7 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
 
 			{
 				vec2_t v;
-				rotateAboutOrigin(weaponoffset[0], weaponoffset[2], -(cl.viewangles[YAW] - hmdorientation[YAW]), v);
+				rotateAboutOrigin(-weaponoffset[0], weaponoffset[2], (cl.refdef.viewangles[YAW] - hmdorientation[YAW]), v);
 				weaponoffset[0] = v[0];
 				weaponoffset[2] = v[1];
 
@@ -123,7 +123,7 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
 
 			{
 				vec2_t v;
-				rotateAboutOrigin(weaponvelocity[0], weaponvelocity[2], -cl.viewangles[YAW], v);
+				rotateAboutOrigin(-weaponvelocity[0], weaponvelocity[2], (cl.refdef.viewangles[YAW] - hmdorientation[YAW]), v);
 				weaponvelocity[0] = v[0];
 				weaponvelocity[2] = v[1];
 
@@ -137,6 +137,8 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
             //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
             const ovrQuatf quatRemote = rightRemoteTracking_new.HeadPose.Pose.Orientation;
             QuatToYawPitchRoll(quatRemote, vr_weapon_pitchadjust->value, weaponangles);
+            weaponangles[YAW] += (cl.refdef.viewangles[YAW] - hmdorientation[YAW]);
+            weaponangles[ROLL] *= -1.0f;
 
 
             if (vr_weapon_stabilised->value &&
@@ -149,12 +151,8 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles, degrees(atanf(y / zxDist)), (cl.viewangles[YAW] - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ROLL]);
+                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), (cl.refdef.viewangles[YAW] - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ROLL]);
                 }
-            }
-            else
-            {
-                weaponangles[YAW] += (cl.viewangles[YAW] - hmdorientation[YAW]);
             }
 
             //Use (Action)
@@ -199,16 +197,16 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
             flashlightoffset[2] = leftRemoteTracking_new.HeadPose.Pose.Position.z - hmdPosition[2];
 
 			vec2_t v;
-			rotateAboutOrigin(flashlightoffset[0], flashlightoffset[2], -(cl.viewangles[YAW] - hmdorientation[YAW]), v);
+			rotateAboutOrigin(-flashlightoffset[0], flashlightoffset[2], (cl.refdef.viewangles[YAW] - hmdorientation[YAW]), v);
 			flashlightoffset[0] = v[0];
 			flashlightoffset[2] = v[1];
 
             QuatToYawPitchRoll(leftRemoteTracking_new.HeadPose.Pose.Orientation, 15.0f, flashlightangles);
 
-            flashlightangles[YAW] += (cl.viewangles[YAW] - hmdorientation[YAW]);
+            flashlightangles[YAW] += (cl.refdef.viewangles[YAW] - hmdorientation[YAW]);
 
 			if (vr_walkdirection->value == 0) {
-				controllerYawHeading = -cl.viewangles[YAW] + flashlightangles[YAW];
+				controllerYawHeading = -cl.refdef.viewangles[YAW] + flashlightangles[YAW];
 			}
 			else
 			{
@@ -230,9 +228,9 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
 
             vec2_t v;
             rotateAboutOrigin(-positionDeltaThisFrame[0] * multiplier,
-                              positionDeltaThisFrame[2] * multiplier, -hmdorientation[YAW], v);
-            positional_movementSideways = v[0];
-            positional_movementForward = v[1];
+                              positionDeltaThisFrame[2] * multiplier, (cl.refdef.viewangles[YAW] - hmdorientation[YAW]), v);
+            //positional_movementSideways = v[0];
+            //positional_movementForward = v[1];
 
             ALOGV("        positional_movementSideways: %f, positional_movementForward: %f",
                   positional_movementSideways,
@@ -324,9 +322,6 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
 
             remote_movementSideways = v[0];
             remote_movementForward = v[1];
-//            remote_movementForward = cosf(radians(flashlightangles[PITCH])) * v[1];
-//            remote_movementUp = sinf(radians(flashlightangles[PITCH])) * v[1];
-
             ALOGV("        remote_movementSideways: %f, remote_movementForward: %f",
                   remote_movementSideways,
                   remote_movementForward);

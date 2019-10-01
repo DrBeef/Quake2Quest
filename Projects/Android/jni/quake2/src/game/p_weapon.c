@@ -490,7 +490,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 				ent->client->ps.gunframe = FRAME_IDLE_FIRST;
 				return;
 			}
-
+/*
 			if (pause_frames)
 			{
 				for (n = 0; pause_frames[n]; n++)
@@ -502,7 +502,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 					}
 				}
 			}
-
+*/
 			ent->client->ps.gunframe++;
 			return;
 		}

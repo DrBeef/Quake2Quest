@@ -521,6 +521,8 @@ R_DrawAliasModel
 
 =================
 */
+extern cvar_t *vr_weaponscale;
+void MYgluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar );
 void R_DrawAliasModel (entity_t *e)
 {
 	int			i;
@@ -740,7 +742,7 @@ void R_DrawAliasModel (entity_t *e)
 	if (currententity->flags & RF_DEPTHHACK) // hack the depth range to prevent view model from poking into walls
 		qglDepthRange (gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin));
 
-	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
+/*	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
 	{
 		extern void MYgluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar );
 
@@ -752,7 +754,29 @@ void R_DrawAliasModel (entity_t *e)
 		qglMatrixMode( GL_MODELVIEW );
 
 		qglCullFace( GL_BACK );
+	}*/
+
+
+	if ( currententity->flags & RF_WEAPONMODEL )
+	{
+        qglMatrixMode( GL_PROJECTION );
+        qglPushMatrix();
+        qglLoadIdentity();
+        MYgluPerspective( r_newrefdef.fov_y, ( float ) r_newrefdef.width / r_newrefdef.height,  0.1,  8192);
+
+        if ( r_lefthand->value == 1.0F ) {
+            qglScalef(-vr_weaponscale->value, vr_weaponscale->value, vr_weaponscale->value);
+        } else {
+            qglScalef(vr_weaponscale->value, vr_weaponscale->value, vr_weaponscale->value);
+        }
+
+        qglMatrixMode( GL_MODELVIEW );
+
+		if ( r_lefthand->value == 1.0F ) {
+			qglCullFace( GL_BACK );
+		}
 	}
+
 
     qglPushMatrix ();
 	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
@@ -830,12 +854,16 @@ void R_DrawAliasModel (entity_t *e)
 	qglEnable( GL_CULL_FACE );
 #endif
 
-	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
+	if ( ( currententity->flags & RF_WEAPONMODEL ) )
 	{
-		qglMatrixMode( GL_PROJECTION );
+        qglMatrixMode( GL_PROJECTION );
 		qglPopMatrix();
-		qglMatrixMode( GL_MODELVIEW );
-		qglCullFace( GL_FRONT );
+
+        qglMatrixMode( GL_MODELVIEW );
+
+		if ( r_lefthand->value == 1.0F ) {
+            qglCullFace(GL_FRONT);
+        }
 	}
 
 	if ( currententity->flags & RF_TRANSLUCENT )

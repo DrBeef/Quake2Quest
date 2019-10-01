@@ -1577,12 +1577,13 @@ extern vec3_t weaponoffset;
 
 extern cvar_t *vr_worldscale;
 
-static void convertFromVRtoQ2(vec3_t in, vec3_t out)
+void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out)
 {
     vec3_t vrSpace;
     VectorSet(vrSpace, -in[2], in[0], in[1]);
-    VectorScale(vrSpace, vr_worldscale->value, out);
-    out[2] += 16;
+    vec3_t temp;
+    VectorScale(vrSpace, vr_worldscale->value, temp);
+    VectorAdd(temp, offset, out);
 }
 
 static void SV_SetWeapon_Client6DOF(edict_t *ent)
@@ -1592,10 +1593,12 @@ static void SV_SetWeapon_Client6DOF(edict_t *ent)
 	VectorCopy(ent->client->v_angle, angles_b);
 
 	vec3_t origin;
-	vec3_t offset;
-    convertFromVRtoQ2(weaponoffset, offset);
+	vec3_t weaponoffsetQ2;
+    vec3_t offset;
+    VectorSet(offset, 0, 0, 8);
+    convertFromVRtoQ2(weaponoffset, offset, weaponoffsetQ2);
 	VectorCopy(ent->s.origin, origin);
-	VectorAdd(offset, origin, ent->s.origin);
+	VectorAdd(weaponoffsetQ2, origin, ent->s.origin);
 	VectorCopy(weaponangles, ent->client->v_angle); // use adjusted angles
 }
 

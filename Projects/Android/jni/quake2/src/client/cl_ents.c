@@ -1341,6 +1341,21 @@ void CL_AddPacketEntities (frame_t *frame)
 }
 
 
+extern cvar_t *vr_worldscale;
+extern vec3_t weaponangles;
+extern vec3_t weaponoffset;
+
+void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out);
+
+static void SetWeapon6DOF(vec3_t origin, vec3_t gunorigin, vec3_t gunangles)
+{
+	vec3_t offset;
+	vec3_t gunoffset;
+	VectorSet(offset, 0, 0, 0);
+	convertFromVRtoQ2(weaponoffset, offset, gunoffset);
+	VectorAdd(origin, gunoffset, gunorigin);
+	VectorCopy(weaponangles, gunangles);
+}
 
 /*
 ==============
@@ -1366,16 +1381,7 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 		return;
 
 	// set up gun position
-	for (i=0 ; i<3 ; i++)
-	{
-		gun.origin[i] = cl.refdef.vieworg[i] + ps->gunoffset[i];
-		gun.angles[i] = ps->gunangles[i];
-
-/*		gun.origin[i] = cl.refdef.vieworg[i] + ops->gunoffset[i]
-			+ cl.lerpfrac * (ps->gunoffset[i] - ops->gunoffset[i]);
-		gun.angles[i] = cl.refdef.viewangles[i] + LerpAngle (ops->gunangles[i],
-			ps->gunangles[i], cl.lerpfrac);
-*/	}
+	SetWeapon6DOF(cl.refdef.vieworg, gun.origin, gun.angles);
 
 	if (gun_frame)
 	{

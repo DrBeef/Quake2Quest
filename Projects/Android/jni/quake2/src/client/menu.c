@@ -3971,13 +3971,11 @@ const char *M_Quit_Key (int key)
 	switch (key)
 	{
 	case K_ESCAPE:
-	case 'n':
-	case 'N':
 		M_PopMenu ();
 		break;
 
-	case 'Y':
-	case 'y':
+	case K_ENTER:
+	case K_SPACE:
 		cls.key_dest = key_console;
 		CL_Quit_f ();
 		break;

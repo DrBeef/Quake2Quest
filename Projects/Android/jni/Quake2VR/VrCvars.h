@@ -13,3 +13,4 @@ cvar_t	*vr_height_adjust;
 cvar_t	*vr_flashlight_model;
 cvar_t	*vr_mirror_weapons;
 cvar_t	*vr_worldscale;
+cvar_t	*vr_weaponscale;

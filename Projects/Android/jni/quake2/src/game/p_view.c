@@ -338,26 +338,6 @@ void SV_CalcViewOffset (edict_t *ent)
 }
 
 
-extern cvar_t *vr_worldscale;
-extern vec3_t weaponangles;
-extern vec3_t weaponoffset;
-
-static void convertFromVRtoQ2(vec3_t in, vec3_t out)
-{
-	vec3_t vrSpace;
-	VectorSet(vrSpace, -in[2], in[0], in[1]);
-	VectorScale(vrSpace, vr_worldscale->value, out);
-	out[2] += 16;
-}
-
-static void SetWeapon_Client6DOF(edict_t *ent)
-{
-	vec3_t origin;
-	vec3_t offset;
-	convertFromVRtoQ2(weaponoffset, ent->client->ps.gunoffset);
-	VectorCopy(weaponangles, ent->client->ps.gunangles);
-}
-
 /*
 ==============
 SV_CalcGunOffset
@@ -408,8 +388,6 @@ void SV_CalcGunOffset (edict_t *ent)
 		ent->client->ps.gunoffset[i] += up[i]* (-gun_z->value);
 	}
  */
-
-	SetWeapon_Client6DOF(ent);
 }
 
 

@@ -1,1 +1,1 @@
-quake2 --supersampling 1.35
+quake2 --supersampling 1.5
