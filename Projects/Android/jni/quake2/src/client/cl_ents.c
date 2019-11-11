@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cl_ents.c -- entity parsing and management
 
 #include "client.h"
+#include "../../../Quake2VR/mathlib.h"
 
 
 extern	struct model_s	*cl_mod_powerscreen;
@@ -1344,16 +1345,34 @@ void CL_AddPacketEntities (frame_t *frame)
 extern cvar_t *vr_worldscale;
 extern vec3_t weaponangles;
 extern vec3_t weaponoffset;
+extern vec3_t hmdorientation;
 
 void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out);
 
+void ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result)
+{
+    result[0] = point[0] + forward[0] * distance[0] + right[0] * distance[1];
+    result[1] = point[1] + forward[1] * distance[0] + right[1] * distance[1];
+    result[2] = point[2] + forward[2] * distance[0] + right[2] * distance[1] + distance[2];
+}
+
 static void SetWeapon6DOF(vec3_t origin, vec3_t gunorigin, vec3_t gunangles)
 {
-	vec3_t offset;
 	vec3_t gunoffset;
-	VectorSet(offset, 0, 0, 0);
-	convertFromVRtoQ2(weaponoffset, offset, gunoffset);
-	VectorAdd(origin, gunoffset, gunorigin);
+
+	vec3_t n0_offset;
+	VectorSet(n0_offset, 0, 0, 0);
+    convertFromVRtoQ2(weaponoffset, n0_offset, gunoffset);
+
+	vec3_t offset;
+    VectorSet(offset, -10, -4, -6);
+    vec3_t forward;
+    vec3_t right;
+    AngleVectors (weaponangles, forward, right, NULL);
+	vec3_t new_gun_offset;
+    ProjectSource (gunoffset, offset, forward, right, new_gun_offset);
+
+	VectorAdd(origin, new_gun_offset, gunorigin);
 	VectorCopy(weaponangles, gunangles);
 }
 
@@ -1457,9 +1476,9 @@ void CL_CalcViewValues (void)
 	else
 	{	// just use interpolated values
 		for (i=0 ; i<3 ; i++)
-			cl.refdef.vieworg[i] = ops->pmove.origin[i]*0.125 + ops->viewoffset[i] 
-				+ lerp * (ps->pmove.origin[i]*0.125 + ps->viewoffset[i] 
-				- (ops->pmove.origin[i]*0.125 + ops->viewoffset[i]) );
+			cl.refdef.vieworg[i] = ops->pmove.origin[i]*0.125 + ops->viewoffset[i]
+				+ lerp * (ps->pmove.origin[i]*0.125  + ps->viewoffset[i]
+				- (ops->pmove.origin[i]*0.125  + ops->viewoffset[i]) );
 	}
 
 	// if not running a demo or on a locked frame, add the local angle movement
