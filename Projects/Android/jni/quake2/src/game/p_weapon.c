@@ -503,7 +503,8 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 				}
 			}
 */
-			ent->client->ps.gunframe++;
+			//Don't play weapon idle anims
+			//ent->client->ps.gunframe++;
 			return;
 		}
 	}
