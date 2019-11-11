@@ -184,6 +184,8 @@ void Matrix3x4_OriginFromMatrix( cmatrix3x4 in, float *out );
 #define Matrix4x4_LoadIdentity( mat )	Matrix4x4_Copy( mat, matrix4x4_identity )
 #define Matrix4x4_Copy( out, in )	Q_memcpy( out, in, sizeof( matrix4x4 ))
 
+void Matrix4x4_Concat (matrix4x4 out, const matrix4x4 in1, const matrix4x4 in2);
+void Matrix4x4_CreateTranslate (matrix4x4 out, double x, double y, double z);
 void Matrix4x4_VectorTransform( cmatrix4x4 in, const float v[3], float out[3] );
 void Matrix4x4_VectorITransform( cmatrix4x4 in, const float v[3], float out[3] );
 void Matrix4x4_VectorRotate( cmatrix4x4 in, const float v[3], float out[3] );

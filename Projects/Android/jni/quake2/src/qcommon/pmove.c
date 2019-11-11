@@ -1080,7 +1080,19 @@ precision of the network channel and in a valid position.
 */
 void PM_SnapPosition (void)
 {
-	int		sign[3];
+    //NO SNAPPING - BREAKS POSITIONAL TRACKING
+    int i;
+    for (i=0 ; i<3 ; i++) {
+        pm->s.origin[i] = pml.origin[i] * 8.0f;
+    }
+
+    for (i=0 ; i<3 ; i++) {
+        pm->s.velocity[i] = pml.velocity[i] * 8.0f;
+    }
+
+    return;
+/*
+    int		sign[3];
 	int		i, j, bits;
 	short	base[3];
 	// try all single bits first
@@ -1118,6 +1130,7 @@ void PM_SnapPosition (void)
 	// go back to the last position
 	VectorCopy (pml.previous_origin, pm->s.origin);
 //	Com_DPrintf ("using previous_origin\n");
+ */
 }
 
 #if 0
@@ -1288,8 +1301,8 @@ void Pmove (pmove_t *pmove)
 	// set mins, maxs, and viewheight
 	PM_CheckDuck ();
 
-	if (pm->snapinitial)
-		PM_InitialSnapPosition ();
+	//if (pm->snapinitial)
+	//	PM_InitialSnapPosition ();
 
 	// set groundentity, watertype, and waterlevel
 	PM_CatagorizePosition ();

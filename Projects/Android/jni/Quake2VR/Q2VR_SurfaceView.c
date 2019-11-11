@@ -1300,7 +1300,7 @@ void VR_Init()
 {
 	//Initialise all our variables
 	playerYaw = 0.0f;
-	showingScreenLayer = false;
+	showingScreenLayer = true;
 	remote_movementSideways = 0.0f;
 	remote_movementForward = 0.0f;
 	remote_movementUp = 0.0f;
@@ -1315,19 +1315,18 @@ void VR_Init()
 	//Create Cvars
 	vr_snapturn_angle = Cvar_Get( "vr_snapturn_angle", "45", CVAR_ARCHIVE);
 	vr_reloadtimeoutms = Cvar_Get( "vr_reloadtimeoutms", "200", CVAR_ARCHIVE);
-	vr_positional_factor = Cvar_Get( "vr_positional_factor", "2800", CVAR_ARCHIVE);
+	vr_positional_factor = Cvar_Get( "vr_positional_factor", "2000", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
     vr_weapon_recoil = Cvar_Get( "vr_weapon_recoil", "0", CVAR_ARCHIVE);
 	vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0", 0);
     vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_ARCHIVE);
-    vr_fov = Cvar_Get( "vr_fov", "107", CVAR_ARCHIVE);
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
 	vr_enable_crouching = Cvar_Get( "vr_enable_crouching", "0.85", CVAR_ARCHIVE);
     vr_height_adjust = Cvar_Get( "vr_height_adjust", "0.0", CVAR_ARCHIVE);
     vr_flashlight_model = Cvar_Get( "vr_flashlight_model", "1", CVAR_ARCHIVE);
 	vr_mirror_weapons = Cvar_Get( "vr_mirror_weapons", "0", CVAR_ARCHIVE);
-	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.4", CVAR_ARCHIVE);
+	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.6", CVAR_ARCHIVE);
 
     //The Engine (which is a derivative of Quake) uses a very specific unit size:
     //Wolfenstein 3D, DOOM and QUAKE use the same coordinate/unit system:

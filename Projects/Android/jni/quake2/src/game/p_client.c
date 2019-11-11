@@ -1595,7 +1595,7 @@ static void SV_SetWeapon_Client6DOF(edict_t *ent)
 	vec3_t origin;
 	vec3_t weaponoffsetQ2;
     vec3_t offset;
-    VectorSet(offset, 0, 0, 8);
+    VectorSet(offset, 0, 0, ent->viewheight-8);
     convertFromVRtoQ2(weaponoffset, offset, weaponoffsetQ2);
 	VectorCopy(ent->s.origin, origin);
 	VectorAdd(weaponoffsetQ2, origin, ent->s.origin);

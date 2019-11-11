@@ -6,7 +6,6 @@ cvar_t	*vr_weapon_pitchadjust;
 cvar_t	*vr_weapon_recoil;
 cvar_t	*vr_weapon_stabilised;
 cvar_t	*vr_lasersight;
-cvar_t	*vr_fov;
 cvar_t	*vr_control_scheme;
 cvar_t	*vr_enable_crouching;
 cvar_t	*vr_height_adjust;

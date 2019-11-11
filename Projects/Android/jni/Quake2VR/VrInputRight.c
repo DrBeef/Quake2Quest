@@ -223,14 +223,14 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
 
             //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
             //player is facing for positional tracking
-            float multiplier = vr_positional_factor->value / (cl_forwardspeed->value *
+            float multiplier = (vr_positional_factor->value) / (cl_forwardspeed->value *
 					((leftTrackedRemoteState_new.Buttons & ovrButton_Trigger) ? 1.5f : 1.0f));
 
             vec2_t v;
             rotateAboutOrigin(-positionDeltaThisFrame[0] * multiplier,
-                              positionDeltaThisFrame[2] * multiplier, (cl.refdef.viewangles[YAW] - hmdorientation[YAW]), v);
-            //positional_movementSideways = v[0];
-            //positional_movementForward = v[1];
+                              positionDeltaThisFrame[2] * multiplier, /*cl.refdef.viewangles[YAW]*/ - hmdorientation[YAW], v);
+            positional_movementSideways = v[0];
+            positional_movementForward = v[1];
 
             ALOGV("        positional_movementSideways: %f, positional_movementForward: %f",
                   positional_movementSideways,
@@ -250,7 +250,7 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
 				if ((rightTrackedRemoteState_new.Buttons & ovrButton_Trigger) !=
 					(rightTrackedRemoteState_old.Buttons & ovrButton_Trigger)) {
 
-					sendButtonActionSimple("inven");
+					sendButtonActionSimple("invuse");
 				}
 			}
 			else

@@ -139,10 +139,10 @@ import android.support.v4.content.ContextCompat;
 	public void create()
 	{
 		//This will copy the shareware version of quake2 if user doesn't have anything installed
-		copy_asset("/sdcard/Quake2Quest/baseq2", "pak0.pak");
-		copy_asset("/sdcard/Quake2Quest/baseq2", "config.cfg");
-		copy_asset("/sdcard/Quake2Quest/baseq2", "autoexec.cfg");
-		copy_asset("/sdcard/Quake2Quest", "commandline.txt");
+		copy_asset("/sdcard/baseq2", "pak0.pak");
+		copy_asset("/sdcard/baseq2", "config.cfg");
+		copy_asset("/sdcard/baseq2", "autoexec.cfg");
+		copy_asset("/sdcard/baseq2", "commandline.txt");
 
 		//GLES3JNILib.setCallbackObjects(null, this);
 
@@ -150,11 +150,11 @@ import android.support.v4.content.ContextCompat;
 		commandLineParams = new String("quake2");
 
 		//See if user is trying to use command line params
-		if(new File("/sdcard/Quake2Quest/commandline.txt").exists()) // should exist!
+		if(new File("/sdcard/baseq2/commandline.txt").exists()) // should exist!
 		{
 			BufferedReader br;
 			try {
-				br = new BufferedReader(new FileReader("/sdcard/Quake2Quest/commandline.txt"));
+				br = new BufferedReader(new FileReader("/sdcard/baseq2/commandline.txt"));
 				String s;
 				StringBuilder sb=new StringBuilder(0);
 				while ((s=br.readLine())!=null)

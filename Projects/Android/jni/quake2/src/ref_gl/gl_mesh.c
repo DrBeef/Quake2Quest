@@ -757,31 +757,23 @@ void R_DrawAliasModel (entity_t *e)
 	}*/
 
 
-	if ( currententity->flags & RF_WEAPONMODEL )
-	{
-        qglMatrixMode( GL_PROJECTION );
-        qglPushMatrix();
-        qglLoadIdentity();
-        MYgluPerspective( r_newrefdef.fov_y, ( float ) r_newrefdef.width / r_newrefdef.height,  0.1,  8192);
+    qglPushMatrix ();
+	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
+	R_RotateForEntity (e);
+	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
 
+    if ( currententity->flags & RF_WEAPONMODEL )
+    {
         if ( r_lefthand->value == 1.0F ) {
             qglScalef(-vr_weaponscale->value, vr_weaponscale->value, vr_weaponscale->value);
         } else {
             qglScalef(vr_weaponscale->value, vr_weaponscale->value, vr_weaponscale->value);
         }
 
-        qglMatrixMode( GL_MODELVIEW );
-
-		if ( r_lefthand->value == 1.0F ) {
-			qglCullFace( GL_BACK );
-		}
-	}
-
-
-    qglPushMatrix ();
-	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
-	R_RotateForEntity (e);
-	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
+        if ( r_lefthand->value == 1.0F ) {
+            qglCullFace( GL_BACK );
+        }
+    }
 
 	// select skin
 	if (currententity->skin)
@@ -856,11 +848,6 @@ void R_DrawAliasModel (entity_t *e)
 
 	if ( ( currententity->flags & RF_WEAPONMODEL ) )
 	{
-        qglMatrixMode( GL_PROJECTION );
-		qglPopMatrix();
-
-        qglMatrixMode( GL_MODELVIEW );
-
 		if ( r_lefthand->value == 1.0F ) {
             qglCullFace(GL_FRONT);
         }
