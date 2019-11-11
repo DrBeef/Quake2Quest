@@ -988,8 +988,8 @@ void SCR_ExecuteLayoutString (char *s,float separation)
 	y = 0;
 	width = 3;
 
-	int offset_stereo=0;
-	if (separation>0)offset_stereo=viddef.width;
+	int offset_stereo= (separation>0) ? -25 : 25;
+	//if (separation>0)offset_stereo=viddef.width;
 //offset_stereo=100;
 
 	while (s)
@@ -1023,7 +1023,7 @@ void SCR_ExecuteLayoutString (char *s,float separation)
 		if (!strcmp(token, "yb"))
 		{
 			token = COM_Parse (&s);
-			y = viddef.height + atoi(token);
+			y = (viddef.height * 0.72) + atoi(token);
 			continue;
 		}
 		if (!strcmp(token, "yv"))

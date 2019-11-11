@@ -502,12 +502,6 @@ void SCR_DrawCrosshair (float separation)
 			  , 0.75 + 0.25*sin(anglemod(cl.time*0.005))	//alpha
 			  , crosshair_pic); //pic
 #else
-	if (separation>0){
-	re.DrawPic (scr_vrect.x+scr_vrect.width + ((scr_vrect.width - crosshair_width)>>1)
-			    , scr_vrect.y + ((scr_vrect.height - crosshair_height)>>1), crosshair_pic);
-
-	}
-	else
 		re.DrawPic (scr_vrect.x + ((scr_vrect.width - crosshair_width)>>1)
 				    , scr_vrect.y + ((scr_vrect.height - crosshair_height)>>1), crosshair_pic);
 
