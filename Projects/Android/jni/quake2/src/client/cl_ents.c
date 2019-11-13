@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // cl_ents.c -- entity parsing and management
 
+#include <src/game/q_shared.h>
 #include "client.h"
 #include "../../../Quake2VR/mathlib.h"
 
@@ -506,7 +507,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 	}
 }
 
-
+qboolean isMultiplayer();
 
 /*
 ===================
@@ -538,16 +539,16 @@ void CL_ParsePlayerstate (frame_t *oldframe, frame_t *newframe)
 
 	if (flags & PS_M_ORIGIN)
 	{
-		state->pmove.origin[0] = MSG_ReadShort (&net_message);
-		state->pmove.origin[1] = MSG_ReadShort (&net_message);
-		state->pmove.origin[2] = MSG_ReadShort (&net_message);
+		state->pmove.origin[0] = MSG_ReadFloat (&net_message);
+		state->pmove.origin[1] = MSG_ReadFloat (&net_message);
+		state->pmove.origin[2] = MSG_ReadFloat (&net_message);
 	}
 
 	if (flags & PS_M_VELOCITY)
 	{
-		state->pmove.velocity[0] = MSG_ReadShort (&net_message);
-		state->pmove.velocity[1] = MSG_ReadShort (&net_message);
-		state->pmove.velocity[2] = MSG_ReadShort (&net_message);
+		state->pmove.velocity[0] = MSG_ReadFloat (&net_message);
+		state->pmove.velocity[1] = MSG_ReadFloat (&net_message);
+		state->pmove.velocity[2] = MSG_ReadFloat (&net_message);
 	}
 
 	if (flags & PS_M_TIME)
@@ -557,13 +558,13 @@ void CL_ParsePlayerstate (frame_t *oldframe, frame_t *newframe)
 		state->pmove.pm_flags = MSG_ReadByte (&net_message);
 
 	if (flags & PS_M_GRAVITY)
-		state->pmove.gravity = MSG_ReadShort (&net_message);
+		state->pmove.gravity = MSG_ReadFloat (&net_message);
 
 	if (flags & PS_M_DELTA_ANGLES)
 	{
-		state->pmove.delta_angles[0] = MSG_ReadShort (&net_message);
-		state->pmove.delta_angles[1] = MSG_ReadShort (&net_message);
-		state->pmove.delta_angles[2] = MSG_ReadShort (&net_message);
+		state->pmove.delta_angles[0] = MSG_ReadFloat (&net_message);
+		state->pmove.delta_angles[1] = MSG_ReadFloat (&net_message);
+		state->pmove.delta_angles[2] = MSG_ReadFloat (&net_message);
 	}
 
 	if (cl.attractloop)
@@ -596,6 +597,11 @@ void CL_ParsePlayerstate (frame_t *oldframe, frame_t *newframe)
 	if (flags & PS_WEAPONINDEX)
 	{
 		state->gunindex = MSG_ReadByte (&net_message);
+
+		if (!isMultiplayer()) {
+			//Only read this if not multiplayer
+			state->weapmodel = MSG_ReadByte(&net_message);
+		}
 	}
 
 	if (flags & PS_WEAPONFRAME)
@@ -1349,31 +1355,55 @@ extern vec3_t hmdorientation;
 
 void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out);
 
-void ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result)
-{
-    result[0] = point[0] + forward[0] * distance[0] + right[0] * distance[1];
-    result[1] = point[1] + forward[1] * distance[0] + right[1] * distance[1];
-    result[2] = point[2] + forward[2] * distance[0] + right[2] * distance[1] + distance[2];
-}
+// gitem_t->weapmodel for weapons indicates model index
+#define WEAP_BLASTER			1
+#define WEAP_SHOTGUN			2
+#define WEAP_SUPERSHOTGUN		3
+#define WEAP_MACHINEGUN			4
+#define WEAP_CHAINGUN			5
+#define WEAP_GRENADES			6
+#define WEAP_GRENADELAUNCHER	7
+#define WEAP_ROCKETLAUNCHER		8
+#define WEAP_HYPERBLASTER		9
+#define WEAP_RAILGUN			10
+#define WEAP_BFG				11
 
-static void SetWeapon6DOF(vec3_t origin, vec3_t gunorigin, vec3_t gunangles)
+static void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunangles)
 {
 	vec3_t gunoffset;
+    convertFromVRtoQ2(weaponoffset, NULL, gunoffset);
 
-	vec3_t n0_offset;
-	VectorSet(n0_offset, 0, 0, 0);
-    convertFromVRtoQ2(weaponoffset, n0_offset, gunoffset);
-
+    //fb / lr / ud
 	vec3_t offset;
-    VectorSet(offset, -10, -4, -6);
+    VectorSet(offset, 10, 4, -5);
     vec3_t forward;
     vec3_t right;
-    AngleVectors (weaponangles, forward, right, NULL);
-	vec3_t new_gun_offset;
-    ProjectSource (gunoffset, offset, forward, right, new_gun_offset);
+    vec3_t up;
 
-	VectorAdd(origin, new_gun_offset, gunorigin);
+    vec3_t tempAngles;
+    VectorCopy(weaponangles, tempAngles);
+    tempAngles[PITCH] -= 180.0;
+
+	vec3_t position_adjust;
+	vec3_t nullVec;
+    VectorSet(nullVec, 0, 0, 0);
+
+    matrix4x4 mat1;
+    Matrix4x4_CreateFromEntity(mat1, nullVec, offset, 1.0);
+
+    matrix4x4 mat2;
+    Matrix4x4_CreateFromEntity(mat2, tempAngles, nullVec, 1.0);
+
+    matrix4x4 mat3;
+    Matrix4x4_Concat(mat3, mat2, mat1);
+
+    Matrix3x4_OriginFromMatrix(mat3, position_adjust);
+
+    VectorAdd(origin, gunoffset, gunorigin);
+    VectorAdd(gunorigin, position_adjust, gunorigin);
+    gunorigin[2] -= 12;
 	VectorCopy(weaponangles, gunangles);
+    gunangles[PITCH] -= 5; // HACK!! (gun angle not quite right)
 }
 
 /*
@@ -1399,8 +1429,8 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 	if (!gun.model)
 		return;
 
-	// set up gun position
-	SetWeapon6DOF(cl.refdef.vieworg, gun.origin, gun.angles);
+    // set up gun position
+    SetWeapon6DOF(ps->weapmodel, cl.refdef.vieworg, gun.origin, gun.angles);
 
 	if (gun_frame)
 	{

@@ -1207,6 +1207,7 @@ typedef struct
 	vec3_t		gunoffset;
 	int			gunindex;
 	int			gunframe;
+	int			weapmodel;
 
 	float		blend[4];		// rgba full screen effect
 	

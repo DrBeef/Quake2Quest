@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#include <src/game/q_shared.h>
 #include "server.h"
 
 /*
@@ -212,6 +213,7 @@ void SV_EmitPacketEntities (client_frame_t *from, client_frame_t *to, sizebuf_t 
 }
 
 
+qboolean isMultiplayer();
 
 /*
 =============
@@ -315,16 +317,16 @@ void SV_WritePlayerstateToClient (client_frame_t *from, client_frame_t *to, size
 
 	if (pflags & PS_M_ORIGIN)
 	{
-		MSG_WriteShort (msg, ps->pmove.origin[0]);
-		MSG_WriteShort (msg, ps->pmove.origin[1]);
-		MSG_WriteShort (msg, ps->pmove.origin[2]);
+		MSG_WriteFloat (msg, ps->pmove.origin[0]);
+		MSG_WriteFloat (msg, ps->pmove.origin[1]);
+		MSG_WriteFloat (msg, ps->pmove.origin[2]);
 	}
 
 	if (pflags & PS_M_VELOCITY)
 	{
-		MSG_WriteShort (msg, ps->pmove.velocity[0]);
-		MSG_WriteShort (msg, ps->pmove.velocity[1]);
-		MSG_WriteShort (msg, ps->pmove.velocity[2]);
+		MSG_WriteFloat (msg, ps->pmove.velocity[0]);
+		MSG_WriteFloat (msg, ps->pmove.velocity[1]);
+		MSG_WriteFloat (msg, ps->pmove.velocity[2]);
 	}
 
 	if (pflags & PS_M_TIME)
@@ -334,13 +336,13 @@ void SV_WritePlayerstateToClient (client_frame_t *from, client_frame_t *to, size
 		MSG_WriteByte (msg, ps->pmove.pm_flags);
 
 	if (pflags & PS_M_GRAVITY)
-		MSG_WriteShort (msg, ps->pmove.gravity);
+        MSG_WriteFloat (msg, ps->pmove.gravity);
 
 	if (pflags & PS_M_DELTA_ANGLES)
 	{
-		MSG_WriteShort (msg, ps->pmove.delta_angles[0]);
-		MSG_WriteShort (msg, ps->pmove.delta_angles[1]);
-		MSG_WriteShort (msg, ps->pmove.delta_angles[2]);
+        MSG_WriteFloat (msg, ps->pmove.delta_angles[0]);
+        MSG_WriteFloat (msg, ps->pmove.delta_angles[1]);
+        MSG_WriteFloat (msg, ps->pmove.delta_angles[2]);
 	}
 
 	//
@@ -370,6 +372,11 @@ void SV_WritePlayerstateToClient (client_frame_t *from, client_frame_t *to, size
 	if (pflags & PS_WEAPONINDEX)
 	{
 		MSG_WriteByte (msg, ps->gunindex);
+
+		if (!isMultiplayer()) {
+			//Add if for multiplayer
+			MSG_WriteByte(msg, ps->weapmodel);
+		}
 	}
 
 	if (pflags & PS_WEAPONFRAME)

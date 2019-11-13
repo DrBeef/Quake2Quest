@@ -1583,7 +1583,12 @@ void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out)
     VectorSet(vrSpace, -in[2], in[0], in[1]);
     vec3_t temp;
     VectorScale(vrSpace, vr_worldscale->value, temp);
-    VectorAdd(temp, offset, out);
+
+    if (offset) {
+		VectorAdd(temp, offset, out);
+	} else {
+    	VectorCopy(temp, out);
+    }
 }
 
 static void SV_SetWeapon_Client6DOF(edict_t *ent)

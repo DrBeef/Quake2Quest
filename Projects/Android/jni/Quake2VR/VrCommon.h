@@ -55,7 +55,7 @@ int ducked;
 
 float radians(float deg);
 float degrees(float rad);
-bool isMultiplayer();
+qboolean isMultiplayer();
 double GetTimeInMilliSeconds();
 float length(float x, float y);
 float nonLinearFilter(float in);

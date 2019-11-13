@@ -109,7 +109,7 @@ void CL_DrawInventory (void)
 
 	re.DrawPic (x, y+8, "inventory");
 
-	y += 24;
+/*	y += 24;
 	x += 24;
 	Inv_DrawString (x, y, "hotkey ### item");
 	Inv_DrawString (x, y+8, "------ --- ----");
@@ -143,7 +143,7 @@ void CL_DrawInventory (void)
 		Inv_DrawString (x, y, string);
 		y += 8;
 	}
-
+*/
 
 }
 

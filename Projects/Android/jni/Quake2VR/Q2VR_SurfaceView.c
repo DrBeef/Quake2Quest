@@ -833,7 +833,7 @@ void setHMDPosition( float x, float y, float z, float yaw )
 	}
 }
 
-bool isMultiplayer()
+qboolean isMultiplayer()
 {
 	return Cvar_VariableValue("maxclients") > 1;
 }
@@ -1336,6 +1336,8 @@ void VR_Init()
 	vr_worldscale = Cvar_Get( "vr_worldscale", "26.2467", CVAR_ARCHIVE);
 }
 
+void M_Menu_Main_f (void);
+
 void * AppThreadFunction( void * parm )
 {
 	ovrAppThread * appThread = (ovrAppThread *)parm;
@@ -1418,6 +1420,7 @@ void * AppThreadFunction( void * parm )
 							Qcommon_Init(argc, (const char**)argv);
 						}
 
+						//M_Menu_Main_f ();
 						quake2_initialised = true;
 					}
 					break;
@@ -1544,9 +1547,6 @@ void * AppThreadFunction( void * parm )
 				case LEFT_HANDED_DEFAULT:
 					HandleInput_Left(appState.Ovr, appState.DisplayTime);
 					break;
-                case GAMEPAD:
-                    //HandleInput_Gamepad(appState.Ovr, appState.DisplayTime); // Someone else can implement this
-                    break;
 			}
 
 			static bool usingScreenLayer = true; //Starts off using the screen layer

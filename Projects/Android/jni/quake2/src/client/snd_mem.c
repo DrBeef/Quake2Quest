@@ -128,7 +128,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	int		size;
 	char	*name;
 
-	if (s->name[0] == '*')
+	if (s == NULL || s->name[0] == '*')
 		return NULL;
 
 // see if still in memory
