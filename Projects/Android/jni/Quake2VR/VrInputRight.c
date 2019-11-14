@@ -335,7 +335,7 @@ void HandleInput_Right(ovrMobile * Ovr, double displayTime )
 
 #ifndef NDEBUG
 				Cbuf_AddText( "cheats 1\n" );
-				Cbuf_AddText( "give weapons\n" );
+				Cbuf_AddText( "give all\n" );
 #endif
             }
 

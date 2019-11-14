@@ -518,11 +518,8 @@ V_RenderView
 extern vec3_t hmdPosition;
 extern cvar_t *vr_worldscale;
 
-#define QUAKE_MARINE_HEIGHT   1.57
-
 void V_RenderView( float stereo_separation )
 {
-
 	extern int entitycmpfnc( const entity_t *, const entity_t * );
 
 	if (cls.state != ca_active)

@@ -241,7 +241,7 @@ void SV_WritePlayerstateToClient (client_frame_t *from, client_frame_t *to, size
 	//
 	// determine what needs to be sent
 	//
-	pflags = 0;
+	pflags = PS_VRSERVER; // we are a VR server!
 
 	if (ps->pmove.pm_type != ops->pmove.pm_type)
 		pflags |= PS_M_TYPE;
@@ -373,10 +373,8 @@ void SV_WritePlayerstateToClient (client_frame_t *from, client_frame_t *to, size
 	{
 		MSG_WriteByte (msg, ps->gunindex);
 
-		if (!isMultiplayer()) {
-			//Add if for multiplayer
-			MSG_WriteByte(msg, ps->weapmodel);
-		}
+		//We are a VR server so write this out
+		MSG_WriteByte(msg, ps->weapmodel);
 	}
 
 	if (pflags & PS_WEAPONFRAME)

@@ -537,18 +537,30 @@ void CL_ParsePlayerstate (frame_t *oldframe, frame_t *newframe)
 	if (flags & PS_M_TYPE)
 		state->pmove.pm_type = MSG_ReadByte (&net_message);
 
-	if (flags & PS_M_ORIGIN)
-	{
-		state->pmove.origin[0] = MSG_ReadFloat (&net_message);
-		state->pmove.origin[1] = MSG_ReadFloat (&net_message);
-		state->pmove.origin[2] = MSG_ReadFloat (&net_message);
-	}
+	if (flags & PS_VRSERVER) {
+        if (flags & PS_M_ORIGIN) {
+            state->pmove.origin[0] = MSG_ReadFloat(&net_message);
+            state->pmove.origin[1] = MSG_ReadFloat(&net_message);
+            state->pmove.origin[2] = MSG_ReadFloat(&net_message);
+        }
 
-	if (flags & PS_M_VELOCITY)
-	{
-		state->pmove.velocity[0] = MSG_ReadFloat (&net_message);
-		state->pmove.velocity[1] = MSG_ReadFloat (&net_message);
-		state->pmove.velocity[2] = MSG_ReadFloat (&net_message);
+        if (flags & PS_M_VELOCITY) {
+            state->pmove.velocity[0] = MSG_ReadFloat(&net_message);
+            state->pmove.velocity[1] = MSG_ReadFloat(&net_message);
+            state->pmove.velocity[2] = MSG_ReadFloat(&net_message);
+        }
+    } else {
+        if (flags & PS_M_ORIGIN) {
+            state->pmove.origin[0] = MSG_ReadShort(&net_message);
+            state->pmove.origin[1] = MSG_ReadShort(&net_message);
+            state->pmove.origin[2] = MSG_ReadShort(&net_message);
+        }
+
+        if (flags & PS_M_VELOCITY) {
+            state->pmove.velocity[0] = MSG_ReadShort(&net_message);
+            state->pmove.velocity[1] = MSG_ReadShort(&net_message);
+            state->pmove.velocity[2] = MSG_ReadShort(&net_message);
+        }
 	}
 
 	if (flags & PS_M_TIME)
@@ -557,15 +569,26 @@ void CL_ParsePlayerstate (frame_t *oldframe, frame_t *newframe)
 	if (flags & PS_M_FLAGS)
 		state->pmove.pm_flags = MSG_ReadByte (&net_message);
 
-	if (flags & PS_M_GRAVITY)
-		state->pmove.gravity = MSG_ReadFloat (&net_message);
+    if (flags & PS_VRSERVER) {
+        if (flags & PS_M_GRAVITY)
+            state->pmove.gravity = MSG_ReadFloat(&net_message);
 
-	if (flags & PS_M_DELTA_ANGLES)
-	{
-		state->pmove.delta_angles[0] = MSG_ReadFloat (&net_message);
-		state->pmove.delta_angles[1] = MSG_ReadFloat (&net_message);
-		state->pmove.delta_angles[2] = MSG_ReadFloat (&net_message);
-	}
+        if (flags & PS_M_DELTA_ANGLES) {
+            state->pmove.delta_angles[0] = MSG_ReadFloat(&net_message);
+            state->pmove.delta_angles[1] = MSG_ReadFloat(&net_message);
+            state->pmove.delta_angles[2] = MSG_ReadFloat(&net_message);
+        }
+    } else {
+        if (flags & PS_M_GRAVITY)
+            state->pmove.gravity = MSG_ReadShort(&net_message);
+
+        if (flags & PS_M_DELTA_ANGLES) {
+            state->pmove.delta_angles[0] = MSG_ReadShort(&net_message);
+            state->pmove.delta_angles[1] = MSG_ReadShort(&net_message);
+            state->pmove.delta_angles[2] = MSG_ReadShort(&net_message);
+        }
+    }
+
 
 	if (cl.attractloop)
 		state->pmove.pm_type = PM_FREEZE;		// demo playback
@@ -598,10 +621,11 @@ void CL_ParsePlayerstate (frame_t *oldframe, frame_t *newframe)
 	{
 		state->gunindex = MSG_ReadByte (&net_message);
 
-		if (!isMultiplayer()) {
-			//Only read this if not multiplayer
+		if (flags & PS_VRSERVER) {
 			state->weapmodel = MSG_ReadByte(&net_message);
-		}
+		} else {
+            state->weapmodel = 0;
+        }
 	}
 
 	if (flags & PS_WEAPONFRAME)
@@ -1352,6 +1376,7 @@ extern cvar_t *vr_worldscale;
 extern vec3_t weaponangles;
 extern vec3_t weaponoffset;
 extern vec3_t hmdorientation;
+extern vec3_t hmdPosition;
 
 void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out);
 
@@ -1401,9 +1426,14 @@ static void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t
 
     VectorAdd(origin, gunoffset, gunorigin);
     VectorAdd(gunorigin, position_adjust, gunorigin);
-    gunorigin[2] -= 12;
-	VectorCopy(weaponangles, gunangles);
-    gunangles[PITCH] -= 5; // HACK!! (gun angle not quite right)
+
+	//add player actual real world height - controller location is relative to HMD
+	gunorigin[2] -= (QUAKE_MARINE_HEIGHT * vr_worldscale->value);
+	gunorigin[2] += (hmdPosition[1] * vr_worldscale->value);
+
+
+    VectorCopy(weaponangles, gunangles);
+    gunangles[PITCH] -= 3; // HACK!! (gun angle not quite right)
 }
 
 /*

@@ -620,7 +620,7 @@ void Con_DrawConsole (float frac, float separation)
 	SCR_AddDirtyPoint (offset,0);
 	SCR_AddDirtyPoint (offset+viddef.width-1,lines-1);
 
-	Com_sprintf (version, sizeof(version), "v%4.2f", VERSION);
+	Com_sprintf (version, sizeof(version), "Quake2Quest v%4.2f", VERSION);
 	for (x=0 ; x<5 ; x++)
 #ifdef QMAX
 		re.DrawChar (offset+viddef.width-44+x*8, lines-12, 128+version[x],1);

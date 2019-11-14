@@ -1574,6 +1574,7 @@ vec3_t angles_b;
 
 extern vec3_t weaponangles;
 extern vec3_t weaponoffset;
+extern vec3_t hmdPosition;
 
 extern cvar_t *vr_worldscale;
 
@@ -1600,9 +1601,17 @@ static void SV_SetWeapon_Client6DOF(edict_t *ent)
 	vec3_t origin;
 	vec3_t weaponoffsetQ2;
     vec3_t offset;
-    VectorSet(offset, 0, 0, ent->viewheight-8);
+    VectorSet(offset, 0, 0, 7-ent->viewheight);
     convertFromVRtoQ2(weaponoffset, offset, weaponoffsetQ2);
 	VectorCopy(ent->s.origin, origin);
+
+	//add player actual real world height - controller location is relative to HMD
+    if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
+    {
+        origin[2] -= 48; //??
+    }
+
+	origin[2] += (hmdPosition[1] * vr_worldscale->value);
 	VectorAdd(weaponoffsetQ2, origin, ent->s.origin);
 	VectorCopy(weaponangles, ent->client->v_angle); // use adjusted angles
 }
