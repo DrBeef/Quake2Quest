@@ -838,6 +838,29 @@ qboolean isMultiplayer()
 	return Cvar_VariableValue("maxclients") > 1;
 }
 
+
+/*
+========================
+Android_Vibrate
+========================
+*/
+
+//0 = left, 1 = right
+float vibration_channel_duration[2] = {0.0f, 0.0f};
+float vibration_channel_intensity[2] = {0.0f, 0.0f};
+
+void Android_Vibrate( float duration, int channel, float intensity )
+{
+	if (vibration_channel_duration[channel] > 0.0f)
+		return;
+
+	if (vibration_channel_duration[channel] == -1.0f &&	duration != 0.0f)
+		return;
+
+	vibration_channel_duration[channel] = duration;
+	vibration_channel_intensity[channel] = intensity;
+}
+
 void Qcommon_BeginFrame (int time);
 void Qcommon_Frame (int eye);
 void Qcommon_EndFrame (int time);
@@ -1319,13 +1342,10 @@ void VR_Init()
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
     vr_weapon_recoil = Cvar_Get( "vr_weapon_recoil", "0", CVAR_ARCHIVE);
-	vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0", 0);
     vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_ARCHIVE);
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
 	vr_enable_crouching = Cvar_Get( "vr_enable_crouching", "0.85", CVAR_ARCHIVE);
     vr_height_adjust = Cvar_Get( "vr_height_adjust", "0.0", CVAR_ARCHIVE);
-    vr_flashlight_model = Cvar_Get( "vr_flashlight_model", "1", CVAR_ARCHIVE);
-	vr_mirror_weapons = Cvar_Get( "vr_mirror_weapons", "0", CVAR_ARCHIVE);
 	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.6", CVAR_ARCHIVE);
 
     //The Engine (which is a derivative of Quake) uses a very specific unit size:
@@ -1503,6 +1523,31 @@ void * AppThreadFunction( void * parm )
 			frameDesc.Layers = layers;
 
 			vrapi_SubmitFrame2( appState.Ovr, &frameDesc );
+		}
+
+		//Handle haptics
+		static float lastFrameTime = 0.0f;
+		float timestamp = (float)(GetTimeInMilliSeconds());
+		float frametime = timestamp - lastFrameTime;
+		lastFrameTime = timestamp;
+
+		for (int i = 0; i < 2; ++i) {
+			if (vibration_channel_duration[i] > 0.0f ||
+				vibration_channel_duration[i] == -1.0f) {
+				vrapi_SetHapticVibrationSimple(appState.Ovr, controllerIDs[i],
+											   vibration_channel_intensity[i]);
+
+				if (vibration_channel_duration[i] != -1.0f) {
+					vibration_channel_duration[i] -= frametime;
+
+					if (vibration_channel_duration[i] < 0.0f) {
+						vibration_channel_duration[i] = 0.0f;
+						vibration_channel_intensity[i] = 0.0f;
+					}
+				}
+			} else {
+				vrapi_SetHapticVibrationSimple(appState.Ovr, controllerIDs[i], 0.0f);
+			}
 		}
 
         if (runStatus == -1) {

@@ -32,6 +32,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     static qboolean dominantGripPushed = false;
 	static float dominantGripPushTime = 0.0f;
     static qboolean inventoryManagementMode = false;
+    static qboolean vr_weapon_stabilised = false;
 
     //Show screen view (if in multiplayer toggle scoreboard)
     if (((pOffTrackedRemoteNew->Buttons & offButton2) !=
@@ -74,6 +75,28 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     }
     else
     {
+        //If distance to off-hand remote is less than 35cm and user pushes grip, then we enable weapon stabilisation
+        float distance = sqrtf(powf(pOffTracking->HeadPose.Pose.Position.x - pDominantTracking->HeadPose.Pose.Position.x, 2) +
+                               powf(pOffTracking->HeadPose.Pose.Position.y - pDominantTracking->HeadPose.Pose.Position.y, 2) +
+                               powf(pOffTracking->HeadPose.Pose.Position.z - pDominantTracking->HeadPose.Pose.Position.z, 2));
+
+        //Turn on weapon stabilisation?
+        if ((pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) !=
+            (pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) {
+
+            if (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger)
+            {
+                if (distance < 0.50f)
+                {
+                    vr_weapon_stabilised = true;
+                }
+            }
+            else
+            {
+                vr_weapon_stabilised = false;
+            }
+        }
+
         //dominant hand stuff first
         {
 			///Weapon location relative to view
@@ -94,6 +117,20 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             weaponangles[YAW] += (cl.refdef.viewangles[YAW] - hmdorientation[YAW]);
             weaponangles[ROLL] *= -1.0f;
 
+
+            if (vr_weapon_stabilised &&
+                //Don't trigger stabilisation if controllers are close together (holding Glock for example)
+                (distance > 0.15f))
+            {
+                float z = pOffTracking->HeadPose.Pose.Position.z - pDominantTracking->HeadPose.Pose.Position.z;
+                float x = pOffTracking->HeadPose.Pose.Position.x - pDominantTracking->HeadPose.Pose.Position.x;
+                float y = pOffTracking->HeadPose.Pose.Position.y - pDominantTracking->HeadPose.Pose.Position.y;
+                float zxDist = length(x, z);
+
+                if (zxDist != 0.0f && z != 0.0f) {
+                    VectorSet(weaponangles, degrees(atanf(y / zxDist)), (cl.refdef.viewangles[YAW] - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ROLL]);
+                }
+            }
 
             if ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) !=
                 (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) {

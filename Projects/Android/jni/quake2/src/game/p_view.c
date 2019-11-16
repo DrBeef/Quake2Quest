@@ -93,6 +93,10 @@ void P_DamageFeedback (edict_t *player)
 	if (count == 0)
 		return;		// didn't take any damage
 
+	//Haptic
+	Android_Vibrate(fmin(count * 5, 150), 0, 0.6);
+	Android_Vibrate(fmin(count * 5, 150), 1, 0.6);
+
 	// start a pain animation if still in the player model
 	if (client->anim_priority < ANIM_PAIN && player->s.modelindex == 255)
 	{

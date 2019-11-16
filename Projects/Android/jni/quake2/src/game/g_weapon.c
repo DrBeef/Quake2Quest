@@ -17,6 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+#include <src/ref_gl/gl_local.h>
 #include "g_local.h"
 
 
@@ -387,7 +388,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 		VectorMA (bolt->s.origin, -10, dir, bolt->s.origin);
 		bolt->touch (bolt, tr.ent, NULL, NULL);
 	}
-}	
+}
 
 
 /*
@@ -647,6 +648,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		check_dodge (self, rocket->s.origin, dir, speed);
 
 	gi.linkentity (rocket);
+
 }
 
 

@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static qboolean	is_quad;
 static byte		is_silenced;
+extern	cvar_t	*r_lefthand;
 
 
 void weapon_grenade_fire (edict_t *ent, qboolean held);
@@ -593,6 +594,9 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 		ent->s.frame = FRAME_wave08;
 		ent->client->anim_end = FRAME_wave01;
 	}
+
+
+	Android_Vibrate(120, 1 - r_lefthand->value, 0.6);
 }
 
 void Weapon_Grenade (edict_t *ent)
@@ -741,6 +745,9 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index]--;
+
+
+	Android_Vibrate(120, 1 - r_lefthand->value, 0.6);
 }
 
 void Weapon_GrenadeLauncher (edict_t *ent)
@@ -784,6 +791,8 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
     VectorSet(offset, 0, 0, 0);
     P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
+
+	Android_Vibrate(120, 1 - r_lefthand->value, 1.0);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -843,6 +852,8 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	gi.multicast (ent->s.origin, MULTICAST_PVS);
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
+
+	Android_Vibrate(120, 1 - r_lefthand->value, 0.4);
 }
 
 
@@ -1014,6 +1025,8 @@ void Machinegun_Fire (edict_t *ent)
     VectorSet(offset, 0, 0, 0);
     P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 	fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
+
+	Android_Vibrate(20, 1 - r_lefthand->value, 0.7);
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
@@ -1227,6 +1240,8 @@ void weapon_shotgun_fire (edict_t *ent)
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index]--;
+
+	Android_Vibrate(120, 1 - r_lefthand->value, 0.6);
 }
 
 void Weapon_Shotgun (edict_t *ent)
@@ -1335,6 +1350,8 @@ void weapon_railgun_fire (edict_t *ent)
     P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 	fire_rail (ent, start, forward, damage, kick);
 
+	Android_Vibrate(120, 1 - r_lefthand->value, 0.9);
+
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
@@ -1415,6 +1432,8 @@ void weapon_bfg_fire (edict_t *ent)
     VectorSet(offset, 0, 0, 0);
     P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 	fire_bfg (ent, start, forward, damage, 400, damage_radius);
+
+	Android_Vibrate(120, 1 - r_lefthand->value, 1.0);
 
 	ent->client->ps.gunframe++;
 

@@ -15,6 +15,8 @@ ovrInputStateTrackedRemote rightTrackedRemoteState_old;
 ovrInputStateTrackedRemote rightTrackedRemoteState_new;
 ovrTracking rightRemoteTracking_new;
 
+ovrDeviceID controllerIDs[2];
+
 float remote_movementSideways;
 float remote_movementForward;
 float remote_movementUp;

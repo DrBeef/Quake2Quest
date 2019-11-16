@@ -159,6 +159,9 @@ extern long Q_ftol( float f );
 
 void VectorMA (vec3_t veca, float scale, vec3_t vecb, vec3_t vecc);
 
+void Android_Vibrate( float duration, int channel, float intensity );
+
+
 // just in case you do't want to use the macros
 vec_t _DotProduct (vec3_t v1, vec3_t v2);
 void _VectorSubtract (vec3_t veca, vec3_t vecb, vec3_t out);
