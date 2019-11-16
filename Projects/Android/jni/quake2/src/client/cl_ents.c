@@ -1372,6 +1372,7 @@ void CL_AddPacketEntities (frame_t *frame)
 }
 
 
+extern cvar_t *r_lefthand;
 extern cvar_t *vr_worldscale;
 extern vec3_t weaponangles;
 extern vec3_t weaponoffset;
@@ -1398,15 +1399,16 @@ static void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t
 	vec3_t gunoffset;
     convertFromVRtoQ2(weaponoffset, NULL, gunoffset);
 
+    int lrOffset = ( r_lefthand->value == 1.0F ) ? -4 : 4;
     //fb / lr / ud
 	vec3_t offset;
 	if (weapmodel == WEAP_BLASTER ||
                 weapmodel == WEAP_MACHINEGUN)
-        VectorSet(offset, 10, 4, -5);
+        VectorSet(offset, 10, lrOffset, -5);
     else if (weapmodel == WEAP_CHAINGUN)
-        VectorSet(offset, 2, 4, -5);
+        VectorSet(offset, 2, lrOffset, -5);
     else
-		VectorSet(offset, 6, 4, -5);
+		VectorSet(offset, 6, lrOffset, -5);
 
     vec3_t tempAngles;
     VectorCopy(weaponangles, tempAngles);

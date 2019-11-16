@@ -765,7 +765,7 @@ void R_DrawAliasModel (entity_t *e)
     if ( currententity->flags & RF_WEAPONMODEL )
     {
         if ( r_lefthand->value == 1.0F ) {
-            qglScalef(-vr_weaponscale->value, vr_weaponscale->value, vr_weaponscale->value);
+            qglScalef(vr_weaponscale->value, -vr_weaponscale->value, vr_weaponscale->value);
         } else {
             qglScalef(vr_weaponscale->value, vr_weaponscale->value, vr_weaponscale->value);
         }

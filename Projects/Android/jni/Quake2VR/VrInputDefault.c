@@ -26,8 +26,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
 {
-	//Ensure handedness is set to right
-	Cvar_Set("hand", "0");
+	//Ensure handedness is set correctly
+	Cvar_Set("hand", vr_control_scheme->value < 10 ? "0" : "1");
 
     static qboolean dominantGripPushed = false;
 	static float dominantGripPushTime = 0.0f;
@@ -47,7 +47,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     }
 
 	//Menu button
-	handleTrackedControllerButton(pOffTrackedRemoteNew, pOffTrackedRemoteOld, ovrButton_Enter, K_ESCAPE);
+	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, K_ESCAPE);
 
     if (cls.key_dest == key_menu)
     {
