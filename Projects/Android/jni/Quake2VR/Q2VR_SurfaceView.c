@@ -1538,15 +1538,22 @@ void * AppThreadFunction( void * parm )
 
             ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
 
+			//Get info for tracked remotes
+			acquireTrackedRemotesData(appState.Ovr, appState.DisplayTime);
+
             //Call additional control schemes here
             switch ((int)vr_control_scheme->value)
 			{
-				case RIGHT_HANDED_DEFAULT:
-					HandleInput_Right(appState.Ovr, appState.DisplayTime);
-					break;
-				case LEFT_HANDED_DEFAULT:
-					HandleInput_Left(appState.Ovr, appState.DisplayTime);
-					break;
+                case RIGHT_HANDED_DEFAULT:
+                    HandleInput_Default(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
+                                        &leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
+                                        ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
+                    break;
+                case LEFT_HANDED_DEFAULT:
+                    HandleInput_Default(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
+                                        &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
+                                        ovrButton_X, ovrButton_Y, ovrButton_A, ovrButton_B);
+                    break;
 			}
 
 			static bool usingScreenLayer = true; //Starts off using the screen layer
@@ -1723,8 +1730,8 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onCreate( JNIEnv
 	/* the global arg_xxx structs are initialised within the argtable */
 	void *argtable[] = {
 			ss   = arg_dbl0("s", "supersampling", "<double>", "super sampling value (e.g. 1.0)"),
-            cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-3 (default: 2)"),
-            gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-3 (default: 3)"),
+            cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-4 (default: 2)"),
+            gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
 			end     = arg_end(20)
 	};
 

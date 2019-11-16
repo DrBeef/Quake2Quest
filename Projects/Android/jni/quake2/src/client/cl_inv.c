@@ -109,10 +109,11 @@ void CL_DrawInventory (void)
 
 	re.DrawPic (x, y+8, "inventory");
 
-/*	y += 24;
+	x = (viddef.width-256);
+	y += 24;
 	x += 24;
-	Inv_DrawString (x, y, "hotkey ### item");
-	Inv_DrawString (x, y+8, "------ --- ----");
+	//Inv_DrawString (x, y, "hotkey ### item");
+	//Inv_DrawString (x, y+8, "------ --- ----");
 	y += 16;
 	for (i=top ; i<num && i < top+DISPLAY_ITEMS ; i++)
 	{
@@ -120,12 +121,13 @@ void CL_DrawInventory (void)
 		// search for a binding
 		Com_sprintf (binding, sizeof(binding), "use %s", cl.configstrings[CS_ITEMS+item]);
 		bind = "";
-		for (j=0 ; j<256 ; j++)
+		//Don't report key bindings as we can't use them!
+/*		for (j=0 ; j<256 ; j++)
 			if (keybindings[j] && !Q_stricmp (keybindings[j], binding))
 			{
 				bind = Key_KeynumToString(j);
 				break;
-			}
+			}*/
 
 		Com_sprintf (string, sizeof(string), "%6s %3i %s", bind, cl.inventory[item],
 			cl.configstrings[CS_ITEMS+item] );
@@ -143,8 +145,6 @@ void CL_DrawInventory (void)
 		Inv_DrawString (x, y, string);
 		y += 8;
 	}
-*/
-
 }
 
 

@@ -52,7 +52,7 @@ import android.support.v4.content.ContextCompat;
 	private SurfaceHolder mSurfaceHolder;
 	private long mNativeHandle;
 
-	private boolean please_exit = false;
+	private boolean stop_audio = true;
 	
 	@Override protected void onCreate( Bundle icicle )
 	{
@@ -229,6 +229,22 @@ import android.support.v4.content.ContextCompat;
 	 * Audio
 	 *----------------------------*/
 
+	private void startAudioThread() {
+		if (stop_audio) {
+			//Start Audio Thread
+			stop_audio = false;
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						audio_thread();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+		}
+	}
+
 	public void audio_thread() throws IOException{
 
 		int audioSize = (2048*4);
@@ -244,14 +260,12 @@ import android.support.v4.content.ContextCompat;
 				AudioTrack.getMinBufferSize(sampleFreq, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT),
 				AudioTrack.MODE_STREAM);
 
-		Log.i("Quake2", "start audio");
-
 		// Start playing data that is written
 		oTrack.play();
 
 		long tstart = SystemClock.uptimeMillis();
 
-		while (!please_exit){
+		while (!stop_audio){
 
 			sQuake2PaintAudio( audioBuffer );
 
@@ -270,7 +284,7 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onStart()" );
 		super.onStart();
-
+		startAudioThread();
 		GLES3JNILib.onStart( mNativeHandle );
 	}
 
@@ -278,7 +292,7 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onResume()" );
 		super.onResume();
-
+		startAudioThread();
 		GLES3JNILib.onResume( mNativeHandle );
 	}
 
@@ -286,6 +300,7 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onPause()" );
 		GLES3JNILib.onPause( mNativeHandle );
+		stop_audio = true;
 		super.onPause();
 	}
 
@@ -293,7 +308,7 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onStop()" );
 		GLES3JNILib.onStop( mNativeHandle );
-//		please_exit = true;
+		stop_audio = true;
 		super.onStop();
 	}
 
@@ -307,8 +322,7 @@ import android.support.v4.content.ContextCompat;
 		}
 
 		GLES3JNILib.onDestroy( mNativeHandle );
-
-		please_exit = true;
+		stop_audio = true;
 
 		super.onDestroy();
 		mNativeHandle = 0;
@@ -321,16 +335,6 @@ import android.support.v4.content.ContextCompat;
 		{
 			GLES3JNILib.onSurfaceCreated( mNativeHandle, holder.getSurface() );
 			mSurfaceHolder = holder;
-
-			//Start Audio Thread
-			new Thread( new Runnable(){
-				public void run() {
-					try {
-						audio_thread();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}}).start();
 		}
 	}
 

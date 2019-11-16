@@ -43,7 +43,6 @@ vec3_t positionDeltaThisFrame;
 #define MELEE 2
 vec3_t weaponangles;
 vec3_t weaponoffset;
-vec3_t weaponvelocity;
 
 vec3_t flashlightangles;
 vec3_t flashlightoffset;

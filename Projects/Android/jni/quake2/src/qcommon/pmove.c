@@ -1230,7 +1230,7 @@ void PM_ClampAngles (void)
 		// circularly clamp the angles with deltas
 		for (i=0 ; i<3 ; i++)
 		{
-			temp = pm->cmd.angles[i] + pm->s.delta_angles[i];
+			temp = pm->cmd.angles[i] + (i > 0 ? pm->s.delta_angles[i] : 0); // Fix pitch being wrong after save?
 			pm->viewangles[i] = SHORT2ANGLE(temp);
 		}
 

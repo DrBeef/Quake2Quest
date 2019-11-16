@@ -351,11 +351,11 @@ void CL_BaseMove (usercmd_t *cmd)
 
 void CL_ClampPitch (void)
 {
-	float	pitch;
+	float	pitch=0;
 
-	pitch = SHORT2ANGLE(cl.frame.playerstate.pmove.delta_angles[PITCH]);
+	/*pitch = SHORT2ANGLE(cl.frame.playerstate.pmove.delta_angles[PITCH]);
 	if (pitch > 180)
-		pitch -= 360;
+		pitch -= 360;*/
 
 	if (cl.viewangles[PITCH] + pitch < -360)
 		cl.viewangles[PITCH] += 360; // wrapped

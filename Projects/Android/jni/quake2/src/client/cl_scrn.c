@@ -1010,10 +1010,15 @@ void SCR_ExecuteLayoutString (char *s,float separation)
 		if (!strcmp(token, "xv"))
 		{
 			token = COM_Parse (&s);
-			x = viddef.width/2 - 160 + atoi(token);
+			x = viddef.width - 160 + atoi(token);
 			continue;
 		}
-
+        if (!strcmp(token, "xh"))
+        {
+            token = COM_Parse (&s);
+            x = viddef.width/2 - 160 + atoi(token);
+            continue;
+        }
 		if (!strcmp(token, "yt"))
 		{
 			token = COM_Parse (&s);

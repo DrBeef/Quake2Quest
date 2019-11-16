@@ -504,11 +504,11 @@ void ReadGame (char *filename)
 		gi.error ("Couldn't open %s", filename);
 
 	fread (str, sizeof(str), 1, f);
-	if (!(oldsave->value) && strcmp (str, __DATE__))
+/*	if (!(oldsave->value) && strcmp (str, __DATE__))
 	{
 		fclose (f);
 		gi.error ("Savegame from an older version.\n");
-	}
+	}*/
 
 	g_edicts =  gi.TagMalloc (game.maxentities * sizeof(g_edicts[0]), TAG_GAME);
 	globals.edicts = g_edicts;

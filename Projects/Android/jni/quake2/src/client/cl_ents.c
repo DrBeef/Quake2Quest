@@ -1400,10 +1400,13 @@ static void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t
 
     //fb / lr / ud
 	vec3_t offset;
-    VectorSet(offset, 10, 4, -5);
-    vec3_t forward;
-    vec3_t right;
-    vec3_t up;
+	if (weapmodel == WEAP_BLASTER ||
+                weapmodel == WEAP_MACHINEGUN)
+        VectorSet(offset, 10, 4, -5);
+    else if (weapmodel == WEAP_CHAINGUN)
+        VectorSet(offset, 2, 4, -5);
+    else
+		VectorSet(offset, 6, 4, -5);
 
     vec3_t tempAngles;
     VectorCopy(weaponangles, tempAngles);

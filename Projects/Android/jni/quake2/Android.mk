@@ -48,8 +48,7 @@ QUAKE2VR_SRC_FILES := \
 		   ../Quake2VR/Q2VR_SurfaceView.c \
 		   ../Quake2VR/VrCompositor.c \
 		   ../Quake2VR/VrInputCommon.c \
-		   ../Quake2VR/VrInputRight.c \
-		   ../Quake2VR/VrInputLeft.c \
+		   ../Quake2VR/VrInputDefault.c \
 		   ../Quake2VR/argtable3.c \
 		   ../Quake2VR/mathlib.c \
 		   ../Quake2VR/matrixlib.c \
