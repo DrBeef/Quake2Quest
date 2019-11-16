@@ -293,7 +293,7 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onStop()" );
 		GLES3JNILib.onStop( mNativeHandle );
-		please_exit = true;
+//		please_exit = true;
 		super.onStop();
 	}
 
