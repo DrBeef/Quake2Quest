@@ -651,30 +651,30 @@ char *single_statusbar =
 "yb	-24 "
 
 // health
-"xv	0 "
+"xh	0 "
 "hnum "
-"xv	50 "
+"xh	50 "
 "pic 0 "
 
 // ammo
 "if 2 "
-"	xv	100 "
+"	xh	100 "
 "	anum "
-"	xv	150 "
+"	xh	150 "
 "	pic 2 "
 "endif "
 
 // armor
 "if 4 "
-"	xv	200 "
+"	xh	200 "
 "	rnum "
-"	xv	250 "
+"	xh	250 "
 "	pic 4 "
 "endif "
 
 // selected item
 "if 6 "
-"	xv	296 "
+"	xh	296 "
 "	pic 6 "
 "endif "
 
@@ -682,9 +682,9 @@ char *single_statusbar =
 
 // picked up item
 "if 7 "
-"	xv	0 "
+"	xh	0 "
 "	pic 7 "
-"	xv	26 "
+"	xh	26 "
 "	yb	-42 "
 "	stat_string 8 "
 "	yb	-50 "
@@ -692,15 +692,15 @@ char *single_statusbar =
 
 // timer
 "if 9 "
-"	xv	262 "
+"	xh	262 "
 "	num	2	10 "
-"	xv	296 "
+"	xh	296 "
 "	pic	9 "
 "endif "
 
 //  help / weapon icon 
 "if 11 "
-"	xv	148 "
+"	xh	148 "
 "	pic	11 "
 "endif "
 ;
@@ -709,30 +709,30 @@ char *dm_statusbar =
 "yb	-24 "
 
 // health
-"xv	0 "
+"xh	0 "
 "hnum "
-"xv	50 "
+"xh	50 "
 "pic 0 "
 
 // ammo
 "if 2 "
-"	xv	100 "
+"	xh	100 "
 "	anum "
-"	xv	150 "
+"	xh	150 "
 "	pic 2 "
 "endif "
 
 // armor
 "if 4 "
-"	xv	200 "
+"	xh	200 "
 "	rnum "
-"	xv	250 "
+"	xh	250 "
 "	pic 4 "
 "endif "
 
 // selected item
 "if 6 "
-"	xv	296 "
+"	xh	296 "
 "	pic 6 "
 "endif "
 
@@ -740,9 +740,9 @@ char *dm_statusbar =
 
 // picked up item
 "if 7 "
-"	xv	0 "
+"	xh	0 "
 "	pic 7 "
-"	xv	26 "
+"	xh	26 "
 "	yb	-42 "
 "	stat_string 8 "
 "	yb	-50 "
@@ -750,15 +750,15 @@ char *dm_statusbar =
 
 // timer
 "if 9 "
-"	xv	246 "
+"	xh	246 "
 "	num	2	10 "
-"	xv	296 "
+"	xh	296 "
 "	pic	9 "
 "endif "
 
 //  help / weapon icon 
 "if 11 "
-"	xv	148 "
+"	xh	148 "
 "	pic	11 "
 "endif "
 
@@ -769,17 +769,17 @@ char *dm_statusbar =
 
 // spectator
 "if 17 "
-  "xv 0 "
+  "xh 0 "
   "yb -58 "
   "string2 \"SPECTATOR MODE\" "
 "endif "
 
 // chase camera
 "if 16 "
-  "xv 0 "
+  "xh 0 "
   "yb -68 "
   "string \"Chasing\" "
-  "xv 64 "
+  "xh 64 "
   "stat_string 16 "
 "endif "
 ;
