@@ -1346,7 +1346,8 @@ void VR_Init()
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
 	vr_enable_crouching = Cvar_Get( "vr_enable_crouching", "0.85", CVAR_ARCHIVE);
     vr_height_adjust = Cvar_Get( "vr_height_adjust", "0.0", CVAR_ARCHIVE);
-	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.6", CVAR_ARCHIVE);
+	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.56", CVAR_ARCHIVE);
+    vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0.0", CVAR_LATCH);
 
     //The Engine (which is a derivative of Quake) uses a very specific unit size:
     //Wolfenstein 3D, DOOM and QUAKE use the same coordinate/unit system:

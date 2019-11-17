@@ -10,3 +10,4 @@ cvar_t	*vr_enable_crouching;
 cvar_t	*vr_height_adjust;
 cvar_t	*vr_worldscale;
 cvar_t	*vr_weaponscale;
+cvar_t	*vr_weapon_stabilised;

@@ -19,6 +19,8 @@ Authors		:	Simon Brown
 #include "../quake2/src/client/client.h"
 
 extern cvar_t	*cl_forwardspeed;
+extern cvar_t	*sv_cheats;
+extern cvar_t	*vr_weapon_stabilised;
 
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
@@ -32,7 +34,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     static qboolean dominantGripPushed = false;
 	static float dominantGripPushTime = 0.0f;
     static qboolean inventoryManagementMode = false;
-    static qboolean vr_weapon_stabilised = false;
 
     //Show screen view (if in multiplayer toggle scoreboard)
     if (((pOffTrackedRemoteNew->Buttons & offButton2) !=
@@ -75,7 +76,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     }
     else
     {
-        //If distance to off-hand remote is less than 35cm and user pushes grip, then we enable weapon stabilisation
         float distance = sqrtf(powf(pOffTracking->HeadPose.Pose.Position.x - pDominantTracking->HeadPose.Pose.Position.x, 2) +
                                powf(pOffTracking->HeadPose.Pose.Position.y - pDominantTracking->HeadPose.Pose.Position.y, 2) +
                                powf(pOffTracking->HeadPose.Pose.Position.z - pDominantTracking->HeadPose.Pose.Position.z, 2));
@@ -88,12 +88,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             {
                 if (distance < 0.50f)
                 {
-                    vr_weapon_stabilised = true;
+                    Cvar_ForceSet("vr_weapon_stabilised", "1.0");
                 }
             }
             else
             {
-                vr_weapon_stabilised = false;
+                Cvar_ForceSet("vr_weapon_stabilised", "0.0");
             }
         }
 
@@ -118,9 +118,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             weaponangles[ROLL] *= -1.0f;
 
 
-            if (vr_weapon_stabilised &&
-                //Don't trigger stabilisation if controllers are close together (holding Glock for example)
-                (distance > 0.15f))
+            if (vr_weapon_stabilised->value == 1.0f)
             {
                 float z = pOffTracking->HeadPose.Pose.Position.z - pDominantTracking->HeadPose.Pose.Position.z;
                 float x = pOffTracking->HeadPose.Pose.Position.x - pDominantTracking->HeadPose.Pose.Position.x;
@@ -307,13 +305,20 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                  (pOffTrackedRemoteOld->Buttons & offButton1)) &&
                 (pOffTrackedRemoteOld->Buttons & offButton1)) {
                 sendButtonActionSimple("cmd help");
-
-#ifndef NDEBUG
-				Cbuf_AddText( "cheats 1\n" );
-				Cbuf_AddText( "give all\n" );
-#endif
             }
 
+
+            //Use (Action)
+            if ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
+                (pOffTrackedRemoteOld->Buttons & ovrButton_Joystick)
+                && (pOffTrackedRemoteNew->Buttons & ovrButton_Joystick)) {
+
+                //If cheats enabled, give all weapons/pickups to player
+                if (sv_cheats->value == 1.0f) {
+                    Cbuf_AddText("give all\n");
+                }
+
+            }
 
             //We need to record if we have started firing primary so that releasing trigger will stop definitely firing, if user has pushed grip
             //in meantime, then it wouldn't stop the gun firing and it would get stuck

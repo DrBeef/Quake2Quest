@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static qboolean	is_quad;
 static byte		is_silenced;
 extern	cvar_t	*r_lefthand;
+extern	cvar_t	*vr_weapon_stabilised;
 
 
 void weapon_grenade_fire (edict_t *ent, qboolean held);
@@ -1003,13 +1004,23 @@ void Machinegun_Fire (edict_t *ent)
 		kick *= 4;
 	}
 
-	for (i=1 ; i<3 ; i++)
+	if (vr_weapon_stabilised->value == 1.0f)
 	{
-		ent->client->kick_origin[i] = crandom() * 0.35;
-		ent->client->kick_angles[i] = crandom() * 0.7;
+		for (i=1 ; i<3 ; i++)
+		{
+			ent->client->kick_origin[i] = crandom() * 0.2;
+			ent->client->kick_angles[i] = crandom() * 0.2;
+		}
+		ent->client->kick_origin[0] = crandom() * 0.2;
+	} else {
+		for (i=1 ; i<3 ; i++)
+		{
+			ent->client->kick_origin[i] = crandom() * 0.35;
+			ent->client->kick_angles[i] = crandom() * 0.7;
+		}
+		ent->client->kick_origin[0] = crandom() * 0.35;
+		ent->client->kick_angles[0] = ent->client->machinegun_shots * -1.5;
 	}
-	ent->client->kick_origin[0] = crandom() * 0.35;
-	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1.5;
 
 	// raise the gun as it is firing
 	if (!deathmatch->value)
