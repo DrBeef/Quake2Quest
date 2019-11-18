@@ -651,30 +651,30 @@ char *single_statusbar =
 "yb	-24 "
 
 // health
-"xh	0 "
+"xv	0 "
 "hnum "
-"xh	50 "
+"xv	50 "
 "pic 0 "
 
 // ammo
 "if 2 "
-"	xh	100 "
+"	xv	100 "
 "	anum "
-"	xh	150 "
+"	xv	150 "
 "	pic 2 "
 "endif "
 
 // armor
 "if 4 "
-"	xh	200 "
+"	xv	200 "
 "	rnum "
-"	xh	250 "
+"	xv	250 "
 "	pic 4 "
 "endif "
 
 // selected item
 "if 6 "
-"	xh	296 "
+"	xv	296 "
 "	pic 6 "
 "endif "
 
@@ -692,7 +692,7 @@ char *single_statusbar =
 
 // timer
 "if 9 "
-"	xh	262 "
+"	xv	262 "
 "	num	2	10 "
 "	xh	296 "
 "	pic	9 "
@@ -700,7 +700,7 @@ char *single_statusbar =
 
 //  help / weapon icon 
 "if 11 "
-"	xh	148 "
+"	xv	148 "
 "	pic	11 "
 "endif "
 ;
