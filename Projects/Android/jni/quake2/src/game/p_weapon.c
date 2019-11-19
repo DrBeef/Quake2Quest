@@ -27,6 +27,7 @@ static qboolean	is_quad;
 static byte		is_silenced;
 extern	cvar_t	*r_lefthand;
 extern	cvar_t	*vr_weapon_stabilised;
+extern  cvar_t  *vr_lasersight;
 
 
 void weapon_grenade_fire (edict_t *ent, qboolean held);
@@ -453,6 +454,22 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		return;
 	}
 
+	//Laser sight?
+	if (vr_lasersight->value == 1.0f)
+	{
+		vec3_t	forward, right;
+		vec3_t	end;
+		AngleVectors (ent->client->v_angle, forward, right, NULL);
+		VectorMA (ent->s.origin, 8192, forward, end);
+		trace_t tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_DEADMONSTER);
+
+		gi.WriteByte (svc_temp_entity);
+		gi.WriteByte (TE_LASER_SIGHT);
+		gi.WritePosition (ent->s.origin);
+		gi.WritePosition (tr.endpos);
+		gi.multicast (ent->s.origin, MULTICAST_PHS);
+	}
+
 	if (ent->client->weaponstate == WEAPON_READY)
 	{
 		if ( ((ent->client->latched_buttons|ent->client->buttons) & BUTTON_ATTACK) )
@@ -509,6 +526,8 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 */
 			//Don't play weapon idle anims
 			//ent->client->ps.gunframe++;
+
+
 			return;
 		}
 	}

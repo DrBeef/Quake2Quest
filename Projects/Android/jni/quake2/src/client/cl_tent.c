@@ -66,6 +66,7 @@ typedef struct
 	int			endtime;
 } laser_t;
 laser_t		cl_lasers[MAX_LASERS];
+laser_t		cl_lasersight;
 
 //ROGUE
 cl_sustain_t	cl_sustains[MAX_SUSTAINS];
@@ -581,6 +582,27 @@ void CL_ParseLaser (int colors)
 	}
 }
 
+/*
+=================
+CL_ParseLaserSight
+=================
+*/
+void CL_ParseLaserSight ()
+{
+	vec3_t	start;
+	vec3_t	end;
+	laser_t	*l = &cl_lasersight;
+	int		i;
+
+	MSG_ReadPos (&net_message, start);
+	MSG_ReadPos (&net_message, end);
+
+    l->ent.flags = RF_LASERSIGHT;
+    VectorCopy (start, l->ent.origin);
+    VectorCopy (end, l->ent.oldorigin);
+    l->endtime = cl.time+250;
+}
+
 #ifdef QMAX
 void CL_GunSmokeEffect (vec3_t org, vec3_t dir)
 {
@@ -1069,6 +1091,10 @@ void CL_ParseTEnt (void)
 
 	case TE_BFG_LASER:
 		CL_ParseLaser (0xd0d1d2d3);
+		break;
+
+	case TE_LASER_SIGHT:
+		CL_ParseLaserSight ();
 		break;
 
 	case TE_BUBBLETRAIL:
@@ -1999,6 +2025,10 @@ void CL_AddLasers (void)
 		if (l->endtime >= cl.time)
 			V_AddEntity (&l->ent);
 	}
+
+	if (cl_lasersight.endtime >= cl.time)
+		V_AddEntity (&cl_lasersight.ent);
+
 }
 
 /* PMM - CL_Sustains */

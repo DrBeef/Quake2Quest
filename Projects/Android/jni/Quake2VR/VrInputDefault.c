@@ -274,10 +274,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 				  pOffTracking->HeadPose.Pose.Position.y,
 				  pOffTracking->HeadPose.Pose.Position.z);
 
-			//Use (Action)
-			if ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
-				(pOffTrackedRemoteOld->Buttons & ovrButton_Joystick)
-				&& (pOffTrackedRemoteNew->Buttons & ovrButton_Joystick)) {
+			//Laser-sight
+			if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
+				(pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick)
+				&& (pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick)) {
 
 				Cvar_SetValue("vr_lasersight", 1.0f - vr_lasersight->value);
 
@@ -300,10 +300,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                   remote_movementForward);
 
 
-            //show help computer
-            if (((pOffTrackedRemoteNew->Buttons & offButton1) !=
-                 (pOffTrackedRemoteOld->Buttons & offButton1)) &&
-                (pOffTrackedRemoteOld->Buttons & offButton1)) {
+            //show help computer while X/A pressed
+            if ((pOffTrackedRemoteNew->Buttons & offButton1) !=
+                 (pOffTrackedRemoteOld->Buttons & offButton1)) {
                 sendButtonActionSimple("cmd help");
             }
 

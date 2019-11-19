@@ -623,7 +623,8 @@ typedef struct
 #define RF_SHELL_RED		1024
 #define	RF_SHELL_GREEN		2048
 #define RF_SHELL_BLUE		4096
-#define RF_NOSHADOW		8192	/* don't draw a shadow */
+#define RF_NOSHADOW		    8192	/* don't draw a shadow */
+#define RF_LASERSIGHT		16384
 
 //ROGUE
 #define RF_IR_VISIBLE		0x00008000		// 32768
@@ -988,8 +989,10 @@ typedef enum
 	TE_WIDOWSPLASH,
 	TE_EXPLOSION1_BIG,
 	TE_EXPLOSION1_NP,
-	TE_FLECHETTE
+	TE_FLECHETTE,
 //ROGUE
+
+	TE_LASER_SIGHT
 } temp_event_t;
 
 #define SPLASH_UNKNOWN		0
