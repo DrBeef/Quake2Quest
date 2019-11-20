@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // cl_tent.c -- client side temporary entities
 
+#include <src/game/q_shared.h>
 #include "client.h"
 
 typedef enum
@@ -589,18 +590,40 @@ CL_ParseLaserSight
 */
 void CL_ParseLaserSight ()
 {
-	vec3_t	start;
-	vec3_t	end;
-	laser_t	*l = &cl_lasersight;
-	int		i;
+    //Set end time so laser is drawn
+    cl_lasersight.ent.flags = RF_LASERSIGHT;
+    cl_lasersight.endtime = cl.time+250;
+}
 
-	MSG_ReadPos (&net_message, start);
-	MSG_ReadPos (&net_message, end);
+void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunangles);
 
-    l->ent.flags = RF_LASERSIGHT;
-    VectorCopy (start, l->ent.origin);
-    VectorCopy (end, l->ent.oldorigin);
-    l->endtime = cl.time+250;
+trace_t CL_Trace (vec3_t start, vec3_t end, float size,  int contentmask)
+{
+    vec3_t maxs, mins;
+
+    VectorSet(maxs, size, size, size);
+    VectorSet(mins, -size, -size, -size);
+
+    return CM_BoxTrace (start, end, mins, maxs, 0, contentmask);
+}
+
+void CL_UpdateLaserSightOrigins ()
+{
+    if (cl_lasersight.endtime > cl.time) {
+        vec3_t forward, right;
+        vec3_t end;
+        vec3_t gunorigin;
+        vec3_t gunangles;
+        //At the point of calling this, the vieworg should already have the player height included
+        SetWeapon6DOF(0, cl.refdef.vieworg, gunorigin, gunangles);
+        gunorigin[2] += 1; // just add a little bit
+        AngleVectors(gunangles, forward, right, NULL);
+        VectorMA(gunorigin, 8192, forward, end);
+        trace_t tr = CL_Trace(gunorigin, end, 1,
+                              CONTENTS_SOLID | CONTENTS_MONSTER | CONTENTS_DEADMONSTER);
+        VectorCopy(gunorigin, cl_lasersight.ent.origin);
+        VectorCopy(tr.endpos, cl_lasersight.ent.oldorigin);
+    }
 }
 
 #ifdef QMAX

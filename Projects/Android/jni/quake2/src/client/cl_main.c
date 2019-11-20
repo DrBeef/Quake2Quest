@@ -1766,6 +1766,9 @@ void CL_BeginFrame (int msec) {
 	// predict all unacknowledged movements
 	CL_PredictMovement();
 
+	//HACK!
+	CL_UpdateLaserSightOrigins();
+
 	// allow rendering DLL change
 	VID_CheckChanges();
 	if (!cl.refresh_prepped && cls.state == ca_active)

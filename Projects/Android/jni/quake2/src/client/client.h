@@ -391,6 +391,7 @@ void CL_ParticleEffect2 (vec3_t org, vec3_t dir, int color, int count);
 // RAFAEL
 void CL_ParticleEffect3 (vec3_t org, vec3_t dir, int color, int count);
 
+void CL_UpdateLaserSightOrigins ();
 
 //=================================================
 

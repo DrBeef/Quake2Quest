@@ -1395,7 +1395,7 @@ void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out);
 #define WEAP_RAILGUN			10
 #define WEAP_BFG				11
 
-static void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunangles)
+void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunangles)
 {
 	vec3_t gunoffset;
     convertFromVRtoQ2(weaponoffset, NULL, gunoffset);
@@ -1403,15 +1403,16 @@ static void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t
     int lrOffset = (( r_lefthand->value == 1.0F ) ? -7 : 7) * vr_weaponscale->value;
     //fb / lr / ud
 	vec3_t offset;
+	VectorSet(offset, 0, 0, 0);
 	if (weapmodel == WEAP_BLASTER ||
                 weapmodel == WEAP_MACHINEGUN)
         VectorSet(offset, 17 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
     else if (weapmodel == WEAP_SHOTGUN)
-        VectorSet(offset, 12 * vr_weaponscale->value, lrOffset * 1.12, -8 * vr_weaponscale->value);
+        VectorSet(offset, 12 * vr_weaponscale->value, lrOffset * 1.1, -8 * vr_weaponscale->value);
 	else if (weapmodel == WEAP_CHAINGUN)
-		VectorSet(offset, 3.5 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
-    else
-		VectorSet(offset, 10 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
+		VectorSet(offset, 3.5 * vr_weaponscale->value, lrOffset * 0.85, -8 * vr_weaponscale->value);
+    else  if (weapmodel != 0)
+    	VectorSet(offset, 10 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
 
     vec3_t tempAngles;
     VectorCopy(weaponangles, tempAngles);
@@ -1433,15 +1434,12 @@ static void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t
     VectorAdd(origin, gunoffset, gunorigin);
     VectorAdd(gunorigin, position_adjust, gunorigin);
 
-	//add player actual real world height - controller location is relative to HMD
-	gunorigin[2] -= (QUAKE_MARINE_HEIGHT * vr_worldscale->value);
-	gunorigin[2] += (hmdPosition[1] * vr_worldscale->value);
-
 	matrix4x4 matAngleAdjust;
 	vec3_t angleAdjust;
+	VectorSet(angleAdjust, 0, 0, 0);
 	if (weapmodel == WEAP_MACHINEGUN)
 		VectorSet(angleAdjust, -3, 6, -4); // Fix crap model orientation!!
-	else
+	else if (weapmodel != 0)
 		VectorSet(angleAdjust, -3, 0, 0);
 	Matrix4x4_CreateFromEntity(matAngleAdjust, angleAdjust, vec3_origin, 1.0);
 
@@ -1480,6 +1478,10 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 
     // set up gun position
     SetWeapon6DOF(ps->weapmodel, cl.refdef.vieworg, gun.origin, gun.angles);
+
+	//add player actual real world height - controller location is relative to HMD
+	gun.origin[2] -= (QUAKE_MARINE_HEIGHT * vr_worldscale->value);
+	gun.origin[2] += (hmdPosition[1] * vr_worldscale->value);
 
 	if (gun_frame)
 	{

@@ -457,16 +457,8 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	//Laser sight?
 	if (vr_lasersight->value == 1.0f)
 	{
-		vec3_t	forward, right;
-		vec3_t	end;
-		AngleVectors (ent->client->v_angle, forward, right, NULL);
-		VectorMA (ent->s.origin, 8192, forward, end);
-		trace_t tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_DEADMONSTER);
-
 		gi.WriteByte (svc_temp_entity);
 		gi.WriteByte (TE_LASER_SIGHT);
-		gi.WritePosition (ent->s.origin);
-		gi.WritePosition (tr.endpos);
 		gi.multicast (ent->s.origin, MULTICAST_PHS);
 	}
 

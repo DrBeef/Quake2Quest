@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 //#define	VERSION		3.21
-#define	VERSION		0.5
+#define	VERSION		0.6
 
 #define	BASEDIRNAME	"baseq2"
 
