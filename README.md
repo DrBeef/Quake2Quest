@@ -60,6 +60,7 @@ set vr_control_scheme "10"
 * Off-Hand Thumbstick - locomotion
 * Off-Hand Trigger - Run
 * Off-Hand Grip Button - Weapon Stabilisation - with the machine gun this will reduce the scatter of the projectiles
+* Off-Hand Thumbstick click - If cheats are enabled then this will give you ALL pickups/weapons
 
 
 Useful CVARs
@@ -73,6 +74,7 @@ set vr_snapturn_angle  "5"
 
 |cvar|description|
 | --- | --- |
+|cheats|If set to 1 then you can click the off-hand thumbstick button to activate "give all", giving you all weapons, pickups etc|
 |vr_snapturn_angle|Sets the angle of the snap turn, set to a value < 10 for smooth turning|
 |vr_walkdirection|Set to 1 for HMD oriented movement direction|
 |vr_control_scheme|Sets the control scheme (default: 0 - off-hand controller oriented, 1 - HMD oriented)|
