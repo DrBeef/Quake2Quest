@@ -279,8 +279,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 				(pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick)
 				&& (pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick)) {
 
-				Cvar_SetValue("vr_lasersight", 1.0f - vr_lasersight->value);
-
+			    if (vr_lasersight->value != 0.0)
+                {
+                    Cvar_ForceSet("vr_lasersight", "0.0");
+                } else {
+                    Cvar_ForceSet("vr_lasersight", "1.0");
+			    }
 			}
 
 			//Apply a filter and quadratic scaler so small movements are easier to make

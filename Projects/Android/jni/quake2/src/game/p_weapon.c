@@ -455,7 +455,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	}
 
 	//Laser sight?
-	if (vr_lasersight->value == 1.0f)
+	if (vr_lasersight->value != 0.0f)
 	{
 		gi.WriteByte (svc_temp_entity);
 		gi.WriteByte (TE_LASER_SIGHT);

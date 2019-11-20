@@ -233,6 +233,7 @@ void CL_ClearTEnts (void)
 	memset (cl_beams, 0, sizeof(cl_beams));
 	memset (cl_explosions, 0, sizeof(cl_explosions));
 	memset (cl_lasers, 0, sizeof(cl_lasers));
+	memset (&cl_lasersight, 0, sizeof(laser_t));
 
 //ROGUE
 	memset (cl_playerbeams, 0, sizeof(cl_playerbeams));
