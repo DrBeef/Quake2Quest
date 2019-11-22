@@ -1404,9 +1404,10 @@ void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunang
     //fb / lr / ud
 	vec3_t offset;
 	VectorSet(offset, 0, 0, 0);
-	if (weapmodel == WEAP_BLASTER ||
-                weapmodel == WEAP_MACHINEGUN)
+	if (weapmodel == WEAP_BLASTER)
         VectorSet(offset, 17 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
+    else if (weapmodel == WEAP_MACHINEGUN)
+        VectorSet(offset, 17 * vr_weaponscale->value, lrOffset * 0.9, -8 * vr_weaponscale->value);
     else if (weapmodel == WEAP_SHOTGUN)
         VectorSet(offset, 12 * vr_weaponscale->value, lrOffset * 1.3, -8 * vr_weaponscale->value);
 	else if (weapmodel == WEAP_CHAINGUN)

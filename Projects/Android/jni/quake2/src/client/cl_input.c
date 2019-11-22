@@ -340,9 +340,9 @@ void CL_BaseMove (usercmd_t *cmd)
 //
 	if ( (in_speed.state & 1) ^ (int)(cl_run->value) )
 	{
-		cmd->forwardmove *= 1.5;
-		cmd->sidemove *= 1.5;
-		cmd->upmove *= 1.5;
+		cmd->forwardmove *= 2;
+		cmd->sidemove *= 2;
+		cmd->upmove *= 2;
 	}
 
 	//retain the move from this

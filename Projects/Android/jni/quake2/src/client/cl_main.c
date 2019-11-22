@@ -1479,8 +1479,8 @@ void CL_InitLocal (void)
 #endif
 
 	cl_upspeed = Cvar_Get ("cl_upspeed", "200", 0);
-	cl_forwardspeed = Cvar_Get ("cl_forwardspeed", "200", 0);
-	cl_sidespeed = Cvar_Get ("cl_sidespeed", "200", 0);
+	cl_forwardspeed = Cvar_Get ("cl_forwardspeed", "150", 0);
+	cl_sidespeed = Cvar_Get ("cl_sidespeed", "150", 0);
 	cl_yawspeed = Cvar_Get ("cl_yawspeed", "140", 0);
 	cl_pitchspeed = Cvar_Get ("cl_pitchspeed", "150", 0);
 	cl_anglespeedkey = Cvar_Get ("cl_anglespeedkey", "1.5", 0);
