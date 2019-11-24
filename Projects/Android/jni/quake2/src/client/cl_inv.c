@@ -103,7 +103,7 @@ void CL_DrawInventory (float separation)
 		top = 0;
 
 	x = (viddef.width-256)/2;
-	y = (viddef.height-240)/2;
+	y = viddef.height/2;
 
 	// repaint everything next frame
 	SCR_DirtyScreen ();

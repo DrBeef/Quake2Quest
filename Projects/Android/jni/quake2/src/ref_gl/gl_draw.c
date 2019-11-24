@@ -146,10 +146,14 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	if (scrap_dirty)
 		Scrap_Upload ();
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
-		qglDisable (GL_ALPHA_TEST);
-	else
-		qglEnable (GL_ALPHA_TEST); // make sure alpha is enabled
+    qglDisable (GL_ALPHA_TEST);
+
+	if (gl->has_alpha)
+	{
+		glEnable(GL_BLEND);
+		glDisable(GL_ALPHA_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
 
 	GL_Bind (gl->texnum);
 	qglBegin (GL_QUADS);
@@ -163,8 +167,9 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	qglVertex2f (x, y+h);
 	qglEnd ();
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
-		qglEnable (GL_ALPHA_TEST);
+	//Restore
+    glDisable( GL_BLEND );
+    glEnable( GL_ALPHA_TEST );
 }
 
 

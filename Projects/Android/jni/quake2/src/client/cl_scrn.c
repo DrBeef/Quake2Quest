@@ -278,7 +278,7 @@ void SCR_DrawCenterString (void)
 	start = scr_centerstring;
 
 	if (scr_center_lines <= 4)
-		y = viddef.height*0.35;
+		y = viddef.height*0.4;
 	else
 		y = 48;
 
@@ -1060,7 +1060,7 @@ void SCR_ExecuteLayoutString (char *s,float separation)
 		if (!strcmp(token, "yt"))
 		{
 			token = COM_Parse (&s);
-			y = atoi(token);
+			y = viddef.height/3 + atoi(token);
 			continue;
 		}
 		if (!strcmp(token, "yb"))
@@ -1072,7 +1072,7 @@ void SCR_ExecuteLayoutString (char *s,float separation)
 		if (!strcmp(token, "yv"))
 		{
 			token = COM_Parse (&s);
-			y = viddef.height/2 - 120 + atoi(token);
+			y = viddef.height/2 + atoi(token);
 			continue;
 		}
 
@@ -1098,7 +1098,7 @@ void SCR_ExecuteLayoutString (char *s,float separation)
 			token = COM_Parse (&s);
 			x = viddef.width/2 - 160 + atoi(token);
 			token = COM_Parse (&s);
-			y = viddef.height/2 - 120 + atoi(token);
+			y = viddef.height/2 + atoi(token);
 			SCR_AddDirtyPoint (x+offset_stereo, y);
 			SCR_AddDirtyPoint (x+offset_stereo+159, y+31);
 
@@ -1137,7 +1137,7 @@ void SCR_ExecuteLayoutString (char *s,float separation)
 			token = COM_Parse (&s);
 			x = viddef.width/2 - 160 + atoi(token);
 			token = COM_Parse (&s);
-			y = viddef.height/2 - 120 + atoi(token);
+			y = viddef.height/2 + atoi(token);
 			SCR_AddDirtyPoint (x+offset_stereo, y);
 			SCR_AddDirtyPoint (x+offset_stereo+159, y+31);
 
