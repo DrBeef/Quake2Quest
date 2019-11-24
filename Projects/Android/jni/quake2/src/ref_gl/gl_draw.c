@@ -148,6 +148,8 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
+	else
+		qglEnable (GL_ALPHA_TEST); // make sure alpha is enabled
 
 	GL_Bind (gl->texnum);
 	qglBegin (GL_QUADS);

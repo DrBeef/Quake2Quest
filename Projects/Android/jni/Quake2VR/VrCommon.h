@@ -52,6 +52,9 @@ vec3_t flashlightoffset;
 #define DUCK_CROUCHED 2
 int ducked;
 
+bool player_moving;
+
+
 float radians(float deg);
 float degrees(float rad);
 qboolean isMultiplayer();

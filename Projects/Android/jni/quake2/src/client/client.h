@@ -662,7 +662,7 @@ void M_AddToServerList (netadr_t adr, char *info);
 //
 void CL_ParseInventory (void);
 void CL_KeyInventory (int key);
-void CL_DrawInventory (void);
+void CL_DrawInventory (float stereo_separation );
 
 //
 // cl_pred.c

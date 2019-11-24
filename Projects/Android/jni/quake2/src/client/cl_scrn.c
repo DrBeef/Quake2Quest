@@ -32,7 +32,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
   */
 
+#include <stdbool.h>
 #include "client.h"
+#include "../../../Quake2VR/VrCvars.h"
 
 
 #define REDBLUE
@@ -482,6 +484,42 @@ void SCR_DrawPause (void)
 
 	re.DrawGetPicSize (&w, &h, "pause");
 	re.DrawPic ((viddef.width-w)/2, viddef.height/2 + 8, "pause");
+}
+
+/*
+==============
+SCR_DrawVignette
+==============
+*/
+extern bool player_moving;
+
+void SCR_DrawVignette (void)
+{
+	if (vr_comfort_mask->value <= 0.0f ||
+		vr_comfort_mask->value > 1.0f)
+	{
+		return;
+	}
+
+	static float currentVLevel = 0.0f;
+
+	if (player_moving)
+	{
+		if (currentVLevel <  vr_comfort_mask->value)
+			currentVLevel += vr_comfort_mask->value * 0.05;
+	} else{
+		if (currentVLevel >  0.0f)
+			currentVLevel -= vr_comfort_mask->value * 0.05;
+	}
+
+	if (currentVLevel > 0.0f &&
+		currentVLevel < 1.0f)
+	{
+		int x = (int)((viddef.width / 2) * currentVLevel);
+		int y = (int)((viddef.height / 2) * currentVLevel);
+
+		re.DrawStretchPic(x, y, viddef.width - (2 * x), viddef.height - (2 * y), "/vignette.tga");
+	}
 }
 
 /*
@@ -1406,7 +1444,7 @@ void SCR_UpdateScreen (void)
 	      if (cl.frame.playerstate.stats[STAT_LAYOUTS] & 1)
 		SCR_DrawLayout (separation[i]);
 	      if (cl.frame.playerstate.stats[STAT_LAYOUTS] & 2)
-		CL_DrawInventory ();
+		CL_DrawInventory (separation[i]);
 
 	      SCR_DrawNet ();
 	      SCR_CheckDrawCenterString ();
@@ -1542,11 +1580,13 @@ void SCR_UpdateForEye (int eye)
 
 		V_RenderView ( separation );
 
+        SCR_DrawVignette();
+
 		SCR_DrawStats (separation );
 		if (cl.frame.playerstate.stats[STAT_LAYOUTS] & 1)
 			SCR_DrawLayout (separation);
 		if (cl.frame.playerstate.stats[STAT_LAYOUTS] & 2)
-			CL_DrawInventory ();
+			CL_DrawInventory (separation);
 
 		SCR_DrawNet ();
 		SCR_CheckDrawCenterString ();

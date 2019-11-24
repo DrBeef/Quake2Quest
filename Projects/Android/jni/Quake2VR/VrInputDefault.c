@@ -293,6 +293,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             float x = nlf * pOffTrackedRemoteNew->Joystick.x;
             float y = nlf * pOffTrackedRemoteNew->Joystick.y;
 
+            player_moving = (fabs(x) + fabs(y)) > 0.05f;
+
 			//Adjust to be off-hand controller oriented
             vec2_t v;
             rotateAboutOrigin(x, y, controllerYawHeading, v);

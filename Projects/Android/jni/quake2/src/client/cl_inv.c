@@ -67,7 +67,7 @@ CL_DrawInventory
 */
 #define	DISPLAY_ITEMS	17
 
-void CL_DrawInventory (void)
+void CL_DrawInventory (float separation)
 {
 	int		i, j;
 	int		num, selected_num, item;
@@ -81,6 +81,7 @@ void CL_DrawInventory (void)
 
 	selected = cl.frame.playerstate.stats[STAT_SELECTED_ITEM];
 
+	int offset_stereo= (separation>0) ? -25 : 25;
 	num = 0;
 	selected_num = 0;
 	for (i=0 ; i<MAX_ITEMS ; i++)
@@ -107,9 +108,9 @@ void CL_DrawInventory (void)
 	// repaint everything next frame
 	SCR_DirtyScreen ();
 
-	re.DrawPic (x, y+8, "inventory");
+	re.DrawPic (x+offset_stereo, y+8, "inventory");
 
-	x = (viddef.width-256);
+	x = (viddef.width-256)/2;
 	y += 24;
 	x += 24;
 	//Inv_DrawString (x, y, "hotkey ### item");
@@ -139,10 +140,10 @@ void CL_DrawInventory (void)
 #ifdef QMAX
 				re.DrawChar (x-8, y, 15, 256);
 #else
-				re.DrawChar (x-8, y, 15);
+				re.DrawChar (x+offset_stereo-8, y, 15);
 #endif
 		}
-		Inv_DrawString (x, y, string);
+		Inv_DrawString (x+offset_stereo, y, string);
 		y += 8;
 	}
 }

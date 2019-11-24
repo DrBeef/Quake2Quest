@@ -595,35 +595,53 @@ void ovrFramebuffer_Advance( ovrFramebuffer * frameBuffer )
 
 void ovrFramebuffer_ClearEdgeTexels( ovrFramebuffer * frameBuffer )
 {
-    LOAD_GLES2(glEnable);
-    LOAD_GLES2(glDisable);
-    LOAD_GLES2(glViewport);
-    LOAD_GLES2(glScissor);
-    LOAD_GLES2(glClearColor);
-    LOAD_GLES2(glClear);
+	LOAD_GLES2(glEnable);
+	LOAD_GLES2(glDisable);
+	LOAD_GLES2(glViewport);
+	LOAD_GLES2(glScissor);
+	LOAD_GLES2(glClearColor);
+	LOAD_GLES2(glClear);
 
-    GL( gles_glEnable( GL_SCISSOR_TEST ) );
-    GL( gles_glViewport( 0, 0, frameBuffer->Width, frameBuffer->Height ) );
+	GL( gles_glEnable( GL_SCISSOR_TEST ) );
+	GL( gles_glViewport( 0, 0, frameBuffer->Width, frameBuffer->Height ) );
 
-    // Explicitly clear the border texels to black because OpenGL-ES does not support GL_CLAMP_TO_BORDER.
-    // Clear to fully opaque black.
-    GL( gles_glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ) );
+	// Explicitly clear the border texels to black because OpenGL-ES does not support GL_CLAMP_TO_BORDER.
+	// Clear to fully opaque black.
+	GL( gles_glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ) );
 
-    // bottom
-    GL( gles_glScissor( 0, 0, frameBuffer->Width, 1 ) );
-    GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
-    // top
-    GL( gles_glScissor( 0, frameBuffer->Height - 1, frameBuffer->Width, 1 ) );
-    GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
-    // left
-    GL( gles_glScissor( 0, 0, 1, frameBuffer->Height ) );
-    GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
-    // right
-    GL( gles_glScissor( frameBuffer->Width - 1, 0, 1, frameBuffer->Height ) );
-    GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+	//Glide comfort mask in and out
+	static float currentVLevel = 0.0f;
+	if (player_moving)
+	{
+		if (currentVLevel <  vr_comfort_mask->value)
+			currentVLevel += vr_comfort_mask->value * 0.05;
+	} else{
+		if (currentVLevel >  0.0f)
+			currentVLevel -= vr_comfort_mask->value * 0.05;
+	}
 
-    GL( gles_glScissor( 0, 0, 0, 0 ) );
-    GL( gles_glDisable( GL_SCISSOR_TEST ) );
+
+	bool useMask = (currentVLevel > 0.0f && currentVLevel <= 1.0f);
+
+	float width = useMask ? (frameBuffer->Width / 2.0f) * currentVLevel : 1;
+	float height = useMask ? (frameBuffer->Height / 2.0f) * currentVLevel : 1;
+
+	// bottom
+	GL( gles_glScissor( 0, 0, frameBuffer->Width, width ) );
+	GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+	// top
+	GL( gles_glScissor( 0, frameBuffer->Height - height, frameBuffer->Width, height ) );
+	GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+	// left
+	GL( gles_glScissor( 0, 0, width, frameBuffer->Height ) );
+	GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+	// right
+	GL( gles_glScissor( frameBuffer->Width - width, 0, width, frameBuffer->Height ) );
+	GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+
+
+	GL( gles_glScissor( 0, 0, 0, 0 ) );
+	GL( gles_glDisable( GL_SCISSOR_TEST ) );
 }
 
 
@@ -1348,6 +1366,7 @@ void VR_Init()
 	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.56", CVAR_ARCHIVE);
     vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0.0", CVAR_LATCH);
 	vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_LATCH);
+    vr_comfort_mask = Cvar_Get( "vr_comfort_mask", "0.0", CVAR_ARCHIVE);
 
     //The Engine (which is a derivative of Quake) uses a very specific unit size:
     //Wolfenstein 3D, DOOM and QUAKE use the same coordinate/unit system:

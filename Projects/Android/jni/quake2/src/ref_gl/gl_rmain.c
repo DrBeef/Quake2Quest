@@ -934,10 +934,10 @@ void R_RenderView (refdef_t *fd)
 void	R_SetGL2D (void)
 {
 	// set 2D virtual screen size
-	qglViewport (0,0, vid.width*2, vid.height);
+	qglViewport (0,0, vid.width, vid.height);
 	qglMatrixMode(GL_PROJECTION);
     qglLoadIdentity ();
-	qglOrtho  (0, vid.width*2, vid.height, 0, -99999, 99999);
+	qglOrtho  (0, vid.width, vid.height, 0, -99999, 99999);
 	qglMatrixMode(GL_MODELVIEW);
     qglLoadIdentity ();
 	qglDisable (GL_DEPTH_TEST);

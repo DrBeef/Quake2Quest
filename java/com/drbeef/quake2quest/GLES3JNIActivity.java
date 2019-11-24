@@ -143,6 +143,7 @@ import android.support.v4.content.ContextCompat;
 		copy_asset("/sdcard/baseq2", "config.cfg");
 		copy_asset("/sdcard/baseq2", "autoexec.cfg");
 		copy_asset("/sdcard/baseq2", "commandline.txt");
+		copy_asset("/sdcard/baseq2", "vignette.tga");
 
 		//GLES3JNILib.setCallbackObjects(null, this);
 
