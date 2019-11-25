@@ -938,8 +938,8 @@ void RenderFrame( ovrRenderer * renderer, const ovrJava * java,
                 GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
                 GL(glDisable(GL_SCISSOR_TEST));
 
-                //Now do the drawing for this eye
-                Qcommon_Frame(eye);
+                //Now do the drawing for this eye (or draw for left eye twice if using screen layer)
+                Qcommon_Frame(useScreenLayer() ? 0 : eye);
             }
 
             //Clear edge to prevent smearing
