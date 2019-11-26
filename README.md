@@ -78,6 +78,7 @@ set vr_snapturn_angle  "5"
 |vr_snapturn_angle|Sets the angle of the snap turn, set to a value < 10 for smooth turning|
 |vr_walkdirection|Set to 1 for HMD oriented movement direction|
 |vr_control_scheme|Sets the control scheme (default: 0 - off-hand controller oriented, 1 - HMD oriented)|
+|vr_height_adjust|Allows you to set a height adjustment (for seated play) value in metres|
 
 
 Things to note / FAQs:
