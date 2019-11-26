@@ -835,19 +835,6 @@ void setHMDPosition( float x, float y, float z, float yaw )
 	if (!useScreenLayer())
     {
     	playerYaw = yaw;
-
-    	if (vr_enable_crouching->value > 0.0f && vr_enable_crouching->value < 0.98f) {
-            //Do we trigger crouching based on player height?
-            if (hmdPosition[1] < (playerHeight * vr_enable_crouching->value) &&
-                ducked == DUCK_NOTDUCKED) {
-                ducked = DUCK_CROUCHED;
-                //sendButtonAction("+crouch", 1);
-            } else if (hmdPosition[1] > (playerHeight * (vr_enable_crouching->value + 0.02f)) &&
-                ducked == DUCK_CROUCHED) {
-                ducked = DUCK_NOTDUCKED;
-                //sendButtonAction("+crouch", 0);
-            }
-        }
 	}
 }
 
@@ -1355,13 +1342,10 @@ void VR_Init()
 
 	//Create Cvars
 	vr_snapturn_angle = Cvar_Get( "vr_snapturn_angle", "45", CVAR_ARCHIVE);
-	vr_reloadtimeoutms = Cvar_Get( "vr_reloadtimeoutms", "200", CVAR_ARCHIVE);
 	vr_positional_factor = Cvar_Get( "vr_positional_factor", "2000", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
-    vr_weapon_recoil = Cvar_Get( "vr_weapon_recoil", "0", CVAR_ARCHIVE);
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
-	vr_enable_crouching = Cvar_Get( "vr_enable_crouching", "0.85", CVAR_ARCHIVE);
     vr_height_adjust = Cvar_Get( "vr_height_adjust", "0.0", CVAR_ARCHIVE);
 	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.56", CVAR_ARCHIVE);
     vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0.0", CVAR_LATCH);

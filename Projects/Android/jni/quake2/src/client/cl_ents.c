@@ -1375,6 +1375,7 @@ void CL_AddPacketEntities (frame_t *frame)
 extern cvar_t *r_lefthand;
 extern cvar_t *vr_worldscale;
 extern cvar_t *vr_weaponscale;
+extern cvar_t *vr_height_adjust;
 extern vec3_t weaponangles;
 extern vec3_t weaponoffset;
 extern vec3_t hmdorientation;
@@ -1484,7 +1485,7 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 
 	//add player actual real world height - controller location is relative to HMD
 	gun.origin[2] -= (QUAKE_MARINE_HEIGHT * vr_worldscale->value);
-	gun.origin[2] += (hmdPosition[1] * vr_worldscale->value);
+	gun.origin[2] += ((hmdPosition[1] + vr_height_adjust->value) * vr_worldscale->value);
 
 	if (gun_frame)
 	{

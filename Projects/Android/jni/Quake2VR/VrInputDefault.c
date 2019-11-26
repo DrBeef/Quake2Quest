@@ -193,16 +193,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             //in meantime, then it wouldn't stop the gun firing and it would get stuck
             static bool firingPrimary = false;
 
-			if (!firingPrimary && dominantGripPushed && (GetTimeInMilliSeconds() - dominantGripPushTime) > vr_reloadtimeoutms->value)
-			{
-				//Use Inventory Item
-				if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
-					(pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
-
-					sendButtonActionSimple("invuse");
-				}
-			}
-			else
 			{
 				//Fire Primary
 				if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=

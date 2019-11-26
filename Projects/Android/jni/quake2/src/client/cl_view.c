@@ -517,6 +517,7 @@ V_RenderView
 
 extern vec3_t hmdPosition;
 extern cvar_t *vr_worldscale;
+extern cvar_t *vr_height_adjust;
 
 void V_RenderView( float stereo_separation )
 {
@@ -574,7 +575,7 @@ void V_RenderView( float stereo_separation )
         //subtract standard height of player
         cl.refdef.vieworg[2] -= (QUAKE_MARINE_HEIGHT * vr_worldscale->value);
         //add player actual real world height
-        cl.refdef.vieworg[2] += (hmdPosition[1] * vr_worldscale->value);
+        cl.refdef.vieworg[2] += ((hmdPosition[1] + vr_height_adjust->value) * vr_worldscale->value);
 
 		// never let it sit exactly on a node line, because a water plane can
 		// dissapear when viewed with the eye exactly on it.

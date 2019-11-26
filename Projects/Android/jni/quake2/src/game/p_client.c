@@ -1577,6 +1577,7 @@ extern vec3_t weaponoffset;
 extern vec3_t hmdPosition;
 
 extern cvar_t *vr_worldscale;
+extern cvar_t *vr_height_adjust;
 
 void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out)
 {
@@ -1611,7 +1612,7 @@ static void SV_SetWeapon_Client6DOF(edict_t *ent)
         origin[2] -= 48; //??
     }
 
-	origin[2] += (hmdPosition[1] * vr_worldscale->value);
+	origin[2] += ((hmdPosition[1] + vr_height_adjust->value) * vr_worldscale->value);
 	VectorAdd(weaponoffsetQ2, origin, ent->s.origin);
 	VectorCopy(weaponangles, ent->client->v_angle); // use adjusted angles
 }
