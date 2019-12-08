@@ -523,6 +523,7 @@ extern cvar_t *sv_rollangle;
 extern cvar_t *r_lefthand;
 extern cvar_t *vr_worldscale;
 extern cvar_t *vr_height_adjust;
+extern cvar_t *vr_weapon_model_correction;
 extern cvar_t *vr_lasersight;
 extern cvar_t *vr_weapon_stabilised;
 

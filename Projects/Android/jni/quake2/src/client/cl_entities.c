@@ -641,6 +641,7 @@ CL_AddPacketEntities(frame_t *frame)
 extern cvar_t *vr_worldscale;
 extern cvar_t *vr_weaponscale;
 extern cvar_t *vr_height_adjust;
+extern cvar_t *vr_weapon_model_correction;
 extern vec3_t weaponangles;
 extern vec3_t weaponoffset;
 extern vec3_t hmdorientation;
@@ -687,18 +688,24 @@ void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunang
 	//fb / lr / ud
 	vec3_t offset;
 	VectorSet(offset, 0, 0, 0);
-	if (weapmodel == WEAP_BLASTER)
-		VectorSet(offset, 17 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
-	else if (weapmodel == WEAP_MACHINEGUN)
-		VectorSet(offset, 17 * vr_weaponscale->value, lrOffset * 0.9, -8 * vr_weaponscale->value);
-	else if (weapmodel == WEAP_SHOTGUN)
-		VectorSet(offset, 12 * vr_weaponscale->value, lrOffset * 1.3, -8 * vr_weaponscale->value);
-	else if (weapmodel == WEAP_CHAINGUN)
-		VectorSet(offset, 3.5 * vr_weaponscale->value, lrOffset * 0.73, -8 * vr_weaponscale->value);
-	else if (weapmodel == WEAP_ROCKETLAUNCHER)
-		VectorSet(offset, 10 * vr_weaponscale->value, lrOffset * 0.8, -8 * vr_weaponscale->value);
-	else  if (weapmodel != 0)
-		VectorSet(offset, 10 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
+	if(vr_weapon_model_correction->value == 1.0f) {
+		if (weapmodel == WEAP_BLASTER)
+			VectorSet(offset, 17 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
+		else if (weapmodel == WEAP_MACHINEGUN)
+			VectorSet(offset, 17 * vr_weaponscale->value, lrOffset * 0.9,
+					  -8 * vr_weaponscale->value);
+		else if (weapmodel == WEAP_SHOTGUN)
+			VectorSet(offset, 12 * vr_weaponscale->value, lrOffset * 1.3,
+					  -8 * vr_weaponscale->value);
+		else if (weapmodel == WEAP_CHAINGUN)
+			VectorSet(offset, 3.5 * vr_weaponscale->value, lrOffset * 0.73,
+					  -8 * vr_weaponscale->value);
+		else if (weapmodel == WEAP_ROCKETLAUNCHER)
+			VectorSet(offset, 10 * vr_weaponscale->value, lrOffset * 0.8,
+					  -8 * vr_weaponscale->value);
+		else if (weapmodel != 0)
+			VectorSet(offset, 10 * vr_weaponscale->value, lrOffset, -8 * vr_weaponscale->value);
+	}
 
 	vec3_t tempAngles;
 	VectorCopy(weaponangles, tempAngles);
@@ -723,10 +730,12 @@ void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunang
 	matrix4x4 matAngleAdjust;
 	vec3_t angleAdjust;
 	VectorSet(angleAdjust, 0, 0, 0);
-	if (weapmodel == WEAP_MACHINEGUN)
-		VectorSet(angleAdjust, -3, 6, -4); // Fix crap model orientation!!
-	else if (weapmodel != 0)
-		VectorSet(angleAdjust, -3, 0, 0);
+    if(vr_weapon_model_correction->value == 1.0f) {
+        if (weapmodel == WEAP_MACHINEGUN)
+            VectorSet(angleAdjust, -3, 6, -4); // Fix crap model orientation!!
+        else if (weapmodel != 0)
+            VectorSet(angleAdjust, -3, 0, 0);
+    }
 	Matrix4x4_CreateFromEntity(matAngleAdjust, angleAdjust, vec3_origin, 1.0);
 
 	matrix4x4 matWeaponAngles;

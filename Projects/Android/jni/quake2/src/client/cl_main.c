@@ -818,9 +818,8 @@ CL_BeginFrame(int packetdelta, int renderdelta, int timedelta, qboolean packetfr
 
 void CL_Frame(int eye, qboolean renderframe) {
 
-	if (renderframe) {
-		SCR_UpdateForEye(eye);
-	}
+	//Always draw!
+	SCR_UpdateForEye(eye);
 }
 
 void CL_EndFrame(int eye, qboolean renderframe)

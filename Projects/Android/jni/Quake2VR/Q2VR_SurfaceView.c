@@ -43,6 +43,7 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_main.h>
+#include <src/client/header/client.h>
 
 #include "VrCompositor.h"
 #include "VrInput.h"
@@ -103,6 +104,7 @@ char **argv;
 int argc=0;
 
 extern cvar_t	*r_lefthand;
+extern cvar_t   *cl_paused;
 
 enum control_scheme {
 	RIGHT_HANDED_DEFAULT = 0,
@@ -138,7 +140,7 @@ void Qcommon_Init (int argc, char **argv);
 bool useScreenLayer()
 {
 	//TODO
-	return (showingScreenLayer || (cls.state != ca_connected && cls.state != ca_active) || cls.key_dest != key_game);
+	return (showingScreenLayer || (cls.state != ca_connected && cls.state != ca_active) || cls.key_dest != key_game) || cl.cinematictime != 0;
 }
 
 int runStatus = -1;
@@ -1359,6 +1361,7 @@ void VR_Init()
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
     vr_height_adjust = Cvar_Get( "vr_height_adjust", "0.0", CVAR_ARCHIVE);
+    vr_weapon_model_correction = Cvar_Get( "vr_weapon_model_correction", "1.0", CVAR_ARCHIVE);
 	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.56", CVAR_ARCHIVE);
     vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0.0", CVAR_LATCH);
 	vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_LATCH);
@@ -1605,6 +1608,23 @@ void * AppThreadFunction( void * parm )
             setWorldPosition(positionHmd.x, positionHmd.y, positionHmd.z);
 
             ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
+
+
+
+
+            static bool s_paused = false;
+            if (s_paused != (cl_paused->value == 1))
+            {
+                s_paused = (cl_paused->value == 1);
+
+                //If we switch from paused to unpaused, go full screen
+                if (cl_paused->value != 1)
+                {
+                    showingScreenLayer = false;
+                }
+            }
+
+
 
 			//Get info for tracked remotes
 			acquireTrackedRemotesData(appState.Ovr, appState.DisplayTime);
