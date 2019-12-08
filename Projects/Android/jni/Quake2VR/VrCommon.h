@@ -24,7 +24,7 @@
 
 bool quake2_initialised;
 
-int global_time;
+long long global_time;
 
 float playerHeight;
 float playerYaw;
@@ -38,12 +38,8 @@ vec3_t hmdPosition;
 vec3_t hmdorientation;
 vec3_t positionDeltaThisFrame;
 
-#define ADJUSTED 0
-#define UNADJUSTED 1
-#define MELEE 2
 vec3_t weaponangles;
 vec3_t weaponoffset;
-vec3_t weaponvelocity;
 
 vec3_t flashlightangles;
 vec3_t flashlightoffset;
@@ -52,6 +48,9 @@ vec3_t flashlightoffset;
 #define DUCK_BUTTON 1
 #define DUCK_CROUCHED 2
 int ducked;
+
+bool player_moving;
+
 
 float radians(float deg);
 float degrees(float rad);

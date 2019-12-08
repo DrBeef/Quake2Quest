@@ -15,6 +15,8 @@ ovrInputStateTrackedRemote rightTrackedRemoteState_old;
 ovrInputStateTrackedRemote rightTrackedRemoteState_new;
 ovrTracking rightRemoteTracking_new;
 
+ovrDeviceID controllerIDs[2];
+
 float remote_movementSideways;
 float remote_movementForward;
 float remote_movementUp;
@@ -27,8 +29,9 @@ void sendButtonActionSimple(const char* action);
 
 void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime);
 
-void HandleInput_Right( ovrMobile * Ovr, double displayTime );
-void HandleInput_Left( ovrMobile * Ovr, double displayTime );
+void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
+                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
+                          int domButton1, int domButton2, int offButton1, int offButton2 );
 
 
 #endif //vrinput_h

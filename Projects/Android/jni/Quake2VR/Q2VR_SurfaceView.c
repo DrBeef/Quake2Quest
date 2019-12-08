@@ -39,12 +39,15 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 #include "VrApi_Input.h"
 #include "VrApi_Types.h"
 
-#include "../gl4es/src/gl/loader.h"
+#include <src/gl/loader.h>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_main.h>
 
 #include "VrCompositor.h"
 #include "VrInput.h"
 
-#include "../quake2/src/client/client.h"
+#include "../quake2/src/client/header/client.h"
 
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
 #define EGL_OPENGL_ES3_BIT_KHR		0x0040
@@ -79,6 +82,8 @@ int NUM_MULTI_SAMPLES	= 1;
 float SS_MULTIPLIER    = 1.25f;
 
 vec2_t cylinderSize = {1280, 720};
+
+jclass clazz;
 
 float radians(float deg) {
 	return (deg * M_PI) / 180.0;
@@ -595,35 +600,53 @@ void ovrFramebuffer_Advance( ovrFramebuffer * frameBuffer )
 
 void ovrFramebuffer_ClearEdgeTexels( ovrFramebuffer * frameBuffer )
 {
-    LOAD_GLES2(glEnable);
-    LOAD_GLES2(glDisable);
-    LOAD_GLES2(glViewport);
-    LOAD_GLES2(glScissor);
-    LOAD_GLES2(glClearColor);
-    LOAD_GLES2(glClear);
+	LOAD_GLES2(glEnable);
+	LOAD_GLES2(glDisable);
+	LOAD_GLES2(glViewport);
+	LOAD_GLES2(glScissor);
+	LOAD_GLES2(glClearColor);
+	LOAD_GLES2(glClear);
 
-    GL( gles_glEnable( GL_SCISSOR_TEST ) );
-    GL( gles_glViewport( 0, 0, frameBuffer->Width, frameBuffer->Height ) );
+	GL( gles_glEnable( GL_SCISSOR_TEST ) );
+	GL( gles_glViewport( 0, 0, frameBuffer->Width, frameBuffer->Height ) );
 
-    // Explicitly clear the border texels to black because OpenGL-ES does not support GL_CLAMP_TO_BORDER.
-    // Clear to fully opaque black.
-    GL( gles_glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ) );
+	// Explicitly clear the border texels to black because OpenGL-ES does not support GL_CLAMP_TO_BORDER.
+	// Clear to fully opaque black.
+	GL( gles_glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ) );
 
-    // bottom
-    GL( gles_glScissor( 0, 0, frameBuffer->Width, 1 ) );
-    GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
-    // top
-    GL( gles_glScissor( 0, frameBuffer->Height - 1, frameBuffer->Width, 1 ) );
-    GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
-    // left
-    GL( gles_glScissor( 0, 0, 1, frameBuffer->Height ) );
-    GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
-    // right
-    GL( gles_glScissor( frameBuffer->Width - 1, 0, 1, frameBuffer->Height ) );
-    GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+	//Glide comfort mask in and out
+	static float currentVLevel = 0.0f;
+	if (player_moving)
+	{
+		if (currentVLevel <  vr_comfort_mask->value)
+			currentVLevel += vr_comfort_mask->value * 0.05;
+	} else{
+		if (currentVLevel >  0.0f)
+			currentVLevel -= vr_comfort_mask->value * 0.05;
+	}
 
-    GL( gles_glScissor( 0, 0, 0, 0 ) );
-    GL( gles_glDisable( GL_SCISSOR_TEST ) );
+
+	bool useMask = (currentVLevel > 0.0f && currentVLevel <= 1.0f);
+
+	float width = useMask ? (frameBuffer->Width / 2.0f) * currentVLevel : 1;
+	float height = useMask ? (frameBuffer->Height / 2.0f) * currentVLevel : 1;
+
+	// bottom
+	GL( gles_glScissor( 0, 0, frameBuffer->Width, width ) );
+	GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+	// top
+	GL( gles_glScissor( 0, frameBuffer->Height - height, frameBuffer->Width, height ) );
+	GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+	// left
+	GL( gles_glScissor( 0, 0, width, frameBuffer->Height ) );
+	GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+	// right
+	GL( gles_glScissor( frameBuffer->Width - width, 0, width, frameBuffer->Height ) );
+	GL( gles_glClear( GL_COLOR_BUFFER_BIT ) );
+
+
+	GL( gles_glScissor( 0, 0, 0, 0 ) );
+	GL( gles_glDisable( GL_SCISSOR_TEST ) );
 }
 
 
@@ -817,19 +840,6 @@ void setHMDPosition( float x, float y, float z, float yaw )
 	if (!useScreenLayer())
     {
     	playerYaw = yaw;
-
-    	if (vr_enable_crouching->value > 0.0f && vr_enable_crouching->value < 0.98f) {
-            //Do we trigger crouching based on player height?
-            if (hmdPosition[1] < (playerHeight * vr_enable_crouching->value) &&
-                ducked == DUCK_NOTDUCKED) {
-                ducked = DUCK_CROUCHED;
-                //sendButtonAction("+crouch", 1);
-            } else if (hmdPosition[1] > (playerHeight * (vr_enable_crouching->value + 0.02f)) &&
-                ducked == DUCK_CROUCHED) {
-                ducked = DUCK_NOTDUCKED;
-                //sendButtonAction("+crouch", 0);
-            }
-        }
 	}
 }
 
@@ -837,6 +847,37 @@ qboolean isMultiplayer()
 {
 	return Cvar_VariableValue("maxclients") > 1;
 }
+
+
+/*
+========================
+Android_Vibrate
+========================
+*/
+
+//0 = left, 1 = right
+float vibration_channel_duration[2] = {0.0f, 0.0f};
+float vibration_channel_intensity[2] = {0.0f, 0.0f};
+
+void Android_Vibrate( float duration, int channel, float intensity )
+{
+	if (vibration_channel_duration[channel] > 0.0f)
+		return;
+
+	if (vibration_channel_duration[channel] == -1.0f &&	duration != 0.0f)
+		return;
+
+	vibration_channel_duration[channel] = duration;
+	vibration_channel_intensity[channel] = intensity;
+}
+
+void getVROrigins(vec3_t _weaponoffset, vec3_t _weaponangles, vec3_t _hmdPosition)
+{
+	VectorCopy(weaponoffset, _weaponoffset);
+	VectorCopy(weaponangles, _weaponangles);
+	VectorCopy(hmdPosition, _hmdPosition);
+}
+
 
 void Qcommon_BeginFrame (int time);
 void Qcommon_Frame (int eye);
@@ -876,7 +917,7 @@ void RenderFrame( ovrRenderer * renderer, const ovrJava * java,
             time = global_time - oldtime;
         } while (time < 1);
 
-        Qcommon_BeginFrame (time);
+        Qcommon_BeginFrame (time * 1000);
 
 		// Render the eye images.
         for (int eye = 0; eye < renderer->NumBuffers && isHostAlive(); eye++) {
@@ -897,8 +938,8 @@ void RenderFrame( ovrRenderer * renderer, const ovrJava * java,
                 GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
                 GL(glDisable(GL_SCISSOR_TEST));
 
-                //Now do the drawing for this eye
-                Qcommon_Frame(eye);
+                //Now do the drawing for this eye (or draw for left eye twice if using screen layer)
+                Qcommon_Frame(useScreenLayer() ? 0 : eye);
             }
 
             //Clear edge to prevent smearing
@@ -907,7 +948,7 @@ void RenderFrame( ovrRenderer * renderer, const ovrJava * java,
             ovrFramebuffer_Advance(frameBuffer);
         }
 
-		Qcommon_EndFrame(time);
+		Qcommon_EndFrame(time * 1000);
 
         oldtime = global_time;
     }
@@ -958,8 +999,6 @@ static void ovrApp_Clear( ovrApp * app )
 	app->Java.Vm = NULL;
 	app->Java.Env = NULL;
 	app->Java.ActivityObject = NULL;
-	app->NativeWindow = NULL;
-	app->Resumed = false;
 	app->Ovr = NULL;
 	app->FrameIndex = 1;
 	app->DisplayTime = 0;
@@ -1265,6 +1304,7 @@ typedef struct
 {
 	JavaVM *		JavaVm;
 	jobject			ActivityObject;
+	jclass          ActivityClass;
 	pthread_t		Thread;
 	ovrMessageQueue	MessageQueue;
 	ANativeWindow * NativeWindow;
@@ -1275,7 +1315,7 @@ long shutdownCountdown;
 int m_width;
 int m_height;
 
-void R_SetMode( void );
+qboolean R_SetMode( void );
 
 void Android_GetScreenRes(int *width, int *height)
 {
@@ -1314,19 +1354,15 @@ void VR_Init()
 
 	//Create Cvars
 	vr_snapturn_angle = Cvar_Get( "vr_snapturn_angle", "45", CVAR_ARCHIVE);
-	vr_reloadtimeoutms = Cvar_Get( "vr_reloadtimeoutms", "200", CVAR_ARCHIVE);
 	vr_positional_factor = Cvar_Get( "vr_positional_factor", "2000", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
-    vr_weapon_recoil = Cvar_Get( "vr_weapon_recoil", "0", CVAR_ARCHIVE);
-	vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0", 0);
-    vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_ARCHIVE);
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
-	vr_enable_crouching = Cvar_Get( "vr_enable_crouching", "0.85", CVAR_ARCHIVE);
     vr_height_adjust = Cvar_Get( "vr_height_adjust", "0.0", CVAR_ARCHIVE);
-    vr_flashlight_model = Cvar_Get( "vr_flashlight_model", "1", CVAR_ARCHIVE);
-	vr_mirror_weapons = Cvar_Get( "vr_mirror_weapons", "0", CVAR_ARCHIVE);
-	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.6", CVAR_ARCHIVE);
+	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.56", CVAR_ARCHIVE);
+    vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0.0", CVAR_LATCH);
+	vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_LATCH);
+    vr_comfort_mask = Cvar_Get( "vr_comfort_mask", "0.0", CVAR_ARCHIVE);
 
     //The Engine (which is a derivative of Quake) uses a very specific unit size:
     //Wolfenstein 3D, DOOM and QUAKE use the same coordinate/unit system:
@@ -1336,7 +1372,8 @@ void VR_Init()
 	vr_worldscale = Cvar_Get( "vr_worldscale", "26.2467", CVAR_ARCHIVE);
 }
 
-void M_Menu_Main_f (void);
+/* Called before SDL_main() to initialize JNI bindings in SDL library */
+extern void SDL_Android_Init(JNIEnv* env, jclass cls);
 
 void * AppThreadFunction( void * parm )
 {
@@ -1346,6 +1383,13 @@ void * AppThreadFunction( void * parm )
 	java.Vm = appThread->JavaVm;
 	(*java.Vm)->AttachCurrentThread( java.Vm, &java.Env, NULL );
 	java.ActivityObject = appThread->ActivityObject;
+
+    jclass cls = (*java.Env)->GetObjectClass(java.Env, java.ActivityObject);
+
+    /* This interface could expand with ABI negotiation, callbacks, etc. */
+    SDL_Android_Init(java.Env, cls);
+
+    SDL_SetMainReady();
 
 	// Note that AttachCurrentThread will reset the thread name.
 	prctl( PR_SET_NAME, (long)"OVR::Main", 0, 0, 0 );
@@ -1382,8 +1426,7 @@ void * AppThreadFunction( void * parm )
 
 	ovrRenderer_Create( m_width, m_height, &appState.Renderer, &java );
 
-	//Always use this folder
-	chdir("/sdcard/Quake2Quest");
+	chdir("/sdcard");
 
 	for ( bool destroyed = false; destroyed == false; )
 	{
@@ -1505,6 +1548,31 @@ void * AppThreadFunction( void * parm )
 			vrapi_SubmitFrame2( appState.Ovr, &frameDesc );
 		}
 
+		//Handle haptics
+		static float lastFrameTime = 0.0f;
+		float timestamp = (float)(GetTimeInMilliSeconds());
+		float frametime = timestamp - lastFrameTime;
+		lastFrameTime = timestamp;
+
+		for (int i = 0; i < 2; ++i) {
+			if (vibration_channel_duration[i] > 0.0f ||
+				vibration_channel_duration[i] == -1.0f) {
+				vrapi_SetHapticVibrationSimple(appState.Ovr, controllerIDs[i],
+											   vibration_channel_intensity[i]);
+
+				if (vibration_channel_duration[i] != -1.0f) {
+					vibration_channel_duration[i] -= frametime;
+
+					if (vibration_channel_duration[i] < 0.0f) {
+						vibration_channel_duration[i] = 0.0f;
+						vibration_channel_intensity[i] = 0.0f;
+					}
+				}
+			} else {
+				vrapi_SetHapticVibrationSimple(appState.Ovr, controllerIDs[i], 0.0f);
+			}
+		}
+
         if (runStatus == -1) {
 #ifndef NDEBUG
             if (appState.FrameIndex > 10800)
@@ -1538,15 +1606,22 @@ void * AppThreadFunction( void * parm )
 
             ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
 
+			//Get info for tracked remotes
+			acquireTrackedRemotesData(appState.Ovr, appState.DisplayTime);
+
             //Call additional control schemes here
             switch ((int)vr_control_scheme->value)
 			{
-				case RIGHT_HANDED_DEFAULT:
-					HandleInput_Right(appState.Ovr, appState.DisplayTime);
-					break;
-				case LEFT_HANDED_DEFAULT:
-					HandleInput_Left(appState.Ovr, appState.DisplayTime);
-					break;
+                case RIGHT_HANDED_DEFAULT:
+                    HandleInput_Default(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
+                                        &leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
+                                        ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
+                    break;
+                case LEFT_HANDED_DEFAULT:
+                    HandleInput_Default(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
+                                        &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
+                                        ovrButton_X, ovrButton_Y, ovrButton_A, ovrButton_B);
+                    break;
 			}
 
 			static bool usingScreenLayer = true; //Starts off using the screen layer
@@ -1673,10 +1748,11 @@ void * AppThreadFunction( void * parm )
 	return NULL;
 }
 
-static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject )
+static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject, jclass activityClass )
 {
 	(*env)->GetJavaVM( env, &appThread->JavaVm );
 	appThread->ActivityObject = (*env)->NewGlobalRef( env, activityObject );
+	appThread->ActivityClass = (*env)->NewGlobalRef( env, activityClass );
 	appThread->Thread = 0;
 	appThread->NativeWindow = NULL;
 	ovrMessageQueue_Create( &appThread->MessageQueue );
@@ -1692,6 +1768,7 @@ static void ovrAppThread_Destroy( ovrAppThread * appThread, JNIEnv * env )
 {
 	pthread_join( appThread->Thread, NULL );
 	(*env)->DeleteGlobalRef( env, appThread->ActivityObject );
+	(*env)->DeleteGlobalRef( env, appThread->ActivityClass );
 	ovrMessageQueue_Destroy( &appThread->MessageQueue );
 }
 
@@ -1703,6 +1780,8 @@ Activity lifecycle
 ================================================================================
 */
 
+JNIEXPORT jint JNICALL SDL_JNI_OnLoad(JavaVM* vm, void* reserved);
+
 int JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	JNIEnv *env;
@@ -1712,7 +1791,7 @@ int JNI_OnLoad(JavaVM* vm, void* reserved)
 		return -1;
 	}
 
-	return JNI_VERSION_1_4;
+	return SDL_JNI_OnLoad(vm, reserved);
 }
 
 JNIEXPORT jlong JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onCreate( JNIEnv * env, jclass activityClass, jobject activity,
@@ -1723,8 +1802,8 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onCreate( JNIEnv
 	/* the global arg_xxx structs are initialised within the argtable */
 	void *argtable[] = {
 			ss   = arg_dbl0("s", "supersampling", "<double>", "super sampling value (e.g. 1.0)"),
-            cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-3 (default: 2)"),
-            gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-3 (default: 3)"),
+            cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-4 (default: 2)"),
+            gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
 			end     = arg_end(20)
 	};
 
@@ -1767,7 +1846,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onCreate( JNIEnv
 	initialize_gl4es();
 
 	ovrAppThread * appThread = (ovrAppThread *) malloc( sizeof( ovrAppThread ) );
-	ovrAppThread_Create( appThread, env, activity );
+	ovrAppThread_Create( appThread, env, activity, activityClass );
 
 	ovrMessageQueue_Enable( &appThread->MessageQueue, true );
 	ovrMessage message;
@@ -1911,22 +1990,5 @@ JNIEXPORT void JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onSurfaceDestroye
 	ALOGV( "        ANativeWindow_release( NativeWindow )" );
 	ANativeWindow_release( appThread->NativeWindow );
 	appThread->NativeWindow = NULL;
-}
-
-/*************************
- * Audio stuff
- *************************/
-
-JNIEXPORT jint JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_Quake2PaintAudio( JNIEnv* env, jobject thiz, jobject buf )
-{
-	extern int paint_audio (void *unused, void * stream, int len);
-
-	void *stream;
-	int len;
-
-	stream = (*env)->GetDirectBufferAddress( env,  buf);
-	len = (*env)->GetDirectBufferCapacity( env,  buf);
-
-	return paint_audio ( NULL, stream, len );
 }
 

@@ -10,11 +10,13 @@ APP_CFLAGS += -Wl,--no-undefined
 
 APPLICATIONMK_PATH = $(call my-dir)
 
-GL4ES_PATH := $(APPLICATIONMK_PATH)/gl4es
+TOP_DIR			:= $(APPLICATIONMK_PATH)
+SUPPORT_LIBS	:= $(APPLICATIONMK_PATH)/SupportLibs
+GL4ES_PATH		:= $(SUPPORT_LIBS)/gl4es
 
 APP_ALLOW_MISSING_DEPS=true
 
-APP_MODULES := gl4es quake2
+APP_MODULES := yquake2 yquake2_game gl4es yquake2_gl1
 APP_STL := c++_shared
 
 

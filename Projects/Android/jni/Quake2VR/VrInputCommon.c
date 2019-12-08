@@ -34,6 +34,8 @@ static void Matrix4x4_Transform (const matrix4x4 *in, const float v[3], float ou
     out[2] = v[0] * (*in)[2][0] + v[1] * (*in)[2][1] + v[2] * (*in)[2][2] + (*in)[2][3];
 }
 
+void Matrix4x4_CreateFromEntity( matrix4x4 out, const vec3_t angles, const vec3_t origin, float scale );
+
 void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out)
 {
     vec3_t temp = {0.0f, 0.0f, 0.0f};
@@ -128,9 +130,11 @@ void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime) {//The 
                 if (remoteCapabilities.ControllerCapabilities & ovrControllerCaps_RightHand) {
                     rightTrackedRemoteState_new = trackedRemoteState;
                     rightRemoteTracking_new = remoteTracking;
+                    controllerIDs[1] = cap.DeviceID;
                 } else{
                     leftTrackedRemoteState_new = trackedRemoteState;
                     leftRemoteTracking_new = remoteTracking;
+                    controllerIDs[0] = cap.DeviceID;
                 }
             }
         }
