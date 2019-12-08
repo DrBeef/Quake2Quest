@@ -822,9 +822,13 @@ void CL_Frame(int eye, qboolean renderframe) {
 	SCR_UpdateForEye(eye);
 }
 
+void SCR_Framecounter(void);
+
 void CL_EndFrame(int eye, qboolean renderframe)
 {
 	static int lasttimecalled;
+
+    SCR_Framecounter();
 
 	if (renderframe)
 	{

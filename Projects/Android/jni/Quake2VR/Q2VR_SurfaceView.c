@@ -1377,6 +1377,7 @@ void VR_Init()
 
 /* Called before SDL_main() to initialize JNI bindings in SDL library */
 extern void SDL_Android_Init(JNIEnv* env, jclass cls);
+void FS_AddDirToSearchPath(char *dir, qboolean create);
 
 void * AppThreadFunction( void * parm )
 {
@@ -1465,6 +1466,8 @@ void * AppThreadFunction( void * parm )
 
 							Qcommon_Init(argc, (const char**)argv);
 						}
+
+                        FS_AddDirToSearchPath("/sdcard/baseq2", true);
 
 						//M_Menu_Main_f ();
 						quake2_initialised = true;

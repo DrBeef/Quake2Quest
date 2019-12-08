@@ -1669,7 +1669,6 @@ void SCR_UpdateForEye (int eye)
 		}
 	}
 
-	SCR_Framecounter();
 	R_EndFrame();
 }
 
