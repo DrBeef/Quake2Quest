@@ -515,8 +515,11 @@ CL_ParseLaserSight
 */
 void CL_ParseLaserSight ()
 {
+	int weapon = MSG_ReadByte(&net_message);
+
 	//Set end time so laser is drawn
 	cl_lasersight.ent.flags = RF_LASERSIGHT;
+	cl_lasersight.ent.frame = weapon; // Used to indicate the weapon
 	cl_lasersight.endtime = cl.time+250;
 }
 
@@ -543,7 +546,7 @@ void CL_UpdateLaserSightOrigins ()
 		SetWeapon6DOF(0, cl.refdef.vieworg, gunorigin, gunangles);
 		gunorigin[2] += 1; // just add a little bit
 		AngleVectors(gunangles, forward, right, NULL);
-		VectorMA(gunorigin, 8192, forward, end);
+		VectorMA(gunorigin, (float)(cl_lasersight.ent.frame != 6 ? 4096.0 : 6.0), forward, end);
 		trace_t tr = CL_Trace(gunorigin, end, 1,
 							  CONTENTS_SOLID | CONTENTS_MONSTER | CONTENTS_DEADMONSTER);
 		VectorCopy(gunorigin, cl_lasersight.ent.origin);

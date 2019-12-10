@@ -1782,7 +1782,7 @@ RI_SetPalette(const unsigned char *palette)
 */
 void R_DrawLaserSight( entity_t *e )
 {
-#define NUM_LASER_SIGHT_SEGS 3
+#define NUM_LASER_SIGHT_SEGS 8
 
 	int	i;
 	float r, g, b;
@@ -1812,7 +1812,7 @@ void R_DrawLaserSight( entity_t *e )
 		return;
 
 	PerpendicularVector( perpvec, normalized_direction );
-	VectorScale( perpvec, 0.15, perpvec );
+	VectorScale( perpvec, 0.1, perpvec );
 
 	for ( i = 0; i < 6; i++ )
 	{
@@ -1825,11 +1825,15 @@ void R_DrawLaserSight( entity_t *e )
 	glEnable( GL_BLEND );
 	glDepthMask( GL_FALSE );
 
-	r = 1.0;
-	g = 0;
-	b = 0;
+	if (e->frame == 6)
+	{
+		//grenade "pointer"
+		glColor4f( 0, 0, 1, 1.0 );
+	} else {
+		glColor4f( 1, 0, 0, 1.0 );
+	}
 
-	glColor4f( r, g, b, 1.0 );
+
 
 	for ( i = 0; i < NUM_BEAM_SEGS; i++ )
 	{
