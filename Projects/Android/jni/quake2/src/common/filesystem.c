@@ -1562,7 +1562,7 @@ FS_BuildGameSpecificSearchPath(char *dir)
 	fsRawPath_t *search;
 	fsSearchPath_t *next;
 
-	// empty string means baseq2
+	// empty string means Quake2Quest
 	if(dir[0] == '\0')
 	{
 		dir = BASEDIRNAME;

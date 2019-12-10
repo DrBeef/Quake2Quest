@@ -232,7 +232,7 @@ InitGame(void)
 
 	/* latched vars */
 	r_lefthand = gi.cvar( "hand", "0", CVAR_USERINFO | CVAR_ARCHIVE );
-	sv_cheats = gi.cvar("cheats", "0", CVAR_SERVERINFO | CVAR_LATCH);
+	sv_cheats = gi.cvar("cheats", "0", CVAR_ARCHIVE);
 	gi.cvar("gamename", GAMEVERSION, CVAR_SERVERINFO | CVAR_LATCH);
 	gi.cvar("gamedate", BUILD_DATE, CVAR_SERVERINFO | CVAR_LATCH);
 	maxclients = gi.cvar("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);

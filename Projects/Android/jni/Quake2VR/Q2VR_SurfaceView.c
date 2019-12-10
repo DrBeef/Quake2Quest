@@ -1466,9 +1466,8 @@ void * AppThreadFunction( void * parm )
 							Qcommon_Init(argc, (const char**)argv);
 						}
 
-                        FS_AddDirToSearchPath("/sdcard/baseq2", true);
+                        FS_AddDirToSearchPath("/sdcard/Quake2Quest", true);
 
-						//M_Menu_Main_f ();
 						quake2_initialised = true;
 					}
 					break;

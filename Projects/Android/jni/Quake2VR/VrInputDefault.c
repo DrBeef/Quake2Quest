@@ -32,7 +32,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	Cvar_Set("hand", vr_control_scheme->value < 10 ? "0" : "1");
 
 	//Get the cvar
-    sv_cheats = Cvar_Get("cheats", "0", CVAR_SERVERINFO | CVAR_LATCH);
+    sv_cheats = Cvar_Get("cheats", "0", CVAR_ARCHIVE);
 
     static qboolean dominantGripPushed = false;
 	static float dominantGripPushTime = 0.0f;

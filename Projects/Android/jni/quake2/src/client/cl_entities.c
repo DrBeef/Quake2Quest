@@ -695,10 +695,10 @@ void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunang
     if (weapmodel != 0)
     {
         char cvar_name[64];
-        Com_sprintf(cvar_name, sizeof(cvar_name), "weapon_adjustment_%i", weapmodel);
+        Com_sprintf(cvar_name, sizeof(cvar_name), "vr_weapon_adjustment_%i", weapmodel);
 
         //Default for the models
-        cvar_t *weapon_adjustment = Cvar_Get( cvar_name, "10.0,7.0,-8.0,-3.0,0.0,0.0", CVAR_USERINFO | CVAR_ARCHIVE );
+        cvar_t *weapon_adjustment = Cvar_Get( cvar_name, "10.0,7.0,-8.0,-3.0,0.0,0.0", CVAR_ARCHIVE );
 
 		vec3_t temp_offset;
         VectorSet(temp_offset, 0, 0, 0);

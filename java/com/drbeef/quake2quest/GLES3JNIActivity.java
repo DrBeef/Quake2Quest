@@ -162,22 +162,34 @@ import static android.system.Os.setenv;
 	public void create()
 	{
 		//This will copy the shareware version of quake2 if user doesn't have anything installed
-		copy_asset("/sdcard/baseq2", "pak0.pak");
-		copy_asset("/sdcard/baseq2", "config.cfg");
-		copy_asset("/sdcard/baseq2", "autoexec.cfg");
-		copy_asset("/sdcard/baseq2", "commandline.txt");
+		copy_asset("/sdcard/Quake2Quest", "pak0.pak");
+		copy_asset("/sdcard/Quake2Quest", "config.cfg");
+		copy_asset("/sdcard/Quake2Quest", "autoexec.cfg");
+		copy_asset("/sdcard/Quake2Quest", "commandline.txt");
 
-		//GLES3JNILib.setCallbackObjects(null, this);
+		//The custom weapon PAK file
+		//copy_asset("/sdcard/Quake2Quest", "pak8.pak");
+
+/*			String models[] = {"g_blast", "v_blast",
+				"g_shotg", "v_shotg",
+				"g_shotg2", "v_shotg2"};
+
+		for (String model : models) {
+			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/skin_new.pcx");
+			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/skin_new.tga");
+			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/tris.md2");
+		}
+		*/
 
 		//Read these from a file and pass through
 		commandLineParams = new String("quake2");
 
 		//See if user is trying to use command line params
-		if(new File("/sdcard/baseq2/commandline.txt").exists()) // should exist!
+		if(new File("/sdcard/Quake2Quest/commandline.txt").exists()) // should exist!
 		{
 			BufferedReader br;
 			try {
-				br = new BufferedReader(new FileReader("/sdcard/baseq2/commandline.txt"));
+				br = new BufferedReader(new FileReader("/sdcard/Quake2Quest/commandline.txt"));
 				String s;
 				StringBuilder sb=new StringBuilder(0);
 				while ((s=br.readLine())!=null)
@@ -210,7 +222,9 @@ import static android.system.Os.setenv;
 		if (!f.exists()) {
 			
 			//Ensure we have an appropriate folder
-			new File(path).mkdirs();
+			String fullname = path + "/" + name;
+			String directory = fullname.substring(0, fullname.lastIndexOf("/"));
+			new File(directory).mkdirs();
 			_copy_asset(name, path + "/" + name);
 		}
 	}

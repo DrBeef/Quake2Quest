@@ -133,7 +133,7 @@ OGG_InitTrackList(void)
 	if (gameCvar == NULL || gameCvar->string[0] == '\0' || strcmp(BASEDIRNAME, gameCvar->string) == 0)
 	{
 		// baseq2 => only 2 dirs in searchPath
-		potMusicDirs[0] = BASEDIRNAME "/music/"; // baseq2/music/
+		potMusicDirs[0] = BASEDIRNAME "/music/"; // Quake2Quest/music/
 		potMusicDirs[1] = "music/"; // global music dir (GOG)
 		potMusicDirs[2] = NULL;
 	}
@@ -143,7 +143,7 @@ OGG_InitTrackList(void)
 		snprintf(gameMusicDir, MAX_QPATH, "%s/music/", gameCvar->string);
 		potMusicDirs[0] = gameMusicDir; // $mod/music/
 		potMusicDirs[1] = "music/"; // global music dir (GOG)
-		potMusicDirs[2] = BASEDIRNAME "/music/"; // baseq2/music/
+		potMusicDirs[2] = BASEDIRNAME "/music/"; // Quake2Quest/music/
 	}
 
 	enum GameType gameType = other;

@@ -36,7 +36,7 @@
 #include "game.h"
 
 /* the "gameversion" client command will print this plus compile date */
-#define GAMEVERSION "baseq2"
+#define GAMEVERSION "Quake2Quest"
 
 /* protocol bytes that can be directly added to messages */
 #define svc_muzzleflash 1

@@ -196,7 +196,7 @@ static qboolean checkForHelp(int argc, char **argv)
 				printf("Most interesting commandline arguments:\n");
 				printf("-h or --help: Show this help\n");
 				printf("-datadir <path>\n");
-				printf("  set path to your Quake2 game data (the directory baseq2/ is in)\n");
+				printf("  set path to your Quake2 game data (the directory Quake2Quest/ is in)\n");
 				printf("-portable\n");
 				printf("  Write (savegames, configs, ...) in the binary directory\n");
 				printf("+exec <config>\n");

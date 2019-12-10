@@ -32,9 +32,9 @@
 #include "shared.h"
 #include "crc.h"
 
-#define Q2QVERSION "0.9"
+#define Q2QVERSION "0.9.2"
 #define YQ2VERSION "7.41"
-#define BASEDIRNAME "baseq2"
+#define BASEDIRNAME "Quake2Quest"
 
 #ifndef YQ2OSTYPE
 #error YQ2OSTYPE should be defined by the build system
