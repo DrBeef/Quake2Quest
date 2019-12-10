@@ -18,8 +18,8 @@ GNU General Public License for more details.
 
 #include <math.h>
 
-#include "../quake2/src/qcommon/qcommon.h"
-#include "../quake2/src/client/keys.h"
+#include "../quake2/src/common/header/common.h"
+#include "../quake2/src/client/header/keyboard.h"
 
 
 // euler angle order
@@ -168,6 +168,8 @@ void InterpolateAngles( vec3_t start, vec3_t end, vec3_t output, float frac );
 
 #define cmatrix3x4 vec4_t *const
 #define cmatrix4x4 vec4_t *const
+typedef vec_t		matrix3x4[3][4];
+typedef vec_t		matrix4x4[4][4];
 
 void Matrix3x4_VectorTransform( cmatrix3x4 in, const float v[3], float out[3] );
 void Matrix3x4_VectorITransform( cmatrix3x4 in, const float v[3], float out[3] );

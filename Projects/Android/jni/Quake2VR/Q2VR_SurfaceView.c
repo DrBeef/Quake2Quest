@@ -39,12 +39,16 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 #include "VrApi_Input.h"
 #include "VrApi_Types.h"
 
-#include "../gl4es/src/gl/loader.h"
+#include <src/gl/loader.h>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_main.h>
+#include <src/client/header/client.h>
 
 #include "VrCompositor.h"
 #include "VrInput.h"
 
-#include "../quake2/src/client/client.h"
+#include "../quake2/src/client/header/client.h"
 
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
 #define EGL_OPENGL_ES3_BIT_KHR		0x0040
@@ -80,6 +84,8 @@ float SS_MULTIPLIER    = 1.25f;
 
 vec2_t cylinderSize = {1280, 720};
 
+jclass clazz;
+
 float radians(float deg) {
 	return (deg * M_PI) / 180.0;
 }
@@ -98,6 +104,7 @@ char **argv;
 int argc=0;
 
 extern cvar_t	*r_lefthand;
+extern cvar_t   *cl_paused;
 
 enum control_scheme {
 	RIGHT_HANDED_DEFAULT = 0,
@@ -133,7 +140,7 @@ void Qcommon_Init (int argc, char **argv);
 bool useScreenLayer()
 {
 	//TODO
-	return (showingScreenLayer || (cls.state != ca_connected && cls.state != ca_active) || cls.key_dest != key_game);
+	return (showingScreenLayer || (cls.state != ca_connected && cls.state != ca_active) || cls.key_dest != key_game) || cl.cinematictime != 0;
 }
 
 int runStatus = -1;
@@ -866,6 +873,14 @@ void Android_Vibrate( float duration, int channel, float intensity )
 	vibration_channel_intensity[channel] = intensity;
 }
 
+void getVROrigins(vec3_t _weaponoffset, vec3_t _weaponangles, vec3_t _hmdPosition)
+{
+	VectorCopy(weaponoffset, _weaponoffset);
+	VectorCopy(weaponangles, _weaponangles);
+	VectorCopy(hmdPosition, _hmdPosition);
+}
+
+
 void Qcommon_BeginFrame (int time);
 void Qcommon_Frame (int eye);
 void Qcommon_EndFrame (int time);
@@ -904,7 +919,7 @@ void RenderFrame( ovrRenderer * renderer, const ovrJava * java,
             time = global_time - oldtime;
         } while (time < 1);
 
-        Qcommon_BeginFrame (time);
+        Qcommon_BeginFrame (time * 1000);
 
 		// Render the eye images.
         for (int eye = 0; eye < renderer->NumBuffers && isHostAlive(); eye++) {
@@ -935,7 +950,7 @@ void RenderFrame( ovrRenderer * renderer, const ovrJava * java,
             ovrFramebuffer_Advance(frameBuffer);
         }
 
-		Qcommon_EndFrame(time);
+		Qcommon_EndFrame(time * 1000);
 
         oldtime = global_time;
     }
@@ -986,8 +1001,6 @@ static void ovrApp_Clear( ovrApp * app )
 	app->Java.Vm = NULL;
 	app->Java.Env = NULL;
 	app->Java.ActivityObject = NULL;
-	app->NativeWindow = NULL;
-	app->Resumed = false;
 	app->Ovr = NULL;
 	app->FrameIndex = 1;
 	app->DisplayTime = 0;
@@ -1293,6 +1306,7 @@ typedef struct
 {
 	JavaVM *		JavaVm;
 	jobject			ActivityObject;
+	jclass          ActivityClass;
 	pthread_t		Thread;
 	ovrMessageQueue	MessageQueue;
 	ANativeWindow * NativeWindow;
@@ -1303,7 +1317,7 @@ long shutdownCountdown;
 int m_width;
 int m_height;
 
-void R_SetMode( void );
+qboolean R_SetMode( void );
 
 void Android_GetScreenRes(int *width, int *height)
 {
@@ -1360,7 +1374,9 @@ void VR_Init()
 	vr_worldscale = Cvar_Get( "vr_worldscale", "26.2467", CVAR_ARCHIVE);
 }
 
-void M_Menu_Main_f (void);
+/* Called before SDL_main() to initialize JNI bindings in SDL library */
+extern void SDL_Android_Init(JNIEnv* env, jclass cls);
+void FS_AddDirToSearchPath(char *dir, qboolean create);
 
 void * AppThreadFunction( void * parm )
 {
@@ -1370,6 +1386,13 @@ void * AppThreadFunction( void * parm )
 	java.Vm = appThread->JavaVm;
 	(*java.Vm)->AttachCurrentThread( java.Vm, &java.Env, NULL );
 	java.ActivityObject = appThread->ActivityObject;
+
+    jclass cls = (*java.Env)->GetObjectClass(java.Env, java.ActivityObject);
+
+    /* This interface could expand with ABI negotiation, callbacks, etc. */
+    SDL_Android_Init(java.Env, cls);
+
+    SDL_SetMainReady();
 
 	// Note that AttachCurrentThread will reset the thread name.
 	prctl( PR_SET_NAME, (long)"OVR::Main", 0, 0, 0 );
@@ -1406,8 +1429,7 @@ void * AppThreadFunction( void * parm )
 
 	ovrRenderer_Create( m_width, m_height, &appState.Renderer, &java );
 
-	//Always use this folder
-	chdir("/sdcard/Quake2Quest");
+	chdir("/sdcard");
 
 	for ( bool destroyed = false; destroyed == false; )
 	{
@@ -1444,7 +1466,8 @@ void * AppThreadFunction( void * parm )
 							Qcommon_Init(argc, (const char**)argv);
 						}
 
-						//M_Menu_Main_f ();
+                        FS_AddDirToSearchPath("/sdcard/Quake2Quest", true);
+
 						quake2_initialised = true;
 					}
 					break;
@@ -1586,6 +1609,23 @@ void * AppThreadFunction( void * parm )
             setWorldPosition(positionHmd.x, positionHmd.y, positionHmd.z);
 
             ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
+
+
+
+
+            static bool s_paused = false;
+            if (s_paused != (cl_paused->value == 1))
+            {
+                s_paused = (cl_paused->value == 1);
+
+                //If we switch from paused to unpaused, go full screen
+                if (cl_paused->value != 1)
+                {
+                    showingScreenLayer = false;
+                }
+            }
+
+
 
 			//Get info for tracked remotes
 			acquireTrackedRemotesData(appState.Ovr, appState.DisplayTime);
@@ -1729,10 +1769,11 @@ void * AppThreadFunction( void * parm )
 	return NULL;
 }
 
-static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject )
+static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject, jclass activityClass )
 {
 	(*env)->GetJavaVM( env, &appThread->JavaVm );
 	appThread->ActivityObject = (*env)->NewGlobalRef( env, activityObject );
+	appThread->ActivityClass = (*env)->NewGlobalRef( env, activityClass );
 	appThread->Thread = 0;
 	appThread->NativeWindow = NULL;
 	ovrMessageQueue_Create( &appThread->MessageQueue );
@@ -1748,6 +1789,7 @@ static void ovrAppThread_Destroy( ovrAppThread * appThread, JNIEnv * env )
 {
 	pthread_join( appThread->Thread, NULL );
 	(*env)->DeleteGlobalRef( env, appThread->ActivityObject );
+	(*env)->DeleteGlobalRef( env, appThread->ActivityClass );
 	ovrMessageQueue_Destroy( &appThread->MessageQueue );
 }
 
@@ -1759,6 +1801,8 @@ Activity lifecycle
 ================================================================================
 */
 
+JNIEXPORT jint JNICALL SDL_JNI_OnLoad(JavaVM* vm, void* reserved);
+
 int JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	JNIEnv *env;
@@ -1768,7 +1812,7 @@ int JNI_OnLoad(JavaVM* vm, void* reserved)
 		return -1;
 	}
 
-	return JNI_VERSION_1_4;
+	return SDL_JNI_OnLoad(vm, reserved);
 }
 
 JNIEXPORT jlong JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onCreate( JNIEnv * env, jclass activityClass, jobject activity,
@@ -1823,7 +1867,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onCreate( JNIEnv
 	initialize_gl4es();
 
 	ovrAppThread * appThread = (ovrAppThread *) malloc( sizeof( ovrAppThread ) );
-	ovrAppThread_Create( appThread, env, activity );
+	ovrAppThread_Create( appThread, env, activity, activityClass );
 
 	ovrMessageQueue_Enable( &appThread->MessageQueue, true );
 	ovrMessage message;
@@ -1967,22 +2011,5 @@ JNIEXPORT void JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onSurfaceDestroye
 	ALOGV( "        ANativeWindow_release( NativeWindow )" );
 	ANativeWindow_release( appThread->NativeWindow );
 	appThread->NativeWindow = NULL;
-}
-
-/*************************
- * Audio stuff
- *************************/
-
-JNIEXPORT jint JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_Quake2PaintAudio( JNIEnv* env, jobject thiz, jobject buf )
-{
-	extern int paint_audio (void *unused, void * stream, int len);
-
-	void *stream;
-	int len;
-
-	stream = (*env)->GetDirectBufferAddress( env,  buf);
-	len = (*env)->GetDirectBufferCapacity( env,  buf);
-
-	return paint_audio ( NULL, stream, len );
 }
 

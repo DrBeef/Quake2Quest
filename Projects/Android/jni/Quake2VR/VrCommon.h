@@ -24,7 +24,7 @@
 
 bool quake2_initialised;
 
-int global_time;
+long long global_time;
 
 float playerHeight;
 float playerYaw;
@@ -38,9 +38,6 @@ vec3_t hmdPosition;
 vec3_t hmdorientation;
 vec3_t positionDeltaThisFrame;
 
-#define ADJUSTED 0
-#define UNADJUSTED 1
-#define MELEE 2
 vec3_t weaponangles;
 vec3_t weaponoffset;
 

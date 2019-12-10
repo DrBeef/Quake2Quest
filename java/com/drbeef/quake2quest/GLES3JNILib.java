@@ -22,7 +22,4 @@ public class GLES3JNILib
 	public static native void onSurfaceCreated( long handle, Surface s );
 	public static native void onSurfaceChanged( long handle, Surface s );
 	public static native void onSurfaceDestroyed( long handle );
-
-	//Audio
-	public static native int Quake2PaintAudio( ByteBuffer buf );
 }

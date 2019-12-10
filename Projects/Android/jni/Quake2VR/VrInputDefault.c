@@ -16,10 +16,10 @@ Authors		:	Simon Brown
 #include "VrInput.h"
 #include "VrCvars.h"
 
-#include "../quake2/src/client/client.h"
+#include "../quake2/src/client/header/client.h"
 
 extern cvar_t	*cl_forwardspeed;
-extern cvar_t	*sv_cheats;
+cvar_t	*sv_cheats;
 extern cvar_t	*vr_weapon_stabilised;
 
 
@@ -30,6 +30,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 {
 	//Ensure handedness is set correctly
 	Cvar_Set("hand", vr_control_scheme->value < 10 ? "0" : "1");
+
+	//Get the cvar
+    sv_cheats = Cvar_Get("cheats", "0", CVAR_ARCHIVE);
 
     static qboolean dominantGripPushed = false;
 	static float dominantGripPushTime = 0.0f;

@@ -20,7 +20,9 @@ import android.content.res.AssetManager;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
+import android.media.AudioRecord;
 import android.media.AudioTrack;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -32,12 +34,14 @@ import android.view.KeyEvent;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
+import static android.system.Os.setenv;
+
 @SuppressLint("SdCardPath") public class GLES3JNIActivity extends Activity implements SurfaceHolder.Callback
 {
 	// Load the gles3jni library right away to make sure JNI_OnLoad() gets called as the very first thing.
 	static
 	{
-		System.loadLibrary( "quake2" );
+		System.loadLibrary( "yquake2" );
 	}
 
 	private static final String TAG = "Quake2Quest";
@@ -52,13 +56,32 @@ import android.support.v4.content.ContextCompat;
 	private SurfaceHolder mSurfaceHolder;
 	private long mNativeHandle;
 
-	private boolean stop_audio = true;
-	
+	// Main components
+	protected static GLES3JNIActivity mSingleton;
+
+	// Audio
+	protected static AudioTrack mAudioTrack;
+	protected static AudioRecord mAudioRecord;
+
+	public static void initialize() {
+		// The static nature of the singleton and Android quirkyness force us to initialize everything here
+		// Otherwise, when exiting the app and returning to it, these variables *keep* their pre exit values
+		mSingleton = null;
+		mAudioTrack = null;
+		mAudioRecord = null;
+	}
+
 	@Override protected void onCreate( Bundle icicle )
 	{
 		Log.v( TAG, "----------------------------------------------------------------" );
 		Log.v( TAG, "GLES3JNIActivity::onCreate()" );
 		super.onCreate( icicle );
+
+		GLES3JNIActivity.initialize();
+
+		// So we can call stuff from static callbacks
+		mSingleton = this;
+
 
 		mView = new SurfaceView( this );
 		setContentView( mView );
@@ -139,23 +162,34 @@ import android.support.v4.content.ContextCompat;
 	public void create()
 	{
 		//This will copy the shareware version of quake2 if user doesn't have anything installed
-		copy_asset("/sdcard/baseq2", "pak0.pak");
-		copy_asset("/sdcard/baseq2", "config.cfg");
-		copy_asset("/sdcard/baseq2", "autoexec.cfg");
-		copy_asset("/sdcard/baseq2", "commandline.txt");
-		copy_asset("/sdcard/baseq2", "vignette.tga");
+		copy_asset("/sdcard/Quake2Quest", "pak0.pak");
+		copy_asset("/sdcard/Quake2Quest", "config.cfg");
+		copy_asset("/sdcard/Quake2Quest", "autoexec.cfg");
+		copy_asset("/sdcard/Quake2Quest", "commandline.txt");
 
-		//GLES3JNILib.setCallbackObjects(null, this);
+		//The custom weapon PAK file
+		//copy_asset("/sdcard/Quake2Quest", "pak8.pak");
+
+/*			String models[] = {"g_blast", "v_blast",
+				"g_shotg", "v_shotg",
+				"g_shotg2", "v_shotg2"};
+
+		for (String model : models) {
+			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/skin_new.pcx");
+			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/skin_new.tga");
+			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/tris.md2");
+		}
+		*/
 
 		//Read these from a file and pass through
 		commandLineParams = new String("quake2");
 
 		//See if user is trying to use command line params
-		if(new File("/sdcard/baseq2/commandline.txt").exists()) // should exist!
+		if(new File("/sdcard/Quake2Quest/commandline.txt").exists()) // should exist!
 		{
 			BufferedReader br;
 			try {
-				br = new BufferedReader(new FileReader("/sdcard/baseq2/commandline.txt"));
+				br = new BufferedReader(new FileReader("/sdcard/Quake2Quest/commandline.txt"));
 				String s;
 				StringBuilder sb=new StringBuilder(0);
 				while ((s=br.readLine())!=null)
@@ -172,6 +206,14 @@ import android.support.v4.content.ContextCompat;
 			}
 		}
 
+		try {
+			setenv("YQUAKE2_GAMELIBDIR", getFilesDir().getParentFile().getPath() + "/lib", true);
+		}
+		catch (Exception e)
+		{
+
+		}
+
 		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams );
 	}
 	
@@ -180,7 +222,9 @@ import android.support.v4.content.ContextCompat;
 		if (!f.exists()) {
 			
 			//Ensure we have an appropriate folder
-			new File(path).mkdirs();
+			String fullname = path + "/" + name;
+			String directory = fullname.substring(0, fullname.lastIndexOf("/"));
+			new File(directory).mkdirs();
 			_copy_asset(name, path + "/" + name);
 		}
 	}
@@ -215,77 +259,11 @@ import android.support.v4.content.ContextCompat;
 		}
 	}
 
-
-	private static Object quake2Lock = new Object();
-
-	private static int sQuake2PaintAudio( ByteBuffer buf ){
-		int ret;
-		synchronized(quake2Lock) {
-			ret = GLES3JNILib.Quake2PaintAudio(buf);
-		}
-		return ret;
-	}
-
-	/*----------------------------
-	 * Audio
-	 *----------------------------*/
-
-	private void startAudioThread() {
-		if (stop_audio) {
-			//Start Audio Thread
-			stop_audio = false;
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-						audio_thread();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}).start();
-		}
-	}
-
-	public void audio_thread() throws IOException{
-
-		int audioSize = (2048*4);
-
-		ByteBuffer audioBuffer = ByteBuffer.allocateDirect(audioSize);
-
-		byte[] audioData = new byte[audioSize];
-
-		int sampleFreq = 22050;
-		AudioTrack oTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleFreq,
-				AudioFormat.CHANNEL_OUT_STEREO,
-				AudioFormat.ENCODING_PCM_16BIT,
-				AudioTrack.getMinBufferSize(sampleFreq, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT),
-				AudioTrack.MODE_STREAM);
-
-		// Start playing data that is written
-		oTrack.play();
-
-		long tstart = SystemClock.uptimeMillis();
-
-		while (!stop_audio){
-
-			sQuake2PaintAudio( audioBuffer );
-
-			audioBuffer.position(0);
-			audioBuffer.get(audioData);
-
-			// Write the byte array to the track
-			oTrack.write(audioData, 0, audioData.length);
-		}
-
-		// Done writing to the track
-		oTrack.stop();
-	}
-
 	@Override protected void onStart()
 	{
 		Log.v( TAG, "GLES3JNIActivity::onStart()" );
 		super.onStart();
-		startAudioThread();
+
 		GLES3JNILib.onStart( mNativeHandle );
 	}
 
@@ -293,7 +271,7 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onResume()" );
 		super.onResume();
-		startAudioThread();
+
 		GLES3JNILib.onResume( mNativeHandle );
 	}
 
@@ -301,7 +279,6 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onPause()" );
 		GLES3JNILib.onPause( mNativeHandle );
-		stop_audio = true;
 		super.onPause();
 	}
 
@@ -309,7 +286,6 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onStop()" );
 		GLES3JNILib.onStop( mNativeHandle );
-		stop_audio = true;
 		super.onStop();
 	}
 
@@ -323,9 +299,10 @@ import android.support.v4.content.ContextCompat;
 		}
 
 		GLES3JNILib.onDestroy( mNativeHandle );
-		stop_audio = true;
 
 		super.onDestroy();
+		// Reset everything in case the user re opens the app
+		GLES3JNIActivity.initialize();
 		mNativeHandle = 0;
 	}
 
@@ -358,4 +335,95 @@ import android.support.v4.content.ContextCompat;
 			mSurfaceHolder = null;
 		}
 	}
+
+	// Audio
+
+	/**
+	 * This method is called by SDL using JNI.
+	 */
+	public static int audioOpen(int sampleRate, boolean is16Bit, boolean isStereo, int desiredFrames) {
+		int channelConfig = isStereo ? AudioFormat.CHANNEL_CONFIGURATION_STEREO : AudioFormat.CHANNEL_CONFIGURATION_MONO;
+		int audioFormat = is16Bit ? AudioFormat.ENCODING_PCM_16BIT : AudioFormat.ENCODING_PCM_8BIT;
+		int frameSize = (isStereo ? 2 : 1) * (is16Bit ? 2 : 1);
+
+		Log.v(TAG, "SDL audio: wanted " + (isStereo ? "stereo" : "mono") + " " + (is16Bit ? "16-bit" : "8-bit") + " " + (sampleRate / 1000f) + "kHz, " + desiredFrames + " frames buffer");
+
+		// Let the user pick a larger buffer if they really want -- but ye
+		// gods they probably shouldn't, the minimums are horrifyingly high
+		// latency already
+		desiredFrames = Math.max(desiredFrames, (AudioTrack.getMinBufferSize(sampleRate, channelConfig, audioFormat) + frameSize - 1) / frameSize);
+
+		if (mAudioTrack == null) {
+			mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
+					channelConfig, audioFormat, desiredFrames * frameSize, AudioTrack.MODE_STREAM);
+
+			// Instantiating AudioTrack can "succeed" without an exception and the track may still be invalid
+			// Ref: https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/media/java/android/media/AudioTrack.java
+			// Ref: http://developer.android.com/reference/android/media/AudioTrack.html#getState()
+
+			if (mAudioTrack.getState() != AudioTrack.STATE_INITIALIZED) {
+				Log.e(TAG, "Failed during initialization of Audio Track");
+				mAudioTrack = null;
+				return -1;
+			}
+
+			mAudioTrack.play();
+		}
+
+		Log.v(TAG, "SDL audio: got " + ((mAudioTrack.getChannelCount() >= 2) ? "stereo" : "mono") + " " + ((mAudioTrack.getAudioFormat() == AudioFormat.ENCODING_PCM_16BIT) ? "16-bit" : "8-bit") + " " + (mAudioTrack.getSampleRate() / 1000f) + "kHz, " + desiredFrames + " frames buffer");
+
+		return 0;
+	}
+
+	/**
+	 * This method is called by SDL using JNI.
+	 */
+	public static void audioWriteShortBuffer(short[] buffer) {
+		for (int i = 0; i < buffer.length; ) {
+			int result = mAudioTrack.write(buffer, i, buffer.length - i);
+			if (result > 0) {
+				i += result;
+			} else if (result == 0) {
+				try {
+					Thread.sleep(1);
+				} catch(InterruptedException e) {
+					// Nom nom
+				}
+			} else {
+				Log.w(TAG, "SDL audio: error return from write(short)");
+				return;
+			}
+		}
+	}
+
+	/**
+	 * This method is called by SDL using JNI.
+	 */
+	public static void audioWriteByteBuffer(byte[] buffer) {
+		for (int i = 0; i < buffer.length; ) {
+			int result = mAudioTrack.write(buffer, i, buffer.length - i);
+			if (result > 0) {
+				i += result;
+			} else if (result == 0) {
+				try {
+					Thread.sleep(1);
+				} catch(InterruptedException e) {
+					// Nom nom
+				}
+			} else {
+				Log.w(TAG, "SDL audio: error return from write(byte)");
+				return;
+			}
+		}
+	}
+
+	/** This method is called by SDL using JNI. */
+	public static void audioClose() {
+		if (mAudioTrack != null) {
+			mAudioTrack.stop();
+			mAudioTrack.release();
+			mAudioTrack = null;
+		}
+	}
+
 }
