@@ -733,16 +733,16 @@ Weapon_Grenade(edict_t *ent)
 		return;
 	}
 
-	if (ent->client->weaponstate == WEAPON_READY)
-	{
-        //Laser sight - always as a short pointer for grenade
-        if (vr_lasersight->value != 0.0f) {
-            gi.WriteByte(svc_temp_entity);
-            gi.WriteByte(TE_LASER_SIGHT);
-            gi.WriteByte(ent->client->pers.weapon->weapmodel);
-            gi.multicast(ent->s.origin, MULTICAST_PHS);
-        }
+    //Laser sight - always as a short pointer for grenade
+    if (vr_lasersight->value != 0.0f) {
+        gi.WriteByte(svc_temp_entity);
+        gi.WriteByte(TE_LASER_SIGHT);
+        gi.WriteByte(ent->client->pers.weapon->weapmodel);
+        gi.multicast(ent->s.origin, MULTICAST_PHS);
+    }
 
+    if (ent->client->weaponstate == WEAPON_READY)
+	{
 		if (((ent->client->latched_buttons |
 			  ent->client->buttons) & BUTTON_ATTACK))
 		{

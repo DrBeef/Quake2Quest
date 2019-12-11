@@ -1789,10 +1789,10 @@ void R_DrawLaserSight( entity_t *e )
 
 	vec3_t perpvec;
 	vec3_t direction, normalized_direction;
-	vec3_t start_points[NUM_BEAM_SEGS], end_points[NUM_BEAM_SEGS];
+	vec3_t start_points[NUM_LASER_SIGHT_SEGS], end_points[NUM_LASER_SIGHT_SEGS];
 	vec3_t oldorigin, origin;
 
-	GLfloat vtx[3*NUM_BEAM_SEGS*4];
+	GLfloat vtx[3*NUM_LASER_SIGHT_SEGS*4];
 	unsigned int index_vtx = 0;
 	unsigned int pointb;
 
@@ -1814,7 +1814,7 @@ void R_DrawLaserSight( entity_t *e )
 	PerpendicularVector( perpvec, normalized_direction );
 	VectorScale( perpvec, 0.1, perpvec );
 
-	for ( i = 0; i < 6; i++ )
+	for ( i = 0; i < NUM_LASER_SIGHT_SEGS; i++ )
 	{
 		RotatePointAroundVector( start_points[i], normalized_direction, perpvec, (360.0/NUM_LASER_SIGHT_SEGS)*i );
 		VectorAdd( start_points[i], origin, start_points[i] );
@@ -1825,7 +1825,7 @@ void R_DrawLaserSight( entity_t *e )
 	glEnable( GL_BLEND );
 	glDepthMask( GL_FALSE );
 
-	if (e->frame == 6)
+	if (e->frame == 6 || e->frame == 7)
 	{
 		//grenade "pointer"
 		glColor4f( 0, 0, 1, 1.0 );
@@ -1835,7 +1835,7 @@ void R_DrawLaserSight( entity_t *e )
 
 
 
-	for ( i = 0; i < NUM_BEAM_SEGS; i++ )
+	for ( i = 0; i < NUM_LASER_SIGHT_SEGS; i++ )
 	{
 		vtx[index_vtx++] = start_points [ i ][ 0 ];
 		vtx[index_vtx++] = start_points [ i ][ 1 ];
@@ -1845,7 +1845,7 @@ void R_DrawLaserSight( entity_t *e )
 		vtx[index_vtx++] = end_points [ i ][ 1 ];
 		vtx[index_vtx++] = end_points [ i ][ 2 ];
 
-		pointb = ( i + 1 ) % NUM_BEAM_SEGS;
+		pointb = ( i + 1 ) % NUM_LASER_SIGHT_SEGS;
 		vtx[index_vtx++] = start_points [ pointb ][ 0 ];
 		vtx[index_vtx++] = start_points [ pointb ][ 1 ];
 		vtx[index_vtx++] = start_points [ pointb ][ 2 ];
@@ -1858,7 +1858,7 @@ void R_DrawLaserSight( entity_t *e )
 	glEnableClientState( GL_VERTEX_ARRAY );
 
 	glVertexPointer( 3, GL_FLOAT, 0, vtx );
-	glDrawArrays( GL_TRIANGLE_STRIP, 0, NUM_BEAM_SEGS*4 );
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, NUM_LASER_SIGHT_SEGS*4 );
 
 	glDisableClientState( GL_VERTEX_ARRAY );
 

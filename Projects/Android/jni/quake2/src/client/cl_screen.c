@@ -1633,6 +1633,8 @@ void SCR_UpdateForEye (int eye)
 
 			V_RenderView(separation);
 
+            SCR_DrawVignette();
+
 			SCR_DrawStats(separation);
 
 			if (cl.frame.playerstate.stats[STAT_LAYOUTS] & 1)

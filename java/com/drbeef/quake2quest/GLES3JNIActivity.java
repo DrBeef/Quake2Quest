@@ -168,7 +168,8 @@ import static android.system.Os.setenv;
 		copy_asset("/sdcard/Quake2Quest", "commandline.txt");
 
 		//The custom weapon PAK file
-		//copy_asset("/sdcard/Quake2Quest", "pak8.pak");
+		copy_asset("/sdcard/Quake2Quest", "pak6.pak");
+		copy_asset("/sdcard/Quake2Quest", "pak99.pak");
 
 /*			String models[] = {"g_blast", "v_blast",
 				"g_shotg", "v_shotg",
