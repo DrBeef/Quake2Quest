@@ -523,7 +523,8 @@ void CL_ParseLaserSight ()
 	cl_lasersight.endtime = cl.time+250;
 }
 
-void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunangles);
+//void SetWeapon6DOF(int weapmodel, vec3_t origin, vec3_t gunorigin, vec3_t gunangles);
+void convertFromVRtoQ2(vec3_t in, vec3_t offset, vec3_t out);
 
 trace_t CL_Trace (vec3_t start, vec3_t end, float size,  int contentmask)
 {
@@ -535,18 +536,24 @@ trace_t CL_Trace (vec3_t start, vec3_t end, float size,  int contentmask)
 	return CM_BoxTrace (start, end, mins, maxs, 0, contentmask);
 }
 
+extern vec3_t weaponangles;
+extern vec3_t weaponoffset;
+
 void CL_UpdateLaserSightOrigins ()
 {
 	if (cl_lasersight.endtime > cl.time) {
 		vec3_t forward, right;
 		vec3_t end;
 		vec3_t gunorigin;
-		vec3_t gunangles;
+
 		//At the point of calling this, the vieworg should already have the player height included
-		SetWeapon6DOF(0, cl.refdef.vieworg, gunorigin, gunangles);
+		convertFromVRtoQ2(weaponoffset, cl.refdef.vieworg, gunorigin);
 		gunorigin[2] += 1; // just add a little bit
-		AngleVectors(gunangles, forward, right, NULL);
-		VectorMA(gunorigin, (float)(cl_lasersight.ent.frame != 6 ? 4096.0 : 6.0), forward, end);
+		AngleVectors(weaponangles, forward, right, NULL);
+
+		qboolean useTrajectoryIndicator = cl_lasersight.ent.frame == 6 || cl_lasersight.ent.frame == 7;
+
+                VectorMA(gunorigin, (float)(useTrajectoryIndicator ? 16.0 : 4096.0), forward, end);
 		trace_t tr = CL_Trace(gunorigin, end, 1,
 							  CONTENTS_SOLID | CONTENTS_MONSTER | CONTENTS_DEADMONSTER);
 		VectorCopy(gunorigin, cl_lasersight.ent.origin);
