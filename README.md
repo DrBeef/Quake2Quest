@@ -74,9 +74,9 @@ set vr_snapturn_angle  "5"
 |cheats|If set to 1 then you can click the off-hand thumbstick button to activate "give all", giving you all weapons, pickups etc|
 |vr_snapturn_angle|Sets the angle of the snap turn, set to a value < 10 for smooth turning|
 |vr_walkdirection|Set to 1 for HMD oriented movement direction|
-|vr_control_scheme|Sets the control scheme (default: 0 - off-hand controller oriented, 1 - HMD oriented)|
+|vr_control_scheme|Sets the control scheme (default: 0 - Right-handed, 10 - Left handed)|
 |vr_height_adjust|Allows you to set a height adjustment (for seated play) value in metres|
-
+|vr_comfort_mask|Enables the movement comfort mask for those who are sensitive to VR sickness (0.0 - 1.0)
 
 Things to note / FAQs:
 ----------------------
@@ -88,6 +88,8 @@ Things to note / FAQs:
 
 Known Issues:
 -------------
+
+* Left-handed laser sight is still not aligned correctly, I will fix at some point
 * Any save games from the previous version will *NOT* work, this is due to the engine change. 
 * As mentioned, multiplayer probably doesn't work very well at all, if at all..
 
@@ -95,8 +97,14 @@ Known Issues:
 Credits:
 --------
 
-This build now includes modified weapon models that have had the hands and arms removed and are based on the HD weapon model pack that can be found here: http://realistic.tastyspleen.net/PAKS/HI%20RES%20PAKS/
-VR Weapon Model modifications courtesy of @Baggyg
+The game includes Hi Res textures, skins and items previously collected by the user Realistic. We could not find the original author of these weapons, nor does the pack include any licensing at all. If you are the author of these textures please feel free to contact us and we would be happy to credit you or remove.
+
+I would like to thank the following teams and individual for making this possible:
+
+* Emile Belanger - For advice regarding converting the Android build of Yamagi. See his other Android ports [here](http://www.beloko.com/)
+* [The Yamagi Team](https://www.yamagi.org/quake2/) - For the excellent engine this based upon.
+* Baggyg - My long-time VR friend whose roles in this have been varied and all helpful, also the creator of excellent websites/artwork/assets for this mod as well as altering models to be more VR friendly
+* The [SideQuest](https://sidequestvr.com/#/news) team - For making it easy for people to install this
 
 
 Building:
