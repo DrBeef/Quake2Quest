@@ -86,6 +86,17 @@ Things to note / FAQs:
 * Multiplayer is unlikely to work very well, if at all I'm afraid. I explain reasons why can be seen here (they apply to this as well as Lambda1VR):  https://www.reddit.com/r/Lambda1VR/comments/dtutnx/so_whats_with_the_head_aiming_in_multiplayer/
 * The folder into which the pak files from the full game and other things like mods and the OST shoud be copied is now called _Quake2Quest_, this is to avoid collision with the older configuration files for the previous version, it also means if you did prefer the vanilla version, you can roll back and all your saves will be intact.
 
+Notes for Users of First released Version
+-----------------------------------------
+
+The 2nd release of Quake2Quest updates the underlying engine to Yamagi. This has a number of benefits including but not limited to modding, music support and a reworked save system. However as previously mentioned save files will not be compatible between these two versions. Moving forward any updates to the application will not break save files. To avoid conflicts and to also allow you to revert to the original version should you feel it necessary, there is a new file structure. If you have copied across the full game this will need to be redone. Complete list of installation instructions below:
+
+1) Install the game via SideQuest or by downloading and installing the APK file
+2) Run the game once
+3) If you own a legal copy of Quake 2, you should copy all .pak files from baseq2 to the newly created Quake2Quest folder on your Quest. 
+Optional:
+4) If you wish to enjoy the Quake 2 soundtrack you can place the relevant OGG files in the folder Quake2Quest/music.
+
 Known Issues:
 -------------
 
