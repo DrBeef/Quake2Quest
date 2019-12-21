@@ -163,24 +163,20 @@ import static android.system.Os.setenv;
 	{
 		//This will copy the shareware version of quake2 if user doesn't have anything installed
 		copy_asset("/sdcard/Quake2Quest", "pak0.pak");
+
+		//HD Textures
+		copy_asset("/sdcard/Quake2Quest", "pak6.pak");
+
+		//Custom weapons
+		copy_asset("/sdcard/Quake2Quest", "pak99.pak");
+
+		//Configuration files
 		copy_asset("/sdcard/Quake2Quest", "config.cfg");
 		copy_asset("/sdcard/Quake2Quest", "autoexec.cfg");
 		copy_asset("/sdcard/Quake2Quest", "commandline.txt");
 
-		//The custom weapon PAK file
-		copy_asset("/sdcard/Quake2Quest", "pak6.pak");
-		copy_asset("/sdcard/Quake2Quest", "pak99.pak");
-
-/*			String models[] = {"g_blast", "v_blast",
-				"g_shotg", "v_shotg",
-				"g_shotg2", "v_shotg2"};
-
-		for (String model : models) {
-			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/skin_new.pcx");
-			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/skin_new.tga");
-			copy_asset("/sdcard/Quake2Quest", "models/weapons/" + model + "/tris.md2");
-		}
-		*/
+		//Comfort Vignette Mask
+		copy_asset("/sdcard/Quake2Quest", "vignette.tga");
 
 		//Read these from a file and pass through
 		commandLineParams = new String("quake2");
