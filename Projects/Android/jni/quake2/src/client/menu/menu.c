@@ -33,6 +33,7 @@
 #include "../header/client.h"
 #include "../sound/header/local.h"
 #include "header/qmenu.h"
+#include "../../../../Quake2VR/VrCvars.h"
 
 static int m_main_cursor;
 
@@ -1053,10 +1054,10 @@ static menuframework_s s_options_menu;
 static menuaction_s s_options_defaults_action;
 static menuaction_s s_options_customize_options_action;
 static menuslider_s s_options_sensitivity_slider;
-static menulist_s s_options_freelook_box;
+static menuslider_s s_options_vr_height_adjust_box;
 static menulist_s s_options_alwaysrun_box;
-static menulist_s s_options_invertmouse_box;
-static menulist_s s_options_lookstrafe_box;
+static menulist_s s_options_handedness_box;
+static menulist_s s_options_vr_walkdirection_box;
 static menulist_s s_options_crosshair_box;
 static menuslider_s s_options_sfxvolume_slider;
 static menuslider_s s_options_haptic_slider;
@@ -1091,9 +1092,9 @@ AlwaysRunFunc(void *unused)
 }
 
 static void
-FreeLookFunc(void *unused)
+HeightAdjustFunc(void *unused)
 {
-    Cvar_SetValue("freelook", (float)s_options_freelook_box.curvalue);
+    Cvar_SetValue("vr_height_adjust", (float)(s_options_vr_height_adjust_box.curvalue / 10.0f));
 }
 
 static void
@@ -1128,9 +1129,9 @@ ControlsSetMenuItemValues(void)
     s_options_quality_list.curvalue = (Cvar_VariableValue("s_loadas8bit") == 0);
     s_options_sensitivity_slider.curvalue = sensitivity->value * 2;
     s_options_alwaysrun_box.curvalue = (cl_run->value != 0);
-    s_options_invertmouse_box.curvalue = (m_pitch->value < 0);
-    s_options_lookstrafe_box.curvalue = (lookstrafe->value != 0);
-    s_options_freelook_box.curvalue = (freelook->value != 0);
+    s_options_handedness_box.curvalue = (vr_control_scheme->value == 0) ? 0 : 1;
+    s_options_vr_walkdirection_box.curvalue = (int)vr_walkdirection->value;
+    s_options_vr_height_adjust_box.curvalue = vr_height_adjust->value * 10.0f;
     s_options_crosshair_box.curvalue = ClampCvar(0, 3, crosshair->value);
     s_options_haptic_slider.curvalue = Cvar_VariableValue("joy_haptic_magnitude") * 10.0F;
 }
@@ -1146,15 +1147,15 @@ ControlsResetDefaultsFunc(void *unused)
 }
 
 static void
-InvertMouseFunc(void *unused)
+HandednessFunc(void *unused)
 {
-    Cvar_SetValue("m_pitch", -m_pitch->value);
+    Cvar_SetValue("vr_control_scheme", s_options_handedness_box.curvalue == 0 ? 0 : 10);
 }
 
 static void
 LookstrafeFunc(void *unused)
 {
-    Cvar_SetValue("lookstrafe", (float)!lookstrafe->value);
+    Cvar_SetValue("vr_walkdirection", (float)(1.0f - vr_walkdirection->value));
 }
 
 static void
@@ -1362,26 +1363,39 @@ Options_MenuInit(void)
     s_options_alwaysrun_box.generic.callback = AlwaysRunFunc;
     s_options_alwaysrun_box.itemnames = yesno_names;
 
-    s_options_invertmouse_box.generic.type = MTYPE_SPINCONTROL;
-    s_options_invertmouse_box.generic.x = 0;
-    s_options_invertmouse_box.generic.y = 80;
-    s_options_invertmouse_box.generic.name = "invert mouse";
-    s_options_invertmouse_box.generic.callback = InvertMouseFunc;
-    s_options_invertmouse_box.itemnames = yesno_names;
+    static const char *handedness[] = {
+            "Right-Handed",
+            "Left-Handed",
+            0
+    };
 
-    s_options_lookstrafe_box.generic.type = MTYPE_SPINCONTROL;
-    s_options_lookstrafe_box.generic.x = 0;
-    s_options_lookstrafe_box.generic.y = 90;
-    s_options_lookstrafe_box.generic.name = "lookstrafe";
-    s_options_lookstrafe_box.generic.callback = LookstrafeFunc;
-    s_options_lookstrafe_box.itemnames = yesno_names;
+    s_options_handedness_box.generic.type = MTYPE_SPINCONTROL;
+    s_options_handedness_box.generic.x = 0;
+    s_options_handedness_box.generic.y = 80;
+    s_options_handedness_box.generic.name = "Handedness";
+    s_options_handedness_box.generic.callback = HandednessFunc;
+    s_options_handedness_box.itemnames = handedness;
 
-    s_options_freelook_box.generic.type = MTYPE_SPINCONTROL;
-    s_options_freelook_box.generic.x = 0;
-    s_options_freelook_box.generic.y = 100;
-    s_options_freelook_box.generic.name = "free look";
-    s_options_freelook_box.generic.callback = FreeLookFunc;
-    s_options_freelook_box.itemnames = yesno_names;
+    static const char *movedirections[] = {
+            "Off-hand Controller",
+            "Gaze Direction",
+            0
+    };
+
+    s_options_vr_walkdirection_box.generic.type = MTYPE_SPINCONTROL;
+    s_options_vr_walkdirection_box.generic.x = 0;
+    s_options_vr_walkdirection_box.generic.y = 90;
+    s_options_vr_walkdirection_box.generic.name = "VR Move Direction";
+    s_options_vr_walkdirection_box.generic.callback = LookstrafeFunc;
+    s_options_vr_walkdirection_box.itemnames = movedirections;
+
+    s_options_vr_height_adjust_box.generic.type = MTYPE_SLIDER;
+    s_options_vr_height_adjust_box.generic.x = 0;
+    s_options_vr_height_adjust_box.generic.y = 100;
+    s_options_vr_height_adjust_box.generic.name = "VR Height Adjust";
+    s_options_vr_height_adjust_box.generic.callback = HeightAdjustFunc;
+    s_options_vr_height_adjust_box.minvalue = 0;
+    s_options_vr_height_adjust_box.maxvalue = 10;
 
     s_options_crosshair_box.generic.type = MTYPE_SPINCONTROL;
     s_options_crosshair_box.generic.x = 0;
@@ -1424,17 +1438,17 @@ Options_MenuInit(void)
     Menu_AddItem(&s_options_menu, (void *)&s_options_oggenable_box);
     Menu_AddItem(&s_options_menu, (void *)&s_options_oggshuffle_box);
     Menu_AddItem(&s_options_menu, (void *)&s_options_quality_list);
-    Menu_AddItem(&s_options_menu, (void *)&s_options_sensitivity_slider);
+//    Menu_AddItem(&s_options_menu, (void *)&s_options_sensitivity_slider);
     Menu_AddItem(&s_options_menu, (void *)&s_options_alwaysrun_box);
-    Menu_AddItem(&s_options_menu, (void *)&s_options_invertmouse_box);
-    Menu_AddItem(&s_options_menu, (void *)&s_options_lookstrafe_box);
-    Menu_AddItem(&s_options_menu, (void *)&s_options_freelook_box);
-    Menu_AddItem(&s_options_menu, (void *)&s_options_crosshair_box);
+    Menu_AddItem(&s_options_menu, (void *)&s_options_handedness_box);
+    Menu_AddItem(&s_options_menu, (void *)&s_options_vr_walkdirection_box);
+    Menu_AddItem(&s_options_menu, (void *)&s_options_vr_height_adjust_box);
+//    Menu_AddItem(&s_options_menu, (void *)&s_options_crosshair_box);
 
 //    if (show_haptic)
 //        Menu_AddItem(&s_options_menu, (void *)&s_options_haptic_slider);
 
-    Menu_AddItem(&s_options_menu, (void *)&s_options_customize_options_action);
+//    Menu_AddItem(&s_options_menu, (void *)&s_options_customize_options_action);
     Menu_AddItem(&s_options_menu, (void *)&s_options_defaults_action);
     Menu_AddItem(&s_options_menu, (void *)&s_options_console_action);
 }

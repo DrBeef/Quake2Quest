@@ -28,6 +28,7 @@
 #include "../../client/header/client.h"
 #include "../../client/menu/header/qmenu.h"
 #include "header/qmenu.h"
+#include "../../../../Quake2VR/VrCvars.h"
 
 extern void M_ForceMenuOff(void);
 
@@ -47,11 +48,11 @@ static cvar_t *gl_msaa_samples;
 
 static menuframework_s s_opengl_menu;
 
-static menulist_s s_renderer_list;
-static menulist_s s_mode_list;
+//static menulist_s s_renderer_list;
+//static menulist_s s_mode_list;
 static menulist_s s_uiscale_list;
 static menuslider_s s_brightness_slider;
-static menuslider_s s_fov_slider;
+static menuslider_s s_comfort_slider;
 static menulist_s s_fs_box;
 static menulist_s s_vsync_list;
 static menulist_s s_af_list;
@@ -127,9 +128,9 @@ BrightnessCallback(void *s)
 }
 
 static void
-FOVCallback(void *s) {
+ComfortCallback(void *s) {
 	menuslider_s *slider = (menuslider_s *)s;
-	Cvar_SetValue("fov", slider->curvalue);
+	Cvar_SetValue("vr_comfort_mask", slider->curvalue / 10.0f);
 }
 
 static void
@@ -161,12 +162,9 @@ ApplyChanges(void *unused)
 {
 	qboolean restart = false;
 
-	/* Renderer */
+	/*
 	if (s_renderer_list.curvalue != GetRenderer())
 	{
-		/*  First element in array is 'OpenGL 1.4' aka gl1.
-			Second element in array is 'OpenGL 3.2' aka gl3.
-			Third element in array is unknown renderer. */
 		if (s_renderer_list.curvalue == 0)
 		{
 			Cvar_Set("vid_renderer", "gl1");
@@ -184,24 +182,21 @@ ApplyChanges(void *unused)
 		}
 	}
 
-	/* auto mode */
 	if (!strcmp(s_mode_list.itemnames[s_mode_list.curvalue],
 		AUTO_MODE_NAME))
 	{
-		/* Restarts automatically */
 		Cvar_SetValue("r_mode", -2);
 	}
 	else if (!strcmp(s_mode_list.itemnames[s_mode_list.curvalue],
 		CUSTOM_MODE_NAME))
 	{
-		/* Restarts automatically */
 		Cvar_SetValue("r_mode", -1);
 	}
 	else
 	{
-		/* Restarts automatically */
 		Cvar_SetValue("r_mode", s_mode_list.curvalue);
 	}
+*/
 
 	/* UI scaling */
 	if (s_uiscale_list.curvalue == 0)
@@ -399,7 +394,7 @@ VID_MenuInit(void)
 	s_opengl_menu.x = viddef.width * 0.50;
 	s_opengl_menu.nitems = 0;
 
-	s_renderer_list.generic.type = MTYPE_SPINCONTROL;
+/*	s_renderer_list.generic.type = MTYPE_SPINCONTROL;
 	s_renderer_list.generic.name = "renderer";
 	s_renderer_list.generic.x = 0;
 	s_renderer_list.generic.y = (y = 0);
@@ -411,6 +406,7 @@ VID_MenuInit(void)
 	s_mode_list.generic.x = 0;
 	s_mode_list.generic.y = (y += 10);
 	s_mode_list.itemnames = resolutions;
+
 
 	if (r_mode->value >= 0)
 	{
@@ -426,11 +422,12 @@ VID_MenuInit(void)
 		// 'custom'
 		s_mode_list.curvalue = GetCustomValue(&s_mode_list);
 	}
+*/
 
 	s_brightness_slider.generic.type = MTYPE_SLIDER;
 	s_brightness_slider.generic.name = "brightness";
 	s_brightness_slider.generic.x = 0;
-	s_brightness_slider.generic.y = (y += 20);
+	s_brightness_slider.generic.y = (y = 0);
 	s_brightness_slider.generic.callback = BrightnessCallback;
 	s_brightness_slider.minvalue = 1;
 	s_brightness_slider.maxvalue = 20;
@@ -448,14 +445,14 @@ VID_MenuInit(void)
 	s_brightness_slider.curvalue = vid_gamma->value * 10;
 #endif
 
-	s_fov_slider.generic.type = MTYPE_SLIDER;
-	s_fov_slider.generic.x = 0;
-	s_fov_slider.generic.y = (y += 10);
-	s_fov_slider.generic.name = "field of view";
-	s_fov_slider.generic.callback = FOVCallback;
-	s_fov_slider.minvalue = 60;
-	s_fov_slider.maxvalue = 120;
-	s_fov_slider.curvalue = fov->value;
+	s_comfort_slider.generic.type = MTYPE_SLIDER;
+	s_comfort_slider.generic.x = 0;
+	s_comfort_slider.generic.y = (y += 10);
+	s_comfort_slider.generic.name = "Comfort Mask";
+	s_comfort_slider.generic.callback = ComfortCallback;
+	s_comfort_slider.minvalue = 0;
+	s_comfort_slider.maxvalue = 9;
+	s_comfort_slider.curvalue = vr_comfort_mask->value * 10.0f;
 
 	s_uiscale_list.generic.type = MTYPE_SPINCONTROL;
 	s_uiscale_list.generic.name = "ui scale";
@@ -542,10 +539,10 @@ VID_MenuInit(void)
 	s_apply_action.generic.y = (y += 10);
 	s_apply_action.generic.callback = ApplyChanges;
 
-	Menu_AddItem(&s_opengl_menu, (void *)&s_renderer_list);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_mode_list);
+//	Menu_AddItem(&s_opengl_menu, (void *)&s_renderer_list);
+//	Menu_AddItem(&s_opengl_menu, (void *)&s_mode_list);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_brightness_slider);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_fov_slider);
+	Menu_AddItem(&s_opengl_menu, (void *)&s_comfort_slider);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_uiscale_list);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_fs_box);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_vsync_list);
