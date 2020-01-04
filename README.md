@@ -116,6 +116,7 @@ I would like to thank the following teams and individual for making this possibl
 * [The Yamagi Team](https://www.yamagi.org/quake2/) - For the excellent engine this based upon.
 * Baggyg - My long-time VR friend whose roles in this have been varied and all helpful, also the creator of excellent websites/artwork/assets for this mod as well as altering models to be more VR friendly
 * The [SideQuest](https://sidequestvr.com/#/news) team - For making it easy for people to install this
+* GLE4ES for the OpenGL -> OpenGLES2 translation: without which this project wouldn't have worked at all: https://github.com/ptitSeb/gl4es
 
 
 Building:
