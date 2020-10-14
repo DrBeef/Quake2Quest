@@ -46,13 +46,13 @@ set vr_control_scheme "10"
 * Open the in-game menu with the left-controller menu button (same irrespective of right/left handed control)
 * A Button - Crouch
 * B Button - Jump
-* Y Button - Bring up the cinematic screen view
+* Y Button - Show inventory screen (use up and down on the right stick to select inventory item and fire to select)
 * X Button - Show the "Help Computer" whilst X is pressed
 * Dominant-Hand Controller - Weapon orientation
 * Dominant-Hand Thumbstick - left/right Snap turn, up/down weapon change
 * Dominant-Hand Thumbstick click - change the laser-sight mode on/off
 * Dominant-Hand Trigger - Fire
-* Dominant Grip Button - Show inventory screen (use up and down on the right stick to select inventory item and fire to select)
+* Dominant Grip Button - Not used
 * Off-Hand Controller - Direction of movement (or if configured in config.cfg HMD direction is used)
 * Off-Hand Thumbstick - locomotion
 * Off-Hand Trigger - Run
