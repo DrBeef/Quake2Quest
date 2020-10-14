@@ -1128,7 +1128,7 @@ ClientEndServerFrame(edict_t *ent)
 	if (level.intermissiontime)
 	{
 		current_client->ps.blend[3] = 0;
-		current_client->ps.fov = 104;
+		current_client->ps.fov = gi.getFOV();
 		G_SetStats(ent);
 		return;
 	}

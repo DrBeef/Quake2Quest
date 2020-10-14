@@ -174,6 +174,7 @@ typedef struct
 	//VR Stuff
 	void (*HapticVibrate)( float duration, int channel, float intensity );
 	void (*getVROrigins)(vec3_t weaponoffset, vec3_t weaponangles, vec3_t hmdPosition);
+	float (*getFOV)( );
 
 	/* ClientCommand and ServerCommand parameter access */
 	int (*argc)(void);

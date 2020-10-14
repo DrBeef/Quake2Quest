@@ -507,7 +507,6 @@ extern cvar_t *r_fullbright;
 
 extern cvar_t *r_norefresh;
 extern cvar_t *gl_lefthand;
-extern cvar_t *r_gunfov;
 extern cvar_t *r_farsee;
 extern cvar_t *r_drawworld;
 

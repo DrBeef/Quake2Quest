@@ -432,6 +432,7 @@ SV_InitGameProgs(void)
 
 	import.HapticVibrate = Android_Vibrate;
 	import.getVROrigins = getVROrigins;
+	import.getFOV = getFOV;
 
 	import.argc = Cmd_Argc;
 	import.argv = Cmd_Argv;

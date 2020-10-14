@@ -1316,10 +1316,11 @@ long shutdownCountdown;
 
 int m_width;
 int m_height;
+static ovrJava java;
 
 qboolean R_SetMode( void );
 
-void Android_GetScreenRes(int *width, int *height)
+void Quest_GetScreenRes(int *width, int *height)
 {
     if (useScreenLayer())
     {
@@ -1331,7 +1332,17 @@ void Android_GetScreenRes(int *width, int *height)
     }
 }
 
-void Android_MessageBox(const char *title, const char *text)
+int Quest_GetRefresh()
+{
+    return vrapi_GetSystemPropertyInt( &java, VRAPI_SYS_PROP_DISPLAY_REFRESH_RATE );
+}
+
+float getFOV()
+{
+    return vrapi_GetSystemPropertyFloat( &java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_X );
+}
+
+void Quest_MessageBox(const char *title, const char *text)
 {
     ALOGE("%s %s", title, text);
 }
@@ -1382,7 +1393,6 @@ void * AppThreadFunction( void * parm )
 {
 	ovrAppThread * appThread = (ovrAppThread *)parm;
 
-	ovrJava java;
 	java.Vm = appThread->JavaVm;
 	(*java.Vm)->AttachCurrentThread( java.Vm, &java.Env, NULL );
 	java.ActivityObject = appThread->ActivityObject;

@@ -97,7 +97,6 @@ cvar_t *gl3_particle_square;
 
 cvar_t *vr_lasersight;
 cvar_t *gl_lefthand;
-cvar_t *r_gunfov;
 cvar_t *r_farsee;
 
 cvar_t *gl3_intensity;
@@ -194,7 +193,6 @@ GL3_Register(void)
 {
 	vr_lasersight = ri.Cvar_Get("vr_lasersight", "0", CVAR_LATCH);
 	gl_lefthand = ri.Cvar_Get("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
-	r_gunfov = ri.Cvar_Get("r_gunfov", "104", CVAR_ARCHIVE);
 	r_farsee = ri.Cvar_Get("r_farsee", "0", CVAR_LATCH | CVAR_ARCHIVE);
 
 	gl_drawbuffer = ri.Cvar_Get("gl_drawbuffer", "GL_BACK", 0);

@@ -234,6 +234,7 @@ void RotatePointAroundVector(vec3_t dst,
 
 void Android_Vibrate( float duration, int channel, float intensity );
 void getVROrigins(vec3_t weaponoffset, vec3_t weaponangles, vec3_t hmdPosition);
+float getFOV();
 
 /* ============================================= */
 

@@ -43,7 +43,8 @@ cvar_t *m_up;
 cvar_t *m_yaw;
 cvar_t *sensitivity;
 
-void Android_GetScreenRes(int *width, int *height);
+void Quest_GetScreenRes(int *width, int *height);
+int Quest_GetRefresh();
 
 qboolean GLimp_Init(void) { return true; }
 void GLimp_Shutdown(void) {}
@@ -60,10 +61,10 @@ qboolean GLimp_InitGraphics(int fullscreen, int *pwidth, int *pheight)
 }
 void GLimp_ShutdownGraphics(void) {}
 void GLimp_GrabInput(qboolean grab) {}
-int GLimp_GetRefreshRate(void) { return 72; } // Returen Quest refresh rate
+int GLimp_GetRefreshRate(void) { return Quest_GetRefresh(); } // Returen Quest refresh rate
 qboolean GLimp_GetDesktopMode(int *pwidth, int *pheight)
 {
-    Android_GetScreenRes(pwidth, pheight);
+    Quest_GetScreenRes(pwidth, pheight);
     return 1; //bettter
 }
 

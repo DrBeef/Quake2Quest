@@ -1736,25 +1736,7 @@ PutClientInServer(edict_t *ent)
 	client->ps.pmove.origin[1] = spawn_origin[1] * 8;
 	client->ps.pmove.origin[2] = spawn_origin[2] * 8;
 
-/*	if (deathmatch->value && ((int)dmflags->value & DF_FIXED_FOV))
-	{
-		client->ps.fov = 104;
-	}
-	else
-	{
-		client->ps.fov = (int)strtol(Info_ValueForKey(client->pers.userinfo, "fov"), (char **)NULL, 10);
-
-		if (client->ps.fov < 1)
-		{
-			client->ps.fov = 104;
-		}
-		else if (client->ps.fov > 160)
-		{
-			client->ps.fov = 160;
-		}
-	}*/
-
-	client->ps.fov = 104;
+	client->ps.fov = gi.getFOV();
 
 	client->ps.gunindex = gi.modelindex(client->pers.weapon->view_model);
 
@@ -1991,7 +1973,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 			ent->client->ps.fov = 160;
 		}
 	}*/
-	ent->client->ps.fov = 104;
+	ent->client->ps.fov = gi.getFOV();
 
 	/* handedness */
 	s = Info_ValueForKey(userinfo, "hand");

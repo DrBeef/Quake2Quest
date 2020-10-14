@@ -46,3 +46,6 @@ Projects/Android/.gradle/4.6/fileHashes/fileHashes.lock
 Projects/Android/.gradle/vcsWorkingDirs/gc.properties
 drbeef-release-key.keystore
 assets/pak6.pak
+Projects/Android/Android.iml
+Projects/Projects.iml
+VrSamples-Quake2Quest.iml

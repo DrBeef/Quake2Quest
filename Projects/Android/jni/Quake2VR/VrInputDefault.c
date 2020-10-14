@@ -38,19 +38,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	static float dominantGripPushTime = 0.0f;
     static qboolean inventoryManagementMode = false;
 
-    //Show screen view (if in multiplayer toggle scoreboard)
-    if (((pOffTrackedRemoteNew->Buttons & offButton2) !=
-         (pOffTrackedRemoteOld->Buttons & offButton2)) &&
-			(pOffTrackedRemoteNew->Buttons & offButton2)) {
-
-		showingScreenLayer = !showingScreenLayer;
-
-        //Check we are in multiplayer
-        if (isMultiplayer()) {
-            sendButtonActionSimple("score");
-        }
-    }
-
 	//Menu button
 	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, K_ESCAPE);
 
@@ -133,11 +120,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 }
             }
 
-            if ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) !=
-                (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) {
-
+            if ((pOffTrackedRemoteNew->Buttons & offButton2) !=
+                (pOffTrackedRemoteOld->Buttons & offButton2))
+            {
                 sendButtonActionSimple("inven");
-                inventoryManagementMode = (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) > 0;
+                inventoryManagementMode = (pOffTrackedRemoteNew->Buttons & offButton2) > 0;
             }
         }
 

@@ -71,7 +71,6 @@ cvar_t *cl_lightlevel;
 cvar_t *name;
 cvar_t *skin;
 cvar_t *rate;
-cvar_t *fov;
 cvar_t *horplus;
 cvar_t *windowed_mouse;
 cvar_t *msg;
@@ -532,7 +531,6 @@ CL_InitLocal(void)
 	rate = Cvar_Get("rate", "8000", CVAR_USERINFO | CVAR_ARCHIVE);
 	msg = Cvar_Get("msg", "1", CVAR_USERINFO | CVAR_ARCHIVE);
 	hand = Cvar_Get("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
-	fov = Cvar_Get("fov", "104", CVAR_USERINFO | CVAR_ARCHIVE);
 	horplus = Cvar_Get("horplus", "0", CVAR_ARCHIVE);
 	windowed_mouse = Cvar_Get("windowed_mouse", "1", CVAR_USERINFO | CVAR_ARCHIVE);
 	gender = Cvar_Get("gender", "male", CVAR_USERINFO | CVAR_ARCHIVE);

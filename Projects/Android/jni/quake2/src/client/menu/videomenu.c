@@ -37,7 +37,6 @@ static cvar_t *r_hudscale;
 static cvar_t *r_consolescale;
 static cvar_t *r_menuscale;
 static cvar_t *crosshair_scale;
-static cvar_t *fov;
 extern cvar_t *scr_viewsize;
 extern cvar_t *vid_gamma;
 extern cvar_t *vid_fullscreen;
@@ -359,11 +358,6 @@ VID_MenuInit(void)
 	if (!crosshair_scale)
 	{
 		crosshair_scale = Cvar_Get("crosshair_scale", "-1", CVAR_ARCHIVE);
-	}
-
-	if (!fov)
-	{
-		fov = Cvar_Get("fov", "104",  CVAR_USERINFO | CVAR_ARCHIVE);
 	}
 
 	if (!vid_gamma)
