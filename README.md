@@ -3,7 +3,7 @@ Quake2Quest
 
 Welcome to the first (and only I believe) full 6DoF implementation of the Quake 2 Engine in VR.
 
-This is built solely for the Oculus Quest VR HMD and will *not* run on any other device.
+This is built solely for the Oculus Quest 1 and 2 VR HMDs and will *not* run on any other device.
 
 The easiest way to install this on your Quest is using SideQuest, a Desktop app designed to simplify sideloading apps and games ( even beat saber songs on quest ) on Standalone Android Headsets like Oculus Quest and Oculus Go. It supports drag and drop for installing APK files!
 
@@ -37,11 +37,7 @@ WARNING:  There is a good chance that unless you have your VR-legs this will pro
 Controls
 --------
 
-All these controls are for right-handed mode (vr_control_scheme 0), if you wish to use a left-handed control scheme then add the following to the config.cfg file and all buttons/sticks/controls will be switched:
-
-```
-set vr_control_scheme "10" 
-```
+All these controls are for right-handed mode, select left handed controls in the options menu and all buttons/sticks/controls will be switched:
 
 * Open the in-game menu with the left-controller menu button (same irrespective of right/left handed control)
 * A Button - Crouch
@@ -60,23 +56,6 @@ set vr_control_scheme "10"
 * Off-Hand Thumbstick click - If cheats are enabled then this will give you ALL pickups/weapons
 
 
-Useful CVARs
-------------
-
-You can set a cvar in the config.cfg in the following manner:
-
-```
-set vr_snapturn_angle  "5"
-```
-
-|cvar|description|
-| --- | --- |
-|cheats|If set to 1 then you can click the off-hand thumbstick button to activate "give all", giving you all weapons, pickups etc|
-|vr_snapturn_angle|Sets the angle of the snap turn, set to a value < 10 for smooth turning|
-|vr_walkdirection|Set to 1 for HMD oriented movement direction|
-|vr_control_scheme|Sets the control scheme (default: 0 - Right-handed, 10 - Left handed)|
-|vr_height_adjust|Allows you to set a height adjustment (for seated play) value in metres|
-|vr_comfort_mask|Enables the movement comfort mask for those who are sensitive to VR sickness (0.0 - 1.0)
 
 Things to note / FAQs:
 ----------------------
