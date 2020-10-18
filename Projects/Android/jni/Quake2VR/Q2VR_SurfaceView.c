@@ -1339,7 +1339,7 @@ int Quest_GetRefresh()
 
 float getFOV()
 {
-    return vrapi_GetSystemPropertyFloat( &java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_X );
+    return vrapi_GetSystemPropertyFloat( &java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_Y );
 }
 
 void Quest_MessageBox(const char *title, const char *text)

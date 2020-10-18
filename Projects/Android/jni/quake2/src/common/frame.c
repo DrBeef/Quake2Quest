@@ -32,7 +32,6 @@ cvar_t *developer;
 cvar_t *modder;
 cvar_t *timescale;
 cvar_t *fixedtime;
-cvar_t *cl_maxfps;
 cvar_t *dedicated;
 cvar_t *busywait;
 
@@ -301,8 +300,6 @@ Qcommon_Init(int argc, char **argv)
 
 	// cvars
 
-	cl_maxfps = Cvar_Get("cl_maxfps", "72", CVAR_ARCHIVE);
-
 	developer = Cvar_Get("developer", "0", 0);
 	fixedtime = Cvar_Get("fixedtime", "0", 0);
 
@@ -502,16 +499,6 @@ Qcommon_BeginFrame(int usec)
 		Cvar_SetValue("vid_maxfps", 999);
 	}
 
-	if (cl_maxfps->value > 250)
-	{
-		Cvar_SetValue("cl_maxfps", 250);
-	}
-	else if (cl_maxfps->value < 1)
-	{
-		Cvar_SetValue("cl_maxfps", 60);
-	}
-
-
 	// Save global time for network- und input code.
 	curtime = Sys_Milliseconds();
 
@@ -535,7 +522,8 @@ Qcommon_BeginFrame(int usec)
 	   scene may be more complex then the previous one and SDL
 	   may give us a 1 or 2 frames too low display refresh rate.
 	   Add a security magin of 5%, e.g. 60fps * 0.95 = 57fps. */
-	pfps = (cl_maxfps->value > (rfps * 0.95)) ? floor(rfps * 0.95) : cl_maxfps->value;
+	//pfps = (cl_maxfps->value > (rfps * 0.95)) ? floor(rfps * 0.95) : cl_maxfps->value;
+	pfps = rfps; // Just use exact same as render fps
 
 
 	// Calculate timings.
