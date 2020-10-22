@@ -83,7 +83,6 @@ ovrRenderer
 typedef struct
 {
 	ovrFramebuffer	FrameBuffer[VRAPI_FRAME_LAYER_EYE_MAX];
-	ovrMatrix4f		ProjectionMatrix;
 	int				NumBuffers;
 } ovrRenderer;
 

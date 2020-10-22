@@ -667,7 +667,7 @@ void ovrRenderer_Clear( ovrRenderer * renderer )
 	{
 		ovrFramebuffer_Clear( &renderer->FrameBuffer[eye] );
 	}
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateIdentity();
+
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
 }
 
@@ -675,9 +675,6 @@ void ovrRenderer_Clear( ovrRenderer * renderer )
 void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ovrJava * java )
 {
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
-
-	//Now using a symmetrical render target, based on the horizontal FOV
-    vrFOV = vrapi_GetSystemPropertyInt( java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_X);
 
 	// Create the render Textures.
 	for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
@@ -688,11 +685,6 @@ void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ov
 							   height,
 							   NUM_MULTI_SAMPLES );
 	}
-
-	// Setup the projection matrix.
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateProjectionFov(
-			vrFOV, vrFOV, 0.0f, 0.0f, 1.0f, 0.0f );
-
 }
 
 void ovrRenderer_Destroy( ovrRenderer * renderer )
@@ -701,7 +693,6 @@ void ovrRenderer_Destroy( ovrRenderer * renderer )
 	{
 		ovrFramebuffer_Destroy( &renderer->FrameBuffer[eye] );
 	}
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateIdentity();
 }
 
 
@@ -1674,7 +1665,8 @@ void * AppThreadFunction( void * parm )
                     layer.Textures[eye].SwapChainIndex = frameBuffer->TextureSwapChainIndex;
 
                     ovrMatrix4f projectionMatrix;
-                    projectionMatrix = ovrMatrix4f_CreateProjectionFov(vrFOV, vrFOV,
+                    float fov = getFOV();
+                    projectionMatrix = ovrMatrix4f_CreateProjectionFov(fov, fov,
                                                                        0.0f, 0.0f, 0.1f, 0.0f);
 
                     layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_TanAngleMatrixFromProjection(&projectionMatrix);
