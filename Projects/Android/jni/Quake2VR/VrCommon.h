@@ -1,7 +1,7 @@
 #if !defined(vrcommon_h)
 #define vrcommon_h
 
-#include <VrApi_Ext.h>
+//#include <VrApi_Ext.h>
 #include <VrApi_Input.h>
 
 #include <android/log.h>
