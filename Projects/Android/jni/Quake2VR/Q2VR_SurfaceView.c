@@ -1432,7 +1432,12 @@ void * AppThreadFunction( void * parm )
 
 	chdir("/sdcard");
 
-	for ( bool destroyed = false; destroyed == false; )
+    //Set 90hz mode for Quest 2
+    if (vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_DEVICE_TYPE) == VRAPI_DEVICE_TYPE_OCULUSQUEST2) {
+        vrapi_SetDisplayRefreshRate(appState.Ovr, 90);
+    }
+
+    for ( bool destroyed = false; destroyed == false; )
 	{
 		for ( ; ; )
 		{
