@@ -80,7 +80,7 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 int CPU_LEVEL			= 4;
 int GPU_LEVEL			= 4;
 int NUM_MULTI_SAMPLES	= 1;
-float SS_MULTIPLIER    = 1.25f;
+float SS_MULTIPLIER    = 1.2f;
 
 vec2_t cylinderSize = {1280, 720};
 
@@ -109,6 +109,7 @@ extern cvar_t   *cl_paused;
 enum control_scheme {
 	RIGHT_HANDED_DEFAULT = 0,
 	LEFT_HANDED_DEFAULT = 10,
+    LEFT_HANDED_SWITCH_STICKS = 11,
 	GAMEPAD = 20 //Not implemented, someone else can do this!
 };
 
@@ -1645,11 +1646,15 @@ void * AppThreadFunction( void * parm )
                                         ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
                     break;
                 case LEFT_HANDED_DEFAULT:
+                case LEFT_HANDED_SWITCH_STICKS:
                     HandleInput_Default(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
                                         &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
                                         ovrButton_X, ovrButton_Y, ovrButton_A, ovrButton_B);
                     break;
 			}
+
+			rightTrackedRemoteState_old = rightTrackedRemoteState_new;
+			leftTrackedRemoteState_old = leftTrackedRemoteState_new;
 
 			static bool usingScreenLayer = true; //Starts off using the screen layer
 			if (usingScreenLayer != useScreenLayer())

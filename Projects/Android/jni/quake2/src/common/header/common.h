@@ -32,7 +32,7 @@
 #include "shared.h"
 #include "crc.h"
 
-#define Q2QVERSION "1.0.6"
+#define Q2QVERSION "1.0.7"
 #define YQ2VERSION "7.41"
 #define BASEDIRNAME "Quake2Quest"
 

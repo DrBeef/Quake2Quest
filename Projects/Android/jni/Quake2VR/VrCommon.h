@@ -61,6 +61,6 @@ bool between(float min, float val, float max);
 void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out);
 void QuatToYawPitchRoll(ovrQuatf q, float pitchAdjust, vec3_t out);
 bool useScreenLayer();
-void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
+void handleTrackedControllerButton(u_int32_t buttonsNew, u_int32_t buttonsOld, uint32_t button, int key);
 
 #endif //vrcommon_h

@@ -1149,7 +1149,16 @@ ControlsResetDefaultsFunc(void *unused)
 static void
 HandednessFunc(void *unused)
 {
-    Cvar_SetValue("vr_control_scheme", s_options_handedness_box.curvalue == 0 ? 0 : 10);
+    float value = 0;
+    if (s_options_handedness_box.curvalue == 1)
+    {
+        value = 10;
+    }
+    else if (s_options_handedness_box.curvalue == 2)
+    {
+        value = 11;
+    }
+    Cvar_SetValue("vr_control_scheme", value);
 }
 
 static void
@@ -1366,6 +1375,7 @@ Options_MenuInit(void)
     static const char *handedness[] = {
             "Right-Handed",
             "Left-Handed",
+            "Left-Handed (Switched Sticks)",
             0
     };
 

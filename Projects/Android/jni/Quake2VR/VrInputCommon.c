@@ -18,11 +18,11 @@ Authors		:	Simon Brown
 //keys.h
 void Key_Event (int key, qboolean down, unsigned time);
 
-void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key)
+void handleTrackedControllerButton(u_int32_t buttonsNew, u_int32_t buttonsOld, uint32_t button, int key)
 {
-    if ((trackedRemoteState->Buttons & button) != (prevTrackedRemoteState->Buttons & button))
+    if ((buttonsNew & button) != (buttonsOld & button))
     {
-        Key_Event(key, (trackedRemoteState->Buttons & button) != 0, global_time);
+        Key_Event(key, (buttonsNew & button) != 0, global_time);
     }
 }
 

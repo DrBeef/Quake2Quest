@@ -23,6 +23,7 @@ cvar_t	*sv_cheats;
 extern cvar_t	*vr_weapon_stabilised;
 
 
+
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
@@ -31,6 +32,55 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	//Ensure handedness is set correctly
 	Cvar_Set("hand", vr_control_scheme->value < 10 ? "0" : "1");
 
+    //All this to allow stick and button switching!
+    ovrVector2f primaryJoystickNew;
+    ovrVector2f primaryJoystickOld;
+    ovrVector2f secondaryJoystickNew;
+    ovrVector2f secondaryJoystickOld;
+    uint32_t primaryButtonsNew;
+    uint32_t primaryButtonsOld;
+    uint32_t secondaryButtonsNew;
+    uint32_t secondaryButtonsOld;
+    int primaryButton1;
+    int primaryButton2;
+    int secondaryButton1;
+    int secondaryButton2;
+
+    if (vr_control_scheme->value == 11) // Left handed (swtiched sticks)
+    {
+        primaryJoystickNew = pOffTrackedRemoteNew->Joystick;
+        primaryJoystickOld = pOffTrackedRemoteOld->Joystick;
+        secondaryJoystickNew = pDominantTrackedRemoteNew->Joystick;
+        secondaryJoystickOld = pDominantTrackedRemoteOld->Joystick;
+
+        primaryButtonsNew = pOffTrackedRemoteNew->Buttons;
+        primaryButtonsOld = pOffTrackedRemoteOld->Buttons;
+        secondaryButtonsNew = pDominantTrackedRemoteNew->Buttons;
+        secondaryButtonsOld = pDominantTrackedRemoteOld->Buttons;
+
+        primaryButton1 = offButton1;
+        primaryButton2 = offButton2;
+        secondaryButton1 = domButton1;
+        secondaryButton2 = domButton2;
+    }
+    else // Left and right handed
+    {
+        primaryJoystickNew = pDominantTrackedRemoteNew->Joystick;
+        primaryJoystickOld = pDominantTrackedRemoteOld->Joystick;
+        secondaryJoystickNew = pOffTrackedRemoteNew->Joystick;
+        secondaryJoystickOld = pOffTrackedRemoteOld->Joystick;
+
+        primaryButtonsNew = pDominantTrackedRemoteNew->Buttons;
+        primaryButtonsOld = pDominantTrackedRemoteOld->Buttons;
+        secondaryButtonsNew = pOffTrackedRemoteNew->Buttons;
+        secondaryButtonsOld = pOffTrackedRemoteOld->Buttons;
+
+        primaryButton1 = domButton1;
+        primaryButton2 = domButton2;
+        secondaryButton1 = offButton1;
+        secondaryButton2 = offButton2;
+    }
+
 	//Get the cvar
     sv_cheats = Cvar_Get("cheats", "0", CVAR_ARCHIVE);
 
@@ -38,31 +88,32 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	static float dominantGripPushTime = 0.0f;
     static qboolean inventoryManagementMode = false;
 
-	//Menu button
-	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, K_ESCAPE);
+	//Menu button - _can_ appear on either controller if user has switched them in the oculus menu
+	handleTrackedControllerButton(primaryButtonsNew, primaryButtonsOld, ovrButton_Enter, K_ESCAPE);
+	handleTrackedControllerButton(secondaryButtonsNew, secondaryButtonsOld, ovrButton_Enter, K_ESCAPE);
 
     if (cls.key_dest == key_menu)
     {
-        int leftJoyState = (pOffTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0);
-        if (leftJoyState != (pOffTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0)) {
+        int leftJoyState = (secondaryJoystickNew.x > 0.7f ? 1 : 0);
+        if (leftJoyState != (secondaryJoystickOld.x > 0.7f ? 1 : 0)) {
             Key_Event(K_RIGHTARROW, leftJoyState, global_time);
         }
-        leftJoyState = (pOffTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0);
-        if (leftJoyState != (pOffTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0)) {
+        leftJoyState = (secondaryJoystickNew.x < -0.7f ? 1 : 0);
+        if (leftJoyState != (secondaryJoystickOld.x < -0.7f ? 1 : 0)) {
             Key_Event(K_LEFTARROW, leftJoyState, global_time);
         }
-        leftJoyState = (pOffTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0);
-        if (leftJoyState != (pOffTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0)) {
+        leftJoyState = (secondaryJoystickNew.y < -0.7f ? 1 : 0);
+        if (leftJoyState != (secondaryJoystickOld.y < -0.7f ? 1 : 0)) {
             Key_Event(K_DOWNARROW, leftJoyState, global_time);
         }
-        leftJoyState = (pOffTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0);
-        if (leftJoyState != (pOffTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0)) {
+        leftJoyState = (secondaryJoystickNew.y > 0.7f ? 1 : 0);
+        if (leftJoyState != (secondaryJoystickOld.y > 0.7f ? 1 : 0)) {
             Key_Event(K_UPARROW, leftJoyState, global_time);
         }
 
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, K_ENTER);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, K_ENTER);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, K_ESCAPE);
+        handleTrackedControllerButton(primaryButtonsNew, primaryButtonsOld, primaryButton1, K_ENTER);
+        handleTrackedControllerButton(primaryButtonsNew, primaryButtonsOld, ovrButton_Trigger, K_ENTER);
+        handleTrackedControllerButton(primaryButtonsNew, primaryButtonsOld, primaryButton2, K_ESCAPE);
     }
     else
     {
@@ -120,11 +171,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 }
             }
 
-            if ((pOffTrackedRemoteNew->Buttons & offButton2) !=
-                (pOffTrackedRemoteOld->Buttons & offButton2))
+            if ((secondaryButtonsNew & secondaryButton2) !=
+                (secondaryButtonsOld & secondaryButton2))
             {
                 sendButtonActionSimple("inven");
-                inventoryManagementMode = (pOffTrackedRemoteNew->Buttons & offButton2) > 0;
+                inventoryManagementMode = (secondaryButtonsNew & secondaryButton2) > 0;
             }
         }
 
@@ -153,13 +204,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			}
         }
 
-        //Right-hand specific stuff
         {
-            ALOGV("        Right-Controller-Position: %f, %f, %f",
-                  pDominantTracking->HeadPose.Pose.Position.x,
-				  pDominantTracking->HeadPose.Pose.Position.y,
-				  pDominantTracking->HeadPose.Pose.Position.z);
-
             //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
             //player is facing for positional tracking
             float multiplier = (vr_positional_factor->value) / (cl_forwardspeed->value *
@@ -176,8 +221,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                   positional_movementForward);
 
             //Jump (B Button)
-            handleTrackedControllerButton(pDominantTrackedRemoteNew,
-                                          pDominantTrackedRemoteOld, domButton2, K_SPACE);
+            handleTrackedControllerButton(primaryButtonsNew,
+                                          primaryButtonsOld, primaryButton2, K_SPACE);
 
             //We need to record if we have started firing primary so that releasing trigger will stop firing, if user has pushed grip
             //in meantime, then it wouldn't stop the gun firing and it would get stuck
@@ -203,21 +248,21 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			}
 
             //Duck with A
-            if ((pDominantTrackedRemoteNew->Buttons & domButton1) !=
-                (pDominantTrackedRemoteOld->Buttons & domButton1) &&
+            if ((primaryButtonsNew & primaryButton1) !=
+                (primaryButtonsOld & primaryButton1) &&
                 ducked != DUCK_CROUCHED) {
-                ducked = (pDominantTrackedRemoteNew->Buttons & domButton1) ? DUCK_BUTTON : DUCK_NOTDUCKED;
-                sendButtonAction("+movedown", (pDominantTrackedRemoteNew->Buttons & domButton1));
+                ducked = (primaryButtonsNew & primaryButton1) ? DUCK_BUTTON : DUCK_NOTDUCKED;
+                sendButtonAction("+movedown", (primaryButtonsNew & primaryButton1));
             }
 
 			//Weapon/Inventory Chooser
 			static qboolean itemSwitched = false;
-			if (between(-0.2f, pDominantTrackedRemoteNew->Joystick.x, 0.2f) &&
-				(between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
-				 between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.8f)))
+			if (between(-0.2f, primaryJoystickNew.x, 0.2f) &&
+				(between(0.8f, primaryJoystickNew.y, 1.0f) ||
+				 between(-1.0f, primaryJoystickNew.y, -0.8f)))
 			{
 				if (!itemSwitched) {
-					if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
+					if (between(0.8f, primaryJoystickNew.y, 1.0f))
 					{
 					    if (inventoryManagementMode)
                         {
@@ -247,13 +292,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			}
         }
 
-        //Left-hand specific stuff
         {
-            ALOGV("        Left-Controller-Position: %f, %f, %f",
-                  pOffTracking->HeadPose.Pose.Position.x,
-				  pOffTracking->HeadPose.Pose.Position.y,
-				  pOffTracking->HeadPose.Pose.Position.z);
-
 			//Laser-sight
 			if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
 				(pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick)
@@ -268,10 +307,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			}
 
 			//Apply a filter and quadratic scaler so small movements are easier to make
-			float dist = length(pOffTrackedRemoteNew->Joystick.x, pOffTrackedRemoteNew->Joystick.y);
+			float dist = length(secondaryJoystickNew.x, secondaryJoystickNew.y);
 			float nlf = nonLinearFilter(dist);
-            float x = nlf * pOffTrackedRemoteNew->Joystick.x;
-            float y = nlf * pOffTrackedRemoteNew->Joystick.y;
+            float x = nlf * secondaryJoystickNew.x;
+            float y = nlf * secondaryJoystickNew.y;
 
             player_moving = (fabs(x) + fabs(y)) > 0.05f;
 
@@ -287,8 +326,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
 
             //show help computer while X/A pressed
-            if ((pOffTrackedRemoteNew->Buttons & offButton1) !=
-                 (pOffTrackedRemoteOld->Buttons & offButton1)) {
+            if ((secondaryButtonsNew & secondaryButton1) !=
+                 (secondaryButtonsOld & secondaryButton1)) {
                 sendButtonActionSimple("cmd help");
             }
 
@@ -307,15 +346,14 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //We need to record if we have started firing primary so that releasing trigger will stop definitely firing, if user has pushed grip
             //in meantime, then it wouldn't stop the gun firing and it would get stuck
-            static bool firingPrimary = false;
 
 			//Run
-			handleTrackedControllerButton(pOffTrackedRemoteNew,
-										  pOffTrackedRemoteOld,
+			handleTrackedControllerButton(pOffTrackedRemoteNew->Buttons,
+                                          pOffTrackedRemoteOld->Buttons,
 										  ovrButton_Trigger, K_SHIFT);
 
             static int increaseSnap = true;
-			if (pDominantTrackedRemoteNew->Joystick.x > 0.6f)
+			if (primaryJoystickNew.x > 0.6f)
 			{
 				if (increaseSnap)
 				{
@@ -329,12 +367,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         snapTurn += 360.f;
                     }
                 }
-			} else if (pDominantTrackedRemoteNew->Joystick.x < 0.4f) {
+			} else if (primaryJoystickNew.x < 0.4f) {
 				increaseSnap = true;
 			}
 
 			static int decreaseSnap = true;
-			if (pDominantTrackedRemoteNew->Joystick.x < -0.6f)
+			if (primaryJoystickNew.x < -0.6f)
 			{
 				if (decreaseSnap)
 				{
@@ -350,14 +388,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         snapTurn -= 360.f;
                     }
 				}
-			} else if (pDominantTrackedRemoteNew->Joystick.x > -0.4f)
+			} else if (primaryJoystickNew.x > -0.4f)
 			{
 				decreaseSnap = true;
 			}
         }
     }
-
-    //Save state
-    rightTrackedRemoteState_old = rightTrackedRemoteState_new;
-    leftTrackedRemoteState_old = leftTrackedRemoteState_new;
 }
