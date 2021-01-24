@@ -1359,7 +1359,6 @@ void VR_Init()
 
 	//Create Cvars
 	vr_snapturn_angle = Cvar_Get( "vr_snapturn_angle", "45", CVAR_ARCHIVE);
-	vr_positional_factor = Cvar_Get( "vr_positional_factor", "2000", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
@@ -1432,6 +1431,8 @@ void * AppThreadFunction( void * parm )
 	ovrRenderer_Create( m_width, m_height, &appState.Renderer, &java );
 
 	chdir("/sdcard");
+
+    hmdType = vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_DEVICE_TYPE);
 
     for ( bool destroyed = false; destroyed == false; )
 	{
@@ -1589,7 +1590,7 @@ void * AppThreadFunction( void * parm )
 #endif
 
             //Set 90hz mode for Quest 2
-            if (vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_DEVICE_TYPE) == VRAPI_DEVICE_TYPE_OCULUSQUEST2) {
+            if (hmdType == VRAPI_DEVICE_TYPE_OCULUSQUEST2) {
                 vrapi_SetDisplayRefreshRate(appState.Ovr, 90);
             }
 
@@ -1863,6 +1864,11 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onCreate( JNIEnv
         if (ss->count > 0 && ss->dval[0] > 0.0)
         {
             SS_MULTIPLIER = ss->dval[0];
+
+            if (SS_MULTIPLIER > 1.2F)
+            {
+                SS_MULTIPLIER = 1.2F;
+            }
         }
 
         if (cpu->count > 0 && cpu->ival[0] > 0 && cpu->ival[0] < 10)

@@ -1129,7 +1129,7 @@ ControlsSetMenuItemValues(void)
     s_options_quality_list.curvalue = (Cvar_VariableValue("s_loadas8bit") == 0);
     s_options_sensitivity_slider.curvalue = sensitivity->value * 2;
     s_options_alwaysrun_box.curvalue = (cl_run->value != 0);
-    s_options_handedness_box.curvalue = (vr_control_scheme->value == 0) ? 0 : 1;
+    s_options_handedness_box.curvalue = (vr_control_scheme->value == 0) ? 0 : ((vr_control_scheme->value == 10) ? 1 : 2);
     s_options_vr_walkdirection_box.curvalue = (int)vr_walkdirection->value;
     s_options_vr_height_adjust_box.curvalue = vr_height_adjust->value * 10.0f;
     s_options_crosshair_box.curvalue = ClampCvar(0, 3, crosshair->value);

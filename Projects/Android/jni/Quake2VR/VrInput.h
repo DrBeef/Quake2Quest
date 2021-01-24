@@ -17,6 +17,8 @@ ovrTracking rightRemoteTracking_new;
 
 ovrDeviceID controllerIDs[2];
 
+int hmdType;
+
 float remote_movementSideways;
 float remote_movementForward;
 float remote_movementUp;

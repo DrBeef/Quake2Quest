@@ -94,26 +94,50 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
     if (cls.key_dest == key_menu)
     {
-        int leftJoyState = (secondaryJoystickNew.x > 0.7f ? 1 : 0);
-        if (leftJoyState != (secondaryJoystickOld.x > 0.7f ? 1 : 0)) {
-            Key_Event(K_RIGHTARROW, leftJoyState, global_time);
+        //Allow both sticks and all buttons to work in the menu
+        {
+            int leftJoyState = (secondaryJoystickNew.x > 0.7f ? 1 : 0);
+            if (leftJoyState != (secondaryJoystickOld.x > 0.7f ? 1 : 0)) {
+                Key_Event(K_RIGHTARROW, leftJoyState, global_time);
+            }
+            leftJoyState = (secondaryJoystickNew.x < -0.7f ? 1 : 0);
+            if (leftJoyState != (secondaryJoystickOld.x < -0.7f ? 1 : 0)) {
+                Key_Event(K_LEFTARROW, leftJoyState, global_time);
+            }
+            leftJoyState = (secondaryJoystickNew.y < -0.7f ? 1 : 0);
+            if (leftJoyState != (secondaryJoystickOld.y < -0.7f ? 1 : 0)) {
+                Key_Event(K_DOWNARROW, leftJoyState, global_time);
+            }
+            leftJoyState = (secondaryJoystickNew.y > 0.7f ? 1 : 0);
+            if (leftJoyState != (secondaryJoystickOld.y > 0.7f ? 1 : 0)) {
+                Key_Event(K_UPARROW, leftJoyState, global_time);
+            }
         }
-        leftJoyState = (secondaryJoystickNew.x < -0.7f ? 1 : 0);
-        if (leftJoyState != (secondaryJoystickOld.x < -0.7f ? 1 : 0)) {
-            Key_Event(K_LEFTARROW, leftJoyState, global_time);
-        }
-        leftJoyState = (secondaryJoystickNew.y < -0.7f ? 1 : 0);
-        if (leftJoyState != (secondaryJoystickOld.y < -0.7f ? 1 : 0)) {
-            Key_Event(K_DOWNARROW, leftJoyState, global_time);
-        }
-        leftJoyState = (secondaryJoystickNew.y > 0.7f ? 1 : 0);
-        if (leftJoyState != (secondaryJoystickOld.y > 0.7f ? 1 : 0)) {
-            Key_Event(K_UPARROW, leftJoyState, global_time);
+        {
+            int leftJoyState = (primaryJoystickNew.x > 0.7f ? 1 : 0);
+            if (leftJoyState != (primaryJoystickOld.x > 0.7f ? 1 : 0)) {
+                Key_Event(K_RIGHTARROW, leftJoyState, global_time);
+            }
+            leftJoyState = (primaryJoystickNew.x < -0.7f ? 1 : 0);
+            if (leftJoyState != (primaryJoystickOld.x < -0.7f ? 1 : 0)) {
+                Key_Event(K_LEFTARROW, leftJoyState, global_time);
+            }
+            leftJoyState = (primaryJoystickNew.y < -0.7f ? 1 : 0);
+            if (leftJoyState != (primaryJoystickOld.y < -0.7f ? 1 : 0)) {
+                Key_Event(K_DOWNARROW, leftJoyState, global_time);
+            }
+            leftJoyState = (primaryJoystickNew.y > 0.7f ? 1 : 0);
+            if (leftJoyState != (primaryJoystickOld.y > 0.7f ? 1 : 0)) {
+                Key_Event(K_UPARROW, leftJoyState, global_time);
+            }
         }
 
         handleTrackedControllerButton(primaryButtonsNew, primaryButtonsOld, primaryButton1, K_ENTER);
         handleTrackedControllerButton(primaryButtonsNew, primaryButtonsOld, ovrButton_Trigger, K_ENTER);
         handleTrackedControllerButton(primaryButtonsNew, primaryButtonsOld, primaryButton2, K_ESCAPE);
+        handleTrackedControllerButton(secondaryButtonsNew, secondaryButtonsOld, secondaryButton1, K_ENTER);
+        handleTrackedControllerButton(secondaryButtonsNew, secondaryButtonsOld, ovrButton_Trigger, K_ENTER);
+        handleTrackedControllerButton(secondaryButtonsNew, secondaryButtonsOld, secondaryButton2, K_ESCAPE);
     }
     else
     {
@@ -207,7 +231,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         {
             //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
             //player is facing for positional tracking
-            float multiplier = (vr_positional_factor->value) / (cl_forwardspeed->value *
+            float positionalFactor = (hmdType == VRAPI_DEVICE_TYPE_OCULUSQUEST2)  ? 2500 : 2000;
+            float multiplier = positionalFactor / (cl_forwardspeed->value *
 					((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) ? 1.5f : 1.0f));
 
             vec2_t v;

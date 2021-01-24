@@ -548,12 +548,12 @@ void CL_UpdateLaserSightOrigins ()
 
 		//At the point of calling this, the vieworg should already have the player height included
 		convertFromVRtoQ2(weaponoffset, cl.refdef.vieworg, gunorigin);
-		gunorigin[2] += 1; // just add a little bit
+		//gunorigin[2] += 1; // just add a little bit
 		AngleVectors(weaponangles, forward, right, NULL);
 
 		qboolean useTrajectoryIndicator = cl_lasersight.ent.frame == 6 || cl_lasersight.ent.frame == 7;
 
-                VectorMA(gunorigin, (float)(useTrajectoryIndicator ? 16.0 : 4096.0), forward, end);
+        VectorMA(gunorigin, (float)(useTrajectoryIndicator ? 16.0 : 4096.0), forward, end);
 		trace_t tr = CL_Trace(gunorigin, end, 1,
 							  CONTENTS_SOLID | CONTENTS_MONSTER | CONTENTS_DEADMONSTER);
 		VectorCopy(gunorigin, cl_lasersight.ent.origin);
