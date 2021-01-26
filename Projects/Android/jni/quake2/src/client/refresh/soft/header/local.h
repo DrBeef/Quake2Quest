@@ -574,7 +574,7 @@ void	RE_Draw_FadeScreen (void);
 
 void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height);
 
-void	R_InitImages(void);
+void	R_InitImages(int hmdType);
 void	R_ShutdownImages(void);
 image_t	*R_FindImage(char *name, imagetype_t type);
 void	R_FreeUnusedImages(void);

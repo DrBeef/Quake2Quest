@@ -333,6 +333,8 @@ VID_ShutdownRenderer(void)
 
 #ifdef __ANDROID__
 	int yquake2Renderer = 0; // 0 = soft, 1 = gl1, 3 = gl3
+
+	extern int hmdType;
 #endif
 
 /*
@@ -428,7 +430,7 @@ VID_LoadRenderer(void)
 	}
 
 	// Everything seems okay, initialize it.
-	if (!re.Init())
+	if (!re.Init(hmdType))
 	{
 		VID_ShutdownRenderer();
 

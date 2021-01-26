@@ -1408,7 +1408,7 @@ R_SetMode(void)
 }
 
 qboolean
-RI_Init()
+RI_Init(int hmdType)
 {
 	int j;
 	extern float r_turbsin[256];
@@ -1577,7 +1577,7 @@ RI_Init()
 
 	R_SetDefaultState();
 
-	R_InitImages();
+	R_InitImages(hmdType);
 	Mod_Init();
 	R_InitParticleTexture();
 	Draw_InitLocal();

@@ -296,7 +296,7 @@ void R_ImageList_f(void);
 
 void R_SetTexturePalette(unsigned palette[256]);
 
-void R_InitImages(void);
+void R_InitImages(int hmdType);
 void R_ShutdownImages(void);
 
 void R_FreeUnusedImages(void);

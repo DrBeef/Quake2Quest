@@ -25,6 +25,7 @@
  */
 
 #include "header/local.h"
+#include "../../../../../../../../../../VrApi/Include/VrApi_Types.h"
 
 image_t gltextures[MAX_GLTEXTURES];
 int numgltextures;
@@ -1312,14 +1313,14 @@ R_FreeUnusedImages(void)
 }
 
 void
-R_InitImages(void)
+R_InitImages(int hmdType)
 {
 	int i, j;
 
 	registration_sequence = 1;
 
 	/* init intensity conversions */
-#ifdef __ANDROID__
+/*#ifdef __ANDROID__
     intensity = ri.Cvar_Get("gl1_intensity", "2.5", CVAR_ARCHIVE); // Make brighter by default
 #else
 	intensity = ri.Cvar_Get("gl1_intensity", "2", CVAR_ARCHIVE);
@@ -1329,8 +1330,11 @@ R_InitImages(void)
 	{
 		ri.Cvar_Set("gl1_intensity", "1");
 	}
+ */
 
-	gl_state.inverse_intensity = 1 / intensity->value;
+	float intensity = (hmdType == VRAPI_DEVICE_TYPE_OCULUSQUEST2) ? 3.7 : 2.5;
+
+	gl_state.inverse_intensity = 1 / intensity;
 
 	Draw_GetPalette(); // FIXME: I think this is redundant - RI_Init() already calls that!
 
@@ -1351,7 +1355,7 @@ R_InitImages(void)
 
 	for (i = 0; i < 256; i++)
 	{
-		j = i * intensity->value;
+		j = i * intensity;
 
 		if (j > 255)
 		{

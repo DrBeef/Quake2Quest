@@ -280,10 +280,10 @@ R_Init
 ===============
 */
 static qboolean
-RE_Init(void)
+RE_Init(int hmdType)
 {
 	R_RegisterVariables ();
-	R_InitImages ();
+	R_InitImages (hmdType);
 	Mod_Init ();
 	Draw_InitLocal ();
 

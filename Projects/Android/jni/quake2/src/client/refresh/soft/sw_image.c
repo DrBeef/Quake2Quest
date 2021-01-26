@@ -549,7 +549,7 @@ R_InitImages
 ===============
 */
 void
-R_InitImages (void)
+R_InitImages (int hmdType)
 {
 	unsigned char * table16to8;
 	registration_sequence = 1;
