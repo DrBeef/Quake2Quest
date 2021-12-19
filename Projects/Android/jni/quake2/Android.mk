@@ -4,11 +4,12 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := yquake2
 
-LOCAL_CFLAGS :=  -DIOAPI_NO_64 -DUSE_GLES1  -DYQUAKE2 -DENGINE_NAME=\"yquake2\" -DYQ2OSTYPE=\"Linux\" -DYQ2ARCH=\"Arm\"
+LOCAL_CFLAGS :=  -DIOAPI_NO_64 -DUSE_GLES1 -DUSE_OPENAL -DYQUAKE2 -DENGINE_NAME=\"yquake2\" -DYQ2OSTYPE=\"Linux\" -DYQ2ARCH=\"Arm\"
 
 
 LOCAL_C_INCLUDES :=     $(SDL_INCLUDE_PATHS) \
-                        $(GL4ES_PATH)
+						$(SUPPORT_LIBS)/openal/include/ \
+                        $(GL4ES_PATH) 
 
 
 # Used by the client
@@ -105,7 +106,7 @@ LOCAL_SRC_FILES :=  $(CLIENT_OBJS_:.o=.c) \
 
 LOCAL_LDLIBS :=  -lEGL -ldl -llog -landroid -lOpenSLES -lz
 LOCAL_STATIC_LIBRARIES := gl4es sigc libzip libpng libjpeg
-LOCAL_SHARED_LIBRARIES := SDL2 SDL2_mixer vrapi
+LOCAL_SHARED_LIBRARIES := openal SDL2 SDL2_mixer vrapi
 LOCAL_LDLIBS += -lGLESv3
 
 include $(BUILD_SHARED_LIBRARY)
