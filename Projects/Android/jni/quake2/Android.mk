@@ -7,8 +7,7 @@ LOCAL_MODULE := yquake2
 LOCAL_CFLAGS :=  -DIOAPI_NO_64 -DUSE_GLES1 -DUSE_OPENAL -DYQUAKE2 -DENGINE_NAME=\"yquake2\" -DYQ2OSTYPE=\"Linux\" -DYQ2ARCH=\"Arm\"
 
 
-LOCAL_C_INCLUDES :=     $(SDL_INCLUDE_PATHS) \
-						$(SUPPORT_LIBS)/openal/include/ \
+LOCAL_C_INCLUDES :=     $(SUPPORT_LIBS)/openal/include/ \
                         $(GL4ES_PATH) 
 
 
@@ -35,7 +34,6 @@ CLIENT_OBJS_ := \
 	src/client/menu/menu.o \
 	src/client/menu/qmenu.o \
 	src/client/menu/videomenu.o \
-	src/client/sound/sdl.o \
 	src/client/sound/ogg.o \
 	src/client/sound/openal.o \
 	src/client/sound/qal.o \
@@ -106,7 +104,7 @@ LOCAL_SRC_FILES :=  $(CLIENT_OBJS_:.o=.c) \
 
 LOCAL_LDLIBS :=  -lEGL -ldl -llog -landroid -lOpenSLES -lz
 LOCAL_STATIC_LIBRARIES := gl4es sigc libzip libpng libjpeg
-LOCAL_SHARED_LIBRARIES := openal SDL2 SDL2_mixer vrapi
+LOCAL_SHARED_LIBRARIES := openal vrapi
 LOCAL_LDLIBS += -lGLESv3
 
 include $(BUILD_SHARED_LIBRARY)

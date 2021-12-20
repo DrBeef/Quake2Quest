@@ -41,8 +41,6 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 
 #include <src/gl/loader.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_main.h>
 #include <src/client/header/client.h>
 
 #include "VrCompositor.h"
@@ -1390,11 +1388,6 @@ void * AppThreadFunction( void * parm )
 
     jclass cls = (*java.Env)->GetObjectClass(java.Env, java.ActivityObject);
 
-    /* This interface could expand with ABI negotiation, callbacks, etc. */
-    SDL_Android_Init(java.Env, cls);
-
-    SDL_SetMainReady();
-
 	// Note that AttachCurrentThread will reset the thread name.
 	prctl( PR_SET_NAME, (long)"OVR::Main", 0, 0, 0 );
 
@@ -1825,7 +1818,7 @@ int JNI_OnLoad(JavaVM* vm, void* reserved)
 		return -1;
 	}
 
-	return SDL_JNI_OnLoad(vm, reserved);
+	return JNI_VERSION_1_4;
 }
 
 JNIEXPORT jlong JNICALL Java_com_drbeef_quake2quest_GLES3JNILib_onCreate( JNIEnv * env, jclass activityClass, jobject activity,
