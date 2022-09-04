@@ -17,6 +17,50 @@ Authors		:	Simon Brown
 
 //keys.h
 void Key_Event (int key, qboolean down, unsigned time);
+bool quake2_initialised;
+
+long long global_time;
+
+enum control_scheme;
+
+ovrInputStateTrackedRemote leftTrackedRemoteState_old;
+ovrInputStateTrackedRemote leftTrackedRemoteState_new;
+ovrTracking leftRemoteTracking_new;
+
+ovrInputStateTrackedRemote rightTrackedRemoteState_old;
+ovrInputStateTrackedRemote rightTrackedRemoteState_new;
+ovrTracking rightRemoteTracking_new;
+
+ovrDeviceID controllerIDs[2];
+
+int hmdType;
+
+float remote_movementSideways;
+float remote_movementForward;
+float remote_movementUp;
+float positional_movementSideways;
+float positional_movementForward;
+float snapTurn;
+
+float playerHeight;
+float playerYaw;
+
+bool showingScreenLayer;
+
+vec3_t worldPosition;
+
+vec3_t hmdPosition;
+vec3_t hmdorientation;
+vec3_t positionDeltaThisFrame;
+
+vec3_t weaponangles;
+vec3_t weaponoffset;
+
+vec3_t flashlightangles;
+vec3_t flashlightoffset;
+int ducked;
+
+bool player_moving;
 
 void handleTrackedControllerButton(u_int32_t buttonsNew, u_int32_t buttonsOld, uint32_t button, int key)
 {

@@ -5,26 +5,26 @@
 #include "VrCommon.h"
 
 //New control scheme definitions to be defined L1VR_SurfaceView.c enumeration
-enum control_scheme;
+extern enum control_scheme;
 
-ovrInputStateTrackedRemote leftTrackedRemoteState_old;
-ovrInputStateTrackedRemote leftTrackedRemoteState_new;
-ovrTracking leftRemoteTracking_new;
+extern ovrInputStateTrackedRemote leftTrackedRemoteState_old;
+extern ovrInputStateTrackedRemote leftTrackedRemoteState_new;
+extern ovrTracking leftRemoteTracking_new;
 
-ovrInputStateTrackedRemote rightTrackedRemoteState_old;
-ovrInputStateTrackedRemote rightTrackedRemoteState_new;
-ovrTracking rightRemoteTracking_new;
+extern ovrInputStateTrackedRemote rightTrackedRemoteState_old;
+extern ovrInputStateTrackedRemote rightTrackedRemoteState_new;
+extern ovrTracking rightRemoteTracking_new;
 
-ovrDeviceID controllerIDs[2];
+extern ovrDeviceID controllerIDs[2];
 
-int hmdType;
+extern int hmdType;
 
-float remote_movementSideways;
-float remote_movementForward;
-float remote_movementUp;
-float positional_movementSideways;
-float positional_movementForward;
-float snapTurn;
+extern float remote_movementSideways;
+extern float remote_movementForward;
+extern float remote_movementUp;
+extern float positional_movementSideways;
+extern float positional_movementForward;
+extern float snapTurn;
 
 void sendButtonAction(const char* action, long buttonDown);
 void sendButtonActionSimple(const char* action);

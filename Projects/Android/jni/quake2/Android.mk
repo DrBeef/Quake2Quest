@@ -103,8 +103,8 @@ LOCAL_SRC_FILES :=  $(CLIENT_OBJS_:.o=.c) \
 
 
 LOCAL_LDLIBS :=  -lEGL -ldl -llog -landroid -lOpenSLES -lz
-LOCAL_STATIC_LIBRARIES := gl4es sigc libzip libpng libjpeg
-LOCAL_SHARED_LIBRARIES := openal vrapi
+LOCAL_STATIC_LIBRARIES := sigc libzip libpng libjpeg
+LOCAL_SHARED_LIBRARIES := gl4es openal vrapi
 LOCAL_LDLIBS += -lGLESv3
 
 include $(BUILD_SHARED_LIBRARY)

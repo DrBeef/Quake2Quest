@@ -22,33 +22,33 @@
 #define ALOGV(...)
 #endif
 
-bool quake2_initialised;
+extern bool quake2_initialised;
 
-long long global_time;
+extern long long global_time;
 
-float playerHeight;
-float playerYaw;
+extern float playerHeight;
+extern float playerYaw;
 
-bool showingScreenLayer;
+extern bool showingScreenLayer;
 
-vec3_t worldPosition;
+extern vec3_t worldPosition;
 
-vec3_t hmdPosition;
-vec3_t hmdorientation;
-vec3_t positionDeltaThisFrame;
+extern vec3_t hmdPosition;
+extern vec3_t hmdorientation;
+extern vec3_t positionDeltaThisFrame;
 
-vec3_t weaponangles;
-vec3_t weaponoffset;
+extern vec3_t weaponangles;
+extern vec3_t weaponoffset;
 
-vec3_t flashlightangles;
-vec3_t flashlightoffset;
+extern vec3_t flashlightangles;
+extern vec3_t flashlightoffset;
 
 #define DUCK_NOTDUCKED 0
 #define DUCK_BUTTON 1
 #define DUCK_CROUCHED 2
-int ducked;
+extern int ducked;
 
-bool player_moving;
+extern bool player_moving;
 
 
 float radians(float deg);

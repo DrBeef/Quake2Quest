@@ -204,7 +204,7 @@ import static android.system.Os.setenv;
 		}
 
 		try {
-			setenv("YQUAKE2_GAMELIBDIR", getFilesDir().getParentFile().getPath() + "/lib", true);
+			setenv("YQUAKE2_GAMELIBDIR", getApplicationInfo().nativeLibraryDir, true);
 		}
 		catch (Exception e)
 		{

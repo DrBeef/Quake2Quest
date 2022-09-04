@@ -33,15 +33,15 @@ int sys_frame_time;
 qboolean joy_altselector_pressed = false;
 
 // Console Variables
-cvar_t *vid_fullscreen;
-cvar_t *freelook;
-cvar_t *lookstrafe;
-cvar_t *m_forward;
-cvar_t *m_pitch;
-cvar_t *m_side;
-cvar_t *m_up;
-cvar_t *m_yaw;
-cvar_t *sensitivity;
+extern cvar_t *vid_fullscreen;
+extern cvar_t *freelook;
+extern cvar_t *lookstrafe;
+extern cvar_t *m_forward;
+extern cvar_t *m_pitch;
+extern cvar_t *m_side;
+extern cvar_t *m_up;
+extern cvar_t *m_yaw;
+extern cvar_t *sensitivity;
 
 void Quest_GetScreenRes(int *width, int *height);
 int Quest_GetRefresh();
