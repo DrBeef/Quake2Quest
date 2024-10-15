@@ -1,4 +1,5 @@
 extern cvar_t	*vr_snapturn_angle;
+extern cvar_t	*vr_turn_deadzone;
 extern cvar_t	*vr_walkdirection;
 extern cvar_t	*vr_weapon_pitchadjust;
 extern cvar_t	*vr_lasersight;

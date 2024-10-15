@@ -377,46 +377,44 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                                           pOffTrackedRemoteOld->Buttons,
 										  ovrButton_Trigger, K_SHIFT);
 
-            static int increaseSnap = true;
-			if (primaryJoystickNew.x > 0.6f)
-			{
-				if (increaseSnap)
-				{
-					snapTurn -= vr_snapturn_angle->value;
-                    if (vr_snapturn_angle->value > 10.0f) {
-                        increaseSnap = false;
-                    }
-
-                    if (snapTurn < -180.0f)
+            static qboolean snapping = true;
+            static float turn_rate;
+            if (vr_snapturn_angle->value > 10.0f){ // snap turning
+                if (primaryJoystickNew.x > 0.6f)
+                {
+                    if (snapping)
                     {
-                        snapTurn += 360.f;
+                        snapTurn -= vr_snapturn_angle->value;
+                        snapping = false;
+
+                        if (snapTurn < -180.0f)
+                        {
+                            snapTurn += 360.f;
+                        }
                     }
                 }
-			} else if (primaryJoystickNew.x < 0.4f) {
-				increaseSnap = true;
-			}
-
-			static int decreaseSnap = true;
-			if (primaryJoystickNew.x < -0.6f)
-			{
-				if (decreaseSnap)
-				{
-					snapTurn += vr_snapturn_angle->value;
-
-					//If snap turn configured for less than 10 degrees
-					if (vr_snapturn_angle->value > 10.0f) {
-                        decreaseSnap = false;
-                    }
-
-                    if (snapTurn > 180.0f)
+                else if (primaryJoystickNew.x < -0.6f)
+                {
+                    if (snapping)
                     {
-                        snapTurn -= 360.f;
+                        snapTurn += vr_snapturn_angle->value;
+                        snapping = false;
+
+                        if (snapTurn > 180.0f)
+                        {
+                            snapTurn -= 360.f;
+                        }
                     }
-				}
-			} else if (primaryJoystickNew.x > -0.4f)
-			{
-				decreaseSnap = true;
-			}
+                } else
+                {
+                    snapping = true;
+                }
+            }else{ // continuous turning
+                turn_rate = vr_snapturn_angle->value < 1.0f ? 1.0f : vr_snapturn_angle->value;
+                if(fabsf(primaryJoystickNew.x) > vr_turn_deadzone->value) {
+                    snapTurn -= (10.0f * primaryJoystickNew.x) / turn_rate;
+                }
+            }
         }
     }
 }
