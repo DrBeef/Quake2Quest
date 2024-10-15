@@ -799,10 +799,6 @@ CL_BeginFrame(int packetdelta, int renderdelta, int timedelta, qboolean packetfr
 		VID_CheckChanges();
 		CL_PredictMovement();
 
-
-		//HACK!
-		CL_UpdateLaserSightOrigins();
-
 		if (!cl.refresh_prepped && (cls.state == ca_active)) {
 			CL_PrepRefresh();
 		}

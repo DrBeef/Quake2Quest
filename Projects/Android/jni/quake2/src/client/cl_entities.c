@@ -800,6 +800,8 @@ CL_AddViewWeapon(player_state_t *ps, player_state_t *ops)
 	gun.flags = RF_MINLIGHT | RF_DEPTHHACK | RF_WEAPONMODEL;
 	gun.backlerp = 1.0f - cl.lerpfrac;
 	VectorCopy(gun.origin, gun.oldorigin); /* don't lerp at all */
+    //HACK!
+    CL_UpdateLaserSightOrigins(/*gun.origin*/);
 	V_AddEntity(&gun);
 }
 
