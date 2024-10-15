@@ -8,3 +8,6 @@ extern cvar_t	*vr_worldscale;
 extern cvar_t	*vr_weaponscale;
 extern cvar_t	*vr_weapon_stabilised;
 extern cvar_t	*vr_comfort_mask;
+extern cvar_t	*vr_framerate;
+extern char     **refresh_names;
+extern float    *refresh_values;

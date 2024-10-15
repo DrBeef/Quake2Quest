@@ -27,7 +27,6 @@
 
 #include "../../client/header/client.h"
 #include "../../client/menu/header/qmenu.h"
-#include "header/qmenu.h"
 #include "../../../../Quake2VR/VrCvars.h"
 
 extern void M_ForceMenuOff(void);
@@ -53,6 +52,7 @@ static menulist_s s_uiscale_list;
 static menuslider_s s_brightness_slider;
 static menuslider_s s_comfort_slider;
 static menulist_s s_fs_box;
+static menulist_s s_refresh_rate;
 static menulist_s s_vsync_list;
 static menulist_s s_af_list;
 static menulist_s s_msaa_list;
@@ -241,6 +241,8 @@ ApplyChanges(void *unused)
 			restart = true;
 		}
 	}
+
+    Cvar_SetValue("vr_framerate", (float)s_refresh_rate.curvalue);
 
 	if (restart)
 	{
@@ -481,6 +483,13 @@ VID_MenuInit(void)
 	s_fs_box.itemnames = fullscreen_names;
 	s_fs_box.curvalue = (int)vid_fullscreen->value;
 
+    s_refresh_rate.generic.type = MTYPE_SPINCONTROL;
+    s_refresh_rate.generic.name = "refresh rate";
+    s_refresh_rate.generic.x = 0;
+    s_refresh_rate.generic.y = (y += 10);
+    s_refresh_rate.itemnames = (const char **) refresh_names;
+    s_refresh_rate.curvalue = (int)vr_framerate->value;
+
 	s_vsync_list.generic.type = MTYPE_SPINCONTROL;
 	s_vsync_list.generic.name = "vertical sync";
 	s_vsync_list.generic.x = 0;
@@ -539,6 +548,7 @@ VID_MenuInit(void)
 	Menu_AddItem(&s_opengl_menu, (void *)&s_comfort_slider);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_uiscale_list);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_fs_box);
+    Menu_AddItem(&s_opengl_menu, (void *)&s_refresh_rate);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_vsync_list);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_af_list);
 	Menu_AddItem(&s_opengl_menu, (void *)&s_msaa_list);
