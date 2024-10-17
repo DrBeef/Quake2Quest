@@ -21,6 +21,12 @@ Authors		:	Simon Brown
 extern cvar_t	*cl_forwardspeed;
 cvar_t	*sv_cheats;
 extern cvar_t	*vr_weapon_stabilised;
+qboolean draw_wep_wheel;
+vec3_t initialAngles;
+vec3_t currentAngles;
+vec2_t relativeAngles;
+vec2_t polarCursor;
+int segment;
 
 
 
@@ -41,6 +47,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     uint32_t primaryButtonsOld;
     uint32_t secondaryButtonsNew;
     uint32_t secondaryButtonsOld;
+    uint32_t primaryTouchesNew;
+    uint32_t primaryTouchesOld;
+    uint32_t secondaryTouchesNew;
+    uint32_t secondaryTouchesOld;
     int primaryButton1;
     int primaryButton2;
     int secondaryButton1;
@@ -58,6 +68,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         secondaryButtonsNew = pDominantTrackedRemoteNew->Buttons;
         secondaryButtonsOld = pDominantTrackedRemoteOld->Buttons;
 
+        primaryTouchesNew = pDominantTrackedRemoteNew->Touches;
+        primaryTouchesOld = pDominantTrackedRemoteOld->Touches;
+
+        secondaryTouchesNew = pOffTrackedRemoteNew->Touches;
+        secondaryTouchesOld = pOffTrackedRemoteOld->Touches;
+
         primaryButton1 = offButton1;
         primaryButton2 = offButton2;
         secondaryButton1 = domButton1;
@@ -74,6 +90,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         primaryButtonsOld = pDominantTrackedRemoteOld->Buttons;
         secondaryButtonsNew = pOffTrackedRemoteNew->Buttons;
         secondaryButtonsOld = pOffTrackedRemoteOld->Buttons;
+
+        primaryTouchesNew = pDominantTrackedRemoteNew->Touches;
+        primaryTouchesOld = pDominantTrackedRemoteOld->Touches;
+
+        secondaryTouchesNew = pOffTrackedRemoteNew->Touches;
+        secondaryTouchesOld = pOffTrackedRemoteOld->Touches;
 
         primaryButton1 = domButton1;
         primaryButton2 = domButton2;
@@ -200,6 +222,72 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             {
                 sendButtonActionSimple("inven");
                 inventoryManagementMode = (secondaryButtonsNew & secondaryButton2) > 0;
+            }
+
+            if ((primaryTouchesNew & ovrTouch_ThumbRest) !=
+                (primaryTouchesOld & ovrTouch_ThumbRest)) {
+                sendButtonActionSimple("inven"); // send the "inven" command to force cl.inventory to be populated
+            }
+
+            // weapon selection wheel
+            {
+                static qboolean touching = false;
+                static qboolean runTouchLogic = false;
+                static int t_rel_t;
+
+                if ((primaryTouchesNew & ovrTouch_ThumbRest)) {
+                    if (!touching) {
+                        draw_wep_wheel = true;
+                        QuatToYawPitchRoll(pDominantTracking->HeadPose.Pose.Orientation, 0.0f,
+                                           initialAngles);
+                        VectorCopy(initialAngles, relativeAngles);
+                        touching = true;
+                    } else {
+                        QuatToYawPitchRoll(pDominantTracking->HeadPose.Pose.Orientation, 0.0f,
+                                           currentAngles);
+                        relativeAngles[0] = initialAngles[1] -
+                                            currentAngles[1]; // relative x -> pitch | Inverted to make right = positive
+                        relativeAngles[1] = currentAngles[0] -
+                                            initialAngles[0]; // relative y -> yaw | to match display coordinates, down = positive
+                        polarCursor[0] = sqrtf(
+                                powf(relativeAngles[0], 2.0f) + powf(relativeAngles[1], 2.0f)); // r
+                        if (polarCursor[0] > 15)
+                            polarCursor[0] = 15; // to keep it within the ring
+                        polarCursor[1] = atan2f(relativeAngles[1], relativeAngles[0]); // theta
+                        segment = (int) (((polarCursor[1] + (M_PI / 11)) + (2.5 * M_PI)) *
+                                         (11 / (2 * M_PI))) %
+                                  11; // Top segment index = 0, clockwise up to 10
+
+                        /*float th = M_PI/-2;
+                        int r = 160;
+                        float factor = M_PI * 2/11;
+                        for(int i = 0; i < 11; i++){
+                            int x, y;
+                            x = r * cosf(th + (i * factor));
+                            y = r * sinf(th + (i * factor));
+                            ALOGV("     segment %i: x: %i y=%i", i, x, y);
+                        }*/ // this snippet generated precalculated coordinates for each weapon icon, relative to the ring center
+                            // I'll leave it here in case those values need to be calculated again
+
+                    }
+                } else {
+                    if(touching){
+                        touching = false;
+                        runTouchLogic = true;
+                        t_rel_t = Sys_Milliseconds();
+                        if (polarCursor[0] > 8) {
+                            char useCom[50];
+                            sprintf(useCom, "use %s", weaponIcons[segment].command);
+                            sendButtonActionSimple(useCom);
+                        }
+                    }
+                    // give it time for the "inven" commmand to be sent,
+                    // preventing the "invisible" inventory window to be shown for a little bit
+                    if(runTouchLogic && Sys_Milliseconds() - t_rel_t > 100) {
+                        draw_wep_wheel = false;
+                        runTouchLogic = false;
+                    }
+                }
             }
         }
 

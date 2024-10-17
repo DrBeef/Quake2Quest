@@ -319,6 +319,19 @@ extern	entity_state_t	cl_parse_entities[MAX_PARSE_ENTITIES];
 extern	netadr_t	net_from;
 extern	sizebuf_t	net_message;
 
+typedef struct
+{
+    const char* name;     // segment for matching icon file
+    const int index;      // weapon index in inventory
+    const char* command;  // command triggered when icon is selected. Also display name
+    const char* ammo;     // type of ammo used by this weapon
+    const int ammo_i;     // index of ammo amount in inventory
+    const int x;          // h offset from center of selection wheel
+    const int y;          // v offset from center of selection wheel
+} wheel_icon_t;
+
+extern wheel_icon_t weaponIcons[];
+
 void DrawString (int x, int y, char *s);
 void DrawStringScaled(int x, int y, char *s, float factor);
 void DrawAltString (int x, int y, char *s);	/* toggle high bit */

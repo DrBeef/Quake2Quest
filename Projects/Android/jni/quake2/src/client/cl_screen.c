@@ -72,6 +72,108 @@ extern cvar_t *crosshair_scale;
 void SCR_TimeRefresh_f(void);
 void SCR_Loading_f(void);
 
+wheel_icon_t weaponIcons[11] = {
+        {
+                "blaster",
+                7,
+                "Blaster",
+                NULL,
+                0,
+                0,
+                -160
+        },
+        {
+                "shotgun",
+                8,
+                "Shotgun",
+                "shells",
+                18,
+                86,
+                -134
+        },
+        {
+                "sshotgun",
+                9,
+                "Super Shotgun",
+                "shells",
+                18,
+                145,
+                -66
+        },
+        {
+                "machinegun",
+                10,
+                "Machinegun",
+                "bullets",
+                19,
+                158,
+                22
+        },
+        {
+                "chaingun",
+                11,
+                "Chaingun",
+                "bullets",
+                19,
+                120,
+                104
+        },
+        {
+                "grenades",
+                12,
+                "Grenades",
+                "grenades",
+                12,
+                45,
+                153
+        },
+        {
+                "glauncher",
+                13,
+                "Grenade Launcher",
+                "grenades",
+                12,
+                -45,
+                153
+        },
+        {
+                "rlauncher",
+                14,
+                "Rocket Launcher",
+                "rockets",
+                21,
+                -120,
+                104
+        },
+        {
+                "hyperblaster",
+                15,
+                "HyperBlaster",
+                "cells",
+                20,
+                -158,
+                22
+        },
+        {
+                "railgun",
+                16,
+                "Railgun",
+                "slugs",
+                22,
+                -145,
+                -66
+        },
+        {
+                "bfg",
+                17,
+                "BFG10K",
+                "cells",
+                20,
+                -86,
+                -134
+        }
+};
+
 /*
  * A new packet was just parsed
  */
@@ -514,6 +616,91 @@ void SCR_DrawVignette (void)
 
 		re.DrawStretchPic(x, y, viddef.width - (2 * x), viddef.height - (2 * y), "/vignette.tga");
 	}
+}
+
+extern qboolean draw_wep_wheel;
+extern vec2_t polarCursor;
+extern int segment;
+static float cursorFactor = 200/15; // 200 is the radius of the ring image
+                                    // 15 is the same radius in VR scale
+
+void
+DrawNumberCenteredImageScaled(int x, int y, char* num, float scale)
+{
+    int len = strlen(num);
+    int width = 8; // half of img width
+    int height = 12; // half of img height
+    for(int i = 0; i < len; i++){
+        char image[7];
+        sprintf(image, "anum_%c", num[i]);
+        float offset = width * ((i * 2) - (len));
+        Draw_PicScaled(x + offset, y - (height * scale), image,
+                       scale);
+    }
+}
+
+void
+SCR_DrawWeaponWheel (float separation)
+{
+    if(draw_wep_wheel)
+    {
+        int offset_stereo = (separation>0) ? -25 : 25;
+        int picw, pich;
+        int curw, curh;
+        int vidwc = (viddef.width/2);
+        int vidhc = (viddef.height/2);
+        Draw_GetPicSize(&picw, &pich,"/ring.png");
+        Draw_PicScaled((vidwc - (picw/2)) + offset_stereo, (vidhc - (pich/2)), "/ring.png", 1.0f);
+        Draw_GetPicSize(&curw, &curh,"/cursor.png");
+        Draw_PicScaled((vidwc - (curw/2)) + ((polarCursor[0] * cosf(polarCursor[1])) * cursorFactor) + offset_stereo,
+                       (vidwc - (curh/2)) + ((polarCursor[0] * sinf(polarCursor[1])) * cursorFactor),
+                       "/cursor.png", 1.0f);
+
+        for(int i = 0; i < 11; i++)
+        {
+            if(cl.inventory[weaponIcons[i].index])
+            { // if weapon is available in inventory
+                char iconName[35];
+                char ammoName[30];
+                char ammoAmount[4];
+                float iconFactor;
+                float ammoFactor = 4.0f;
+                int iconWidth = 12; // actually half of icon size. For centering purposes
+                if (i == segment && polarCursor[0] > 8)
+                { // if cursor is inside the segment corresponding to the weapon
+                    iconFactor = 2.5f;
+                    sprintf(iconName, "/wheel/w_%s_selected.png", weaponIcons[i].name);
+                    sprintf(ammoName, "/wheel/a_%s.png", weaponIcons[i].ammo);
+                    DrawStringScaled(vidwc + offset_stereo - (strlen(weaponIcons[i].command) * 4),
+                                     vidhc - 100,
+                                     weaponIcons[i].command, 1.0f); // Weapon name
+                    if(weaponIcons[i].ammo_i > 0)
+                    {
+                        sprintf(ammoAmount, "%i", cl.inventory[weaponIcons[i].ammo_i]);
+                        DrawNumberCenteredImageScaled(vidwc + offset_stereo, vidhc + 100,
+                                                      ammoAmount,
+                                                      1.0f); // ammo amount in image numbers
+                    }
+                    Draw_PicScaled(vidwc - (iconWidth * ammoFactor) + offset_stereo, // ammo icon for the weapon
+                                   vidhc - (iconWidth * ammoFactor), ammoName,
+                                   ammoFactor);
+                    Draw_PicScaled(vidwc + weaponIcons[i].x - (iconWidth * iconFactor) +
+                                   (offset_stereo * 1.3f),
+                                   vidhc + weaponIcons[i].y - (iconWidth * iconFactor), iconName,
+                                   iconFactor);
+                }
+                else
+                {
+                    iconFactor = 1.5f;
+                    sprintf(iconName, "/wheel/w_%s.png", weaponIcons[i].name);
+                    Draw_PicScaled(vidwc + weaponIcons[i].x - (iconWidth * iconFactor) + (offset_stereo),
+                                   vidhc + weaponIcons[i].y - (iconWidth * iconFactor), iconName,
+                                   iconFactor);
+                }
+            }
+        }
+
+    }
 }
 
 void
@@ -1646,6 +1833,8 @@ void SCR_UpdateForEye (int eye)
 			{
 				CL_DrawInventory(separation);
 			}
+
+            SCR_DrawWeaponWheel(separation);
 
 			SCR_DrawNet();
 			SCR_CheckDrawCenterString();
