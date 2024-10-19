@@ -1141,6 +1141,7 @@ ControlsSetMenuItemValues(void)
     s_options_vr_height_adjust_box.curvalue = vr_height_adjust->value * 10.0f;
     s_options_crosshair_box.curvalue = ClampCvar(0, 3, crosshair->value);
     s_options_haptic_slider.curvalue = Cvar_VariableValue("joy_haptic_magnitude") * 10.0F;
+    s_options_enable_item_wheels.curvalue = (int)vr_use_wheels->value;
 }
 
 static void

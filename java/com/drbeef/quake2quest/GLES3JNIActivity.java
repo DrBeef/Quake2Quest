@@ -161,6 +161,15 @@ import static android.system.Os.setenv;
 
 	public void create()
 	{
+		try {
+			AssetManager assets = this.getAssets();
+			String[] assetList = assets.list("wheel");
+			for(String filename: assetList){
+				Log.v("Assets", "qfqfqfqf Filename: " + filename);
+			}
+		} catch (IOException e) {
+			//throw new RuntimeException(e);
+		}
 		//This will copy the shareware version of quake2 if user doesn't have anything installed
 		copy_asset("/sdcard/Quake2Quest", "pak0.pak");
 
@@ -177,6 +186,17 @@ import static android.system.Os.setenv;
 
 		//Comfort Vignette Mask
 		copy_asset("/sdcard/Quake2Quest", "vignette.tga");
+
+		//item wheel files
+		try {
+			AssetManager assets = this.getAssets();
+			String[] assetList = assets.list("wheel");
+			for(String filename: assetList){
+				copy_asset("/sdcard/Quake2Quest", "wheel/" + filename);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		//Read these from a file and pass through
 		commandLineParams = new String("quake2");

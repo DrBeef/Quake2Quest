@@ -715,12 +715,12 @@ SCR_DrawItemWheel (float separation)
         int curw, curh;
         int vidwc = (viddef.width/2);
         int vidhc = (viddef.height/2);
-        Draw_GetPicSize(&ringw, &ringh,"/ring.png");
-        Draw_PicScaled((vidwc - (ringw/2)) + offset_stereo, (vidhc - (ringh/2)), "/ring.png", 1.0f);
-        Draw_GetPicSize(&curw, &curh,"/cursor.png");
+        Draw_GetPicSize(&ringw, &ringh,"/wheel/ring.png");
+        Draw_PicScaled((vidwc - (ringw/2)) + offset_stereo, (vidhc - (ringh/2)), "/wheel/ring.png", 1.0f);
+        Draw_GetPicSize(&curw, &curh,"/wheel/cursor.png");
         Draw_PicScaled((vidwc - (curw/2)) + ((polarCursor[0] * cosf(polarCursor[1])) * cursorFactor) + offset_stereo,
                        (vidwc - (curh/2)) + ((polarCursor[0] * sinf(polarCursor[1])) * cursorFactor),
-                       "/cursor.png", 1.0f);
+                       "/wheel/cursor.png", 1.0f);
 
         for(int i = 0; i < totalIcons; i++)
         {

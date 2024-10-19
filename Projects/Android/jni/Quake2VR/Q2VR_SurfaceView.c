@@ -1416,7 +1416,7 @@ void VR_Init()
     vr_comfort_mask = Cvar_Get( "vr_comfort_mask", "0.0", CVAR_ARCHIVE);
     vr_turn_deadzone = Cvar_Get( "vr_turn_deadzone", "0.2", CVAR_ARCHIVE);
     vr_framerate = Cvar_Get( "vr_framerate", "0", CVAR_ARCHIVE);
-    vr_use_wheels = Cvar_Get( "vr_use_wheels", "0", 0);
+    vr_use_wheels = Cvar_Get( "vr_use_wheels", "0", CVAR_ARCHIVE);
 
     //Acquire supported refresh rates to populate options in video menu where framerate is selected
 
