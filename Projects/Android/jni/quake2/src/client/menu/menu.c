@@ -1066,6 +1066,7 @@ static menuslider_s s_options_oggvolume_slider;
 static menulist_s s_options_oggenable_box;
 static menulist_s s_options_quality_list;
 static menulist_s s_options_console_action;
+static menulist_s s_options_enable_item_wheels;
 
 static void
 CrosshairFunc(void *unused)
@@ -1089,6 +1090,12 @@ static void
 AlwaysRunFunc(void *unused)
 {
     Cvar_SetValue("cl_run", (float)s_options_alwaysrun_box.curvalue);
+}
+
+static void
+EnableWheels(void *unused)
+{
+    Cvar_SetValue("vr_use_wheels", (float)s_options_enable_item_wheels.curvalue);
 }
 
 static void
@@ -1303,6 +1310,13 @@ Options_MenuInit(void)
         0
     };
 
+    static const char *yesno_thumbrest_wheels[] =
+    {
+        "no",
+        "yes",
+        0
+    };
+
     static const char *crosshair_names[] =
     {
         "none",
@@ -1407,6 +1421,13 @@ Options_MenuInit(void)
     s_options_vr_height_adjust_box.minvalue = 0;
     s_options_vr_height_adjust_box.maxvalue = 10;
 
+    s_options_enable_item_wheels.generic.type = MTYPE_SPINCONTROL;
+    s_options_enable_item_wheels.generic.x = 0;
+    s_options_enable_item_wheels.generic.y = 110;
+    s_options_enable_item_wheels.generic.name = "Enable item wheels (Quest only)";
+    s_options_enable_item_wheels.generic.callback = EnableWheels;
+    s_options_enable_item_wheels.itemnames = yesno_thumbrest_wheels;
+
     s_options_crosshair_box.generic.type = MTYPE_SPINCONTROL;
     s_options_crosshair_box.generic.x = 0;
     s_options_crosshair_box.generic.y = 110;
@@ -1457,7 +1478,7 @@ Options_MenuInit(void)
 
 //    if (show_haptic)
 //        Menu_AddItem(&s_options_menu, (void *)&s_options_haptic_slider);
-
+    Menu_AddItem(&s_options_menu, (void *)&s_options_enable_item_wheels);
 //    Menu_AddItem(&s_options_menu, (void *)&s_options_customize_options_action);
     Menu_AddItem(&s_options_menu, (void *)&s_options_defaults_action);
     Menu_AddItem(&s_options_menu, (void *)&s_options_console_action);

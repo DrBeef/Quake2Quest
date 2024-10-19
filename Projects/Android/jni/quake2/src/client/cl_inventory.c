@@ -26,7 +26,7 @@
 
 #include "header/client.h"
 
-extern qboolean draw_wep_wheel;
+extern qboolean draw_item_wheel;
 
 void
 CL_ParseInventory(void)
@@ -64,7 +64,7 @@ SetStringHighBit(char *s)
 void
 CL_DrawInventory(float separation)
 {
-    if(!draw_wep_wheel) { // do not draw if weapon wheel is being drawn
+    if(!draw_item_wheel) { // do not draw if weapon wheel is being drawn
         Com_Printf("qiqiqiqi      inventory drawn at %i", Sys_Milliseconds());
         int i, j;
         int num, selected_num, item;

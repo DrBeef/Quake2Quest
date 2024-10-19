@@ -21,10 +21,9 @@ Authors		:	Simon Brown
 extern cvar_t	*cl_forwardspeed;
 cvar_t	*sv_cheats;
 extern cvar_t	*vr_weapon_stabilised;
-qboolean draw_wep_wheel;
-vec3_t initialAngles;
-vec3_t currentAngles;
-vec2_t relativeAngles;
+extern cvar_t	*vr_use_wheels;
+qboolean draw_item_wheel;
+qboolean isItems;
 vec2_t polarCursor;
 int segment;
 
@@ -217,75 +216,101 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 }
             }
 
-            if ((secondaryButtonsNew & secondaryButton2) !=
-                (secondaryButtonsOld & secondaryButton2))
-            {
-                sendButtonActionSimple("inven");
-                inventoryManagementMode = (secondaryButtonsNew & secondaryButton2) > 0;
-            }
+            if(vr_use_wheels->value > 0) {
+                {
+                    // weapon selection wheel
+                    if ((secondaryButtonsNew & secondaryButton2) !=
+                        (secondaryButtonsOld & secondaryButton2)) {
+                        sendButtonActionSimple("inven");
+                        inventoryManagementMode = (secondaryButtonsNew & secondaryButton2) > 0;
+                    }
+                    static qboolean active = false;
+                    static qboolean touching = false;
+                    static qboolean runTouchLogic = false;
+                    static int totalIcons;
+                    static int t_rel_t;
+                    static vec3_t initialAngles;
+                    static wheel_icon_t *iconList;
+                    ovrTracking *activeController;
+                    vec3_t currentAngles;
+                    vec2_t relativeAngles;
 
-            if ((primaryTouchesNew & ovrTouch_ThumbRest) !=
-                (primaryTouchesOld & ovrTouch_ThumbRest)) {
-                sendButtonActionSimple("inven"); // send the "inven" command to force cl.inventory to be populated
-            }
-
-            // weapon selection wheel
-            {
-                static qboolean touching = false;
-                static qboolean runTouchLogic = false;
-                static int t_rel_t;
-
-                if ((primaryTouchesNew & ovrTouch_ThumbRest)) {
-                    if (!touching) {
-                        draw_wep_wheel = true;
-                        QuatToYawPitchRoll(pDominantTracking->HeadPose.Pose.Orientation, 0.0f,
-                                           initialAngles);
-                        VectorCopy(initialAngles, relativeAngles);
-                        touching = true;
+                    if ((primaryTouchesNew & ovrTouch_ThumbRest) &&
+                        !(secondaryTouchesNew & ovrTouch_ThumbRest)) {
+                        activeController = pDominantTracking; // regardless of handedness or stick assignment, makes sense to use the weapon hand for the weapon wheel
+                        iconList = weaponIcons;
+                        isItems = false;
+                        totalIcons = 11;
+                        active = true;
+                    } else if ((secondaryTouchesNew & ovrTouch_ThumbRest) &&
+                               !(primaryTouchesNew & ovrTouch_ThumbRest)) {
+                        activeController = pOffTracking; // conversely, makes sense to use the off hand for the item wheel
+                        iconList = itemIcons;
+                        isItems = true;
+                        totalIcons = 6;
+                        active = true;
                     } else {
-                        QuatToYawPitchRoll(pDominantTracking->HeadPose.Pose.Orientation, 0.0f,
-                                           currentAngles);
-                        relativeAngles[0] = initialAngles[1] -
-                                            currentAngles[1]; // relative x -> pitch | Inverted to make right = positive
-                        relativeAngles[1] = currentAngles[0] -
-                                            initialAngles[0]; // relative y -> yaw | to match display coordinates, down = positive
-                        polarCursor[0] = sqrtf(
-                                powf(relativeAngles[0], 2.0f) + powf(relativeAngles[1], 2.0f)); // r
-                        if (polarCursor[0] > 15)
-                            polarCursor[0] = 15; // to keep it within the ring
-                        polarCursor[1] = atan2f(relativeAngles[1], relativeAngles[0]); // theta
-                        segment = (int) (((polarCursor[1] + (M_PI / 11)) + (2.5 * M_PI)) *
-                                         (11 / (2 * M_PI))) %
-                                  11; // Top segment index = 0, clockwise up to 10
+                        active = false;
+                    }
+                    if (active) {
+                        if (!touching) {
+                            draw_item_wheel = true;
+                            sendButtonActionSimple(
+                                    "inven"); // send the "inven" command to force cl.inventory to be populated
+                            QuatToYawPitchRoll(activeController->HeadPose.Pose.Orientation, 0.0f,
+                                               initialAngles);
+                            VectorCopy(initialAngles, relativeAngles);
+                            touching = true;
+                        } else {
+                            QuatToYawPitchRoll(activeController->HeadPose.Pose.Orientation, 0.0f,
+                                               currentAngles);
+                            relativeAngles[0] = initialAngles[1] -
+                                                currentAngles[1]; // relative x -> pitch | Inverted to make right = positive
+                            relativeAngles[1] = currentAngles[0] -
+                                                initialAngles[0]; // relative y -> yaw | to match display coordinates, down = positive
+                            polarCursor[0] = sqrtf(
+                                    powf(relativeAngles[0], 2.0f) +
+                                    powf(relativeAngles[1], 2.0f)); // r
+                            if (polarCursor[0] > 15)
+                                polarCursor[0] = 15; // to keep it within the ring
+                            polarCursor[1] = atan2f(relativeAngles[1], relativeAngles[0]); // theta
+                            segment =
+                                    (int) (((polarCursor[1] + (M_PI / totalIcons)) + (2.5 * M_PI)) *
+                                           (totalIcons / (2 * M_PI))) %
+                                    totalIcons; // Top segment index = 0, clockwise up to 10
 
-                        /*float th = M_PI/-2;
-                        int r = 160;
-                        float factor = M_PI * 2/11;
-                        for(int i = 0; i < 11; i++){
-                            int x, y;
-                            x = r * cosf(th + (i * factor));
-                            y = r * sinf(th + (i * factor));
-                            ALOGV("     segment %i: x: %i y=%i", i, x, y);
-                        }*/ // this snippet generated precalculated coordinates for each weapon icon, relative to the ring center
+                            /*float th = M_PI/-2;
+                            int r = 160;
+                            float factor = M_PI * 2/6;
+                            for(int i = 0; i < 6; i++){
+                                int x, y;
+                                x = r * cosf(th + (i * factor));
+                                y = r * sinf(th + (i * factor));
+                                ALOGV("     segment %i: x: %i y=%i", i, x, y);
+                            }*/ // this snippet generated precalculated coordinates for each icon, relative to the ring center
                             // I'll leave it here in case those values need to be calculated again
 
-                    }
-                } else {
-                    if(touching){
-                        touching = false;
-                        runTouchLogic = true;
-                        t_rel_t = Sys_Milliseconds();
-                        if (polarCursor[0] > 8) {
-                            char useCom[50];
-                            sprintf(useCom, "use %s", weaponIcons[segment].command);
-                            sendButtonActionSimple(useCom);
                         }
-                    }
-                    // give it time for the "inven" commmand to be sent,
-                    // preventing the "invisible" inventory window to be shown for a little bit
-                    if(runTouchLogic && Sys_Milliseconds() - t_rel_t > 100) {
-                        draw_wep_wheel = false;
-                        runTouchLogic = false;
+                    } else {
+                        if (touching) {
+                            sendButtonActionSimple(
+                                    "inven"); // send the "inven" command again to close the inventory
+                            touching = false;
+                            runTouchLogic = true;
+                            t_rel_t = Sys_Milliseconds();
+                            if (polarCursor[0] > 8) {
+                                char useCom[50];
+                                sprintf(useCom, "use %s", iconList[segment].command);
+                                sendButtonActionSimple(useCom);
+                            }
+                        }
+                        // give it time for the "inven" commmand to be sent,
+                        // preventing the "invisible" inventory window to be shown for a little bit
+                        if (runTouchLogic && Sys_Milliseconds() - t_rel_t > 100) {
+                            draw_item_wheel = false;
+                            runTouchLogic = false;
+                            polarCursor[0] = 0;
+                        }
                     }
                 }
             }
