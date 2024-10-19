@@ -538,6 +538,8 @@ trace_t CL_Trace (vec3_t start, vec3_t end, float size,  int contentmask)
 
 extern vec3_t weaponangles;
 extern vec3_t weaponoffset;
+extern vec3_t hmdPosition;
+extern cvar_t *vr_height_adjust;
 
 void CL_UpdateLaserSightOrigins ()
 {
@@ -548,6 +550,8 @@ void CL_UpdateLaserSightOrigins ()
 
 		//At the point of calling this, the vieworg should already have the player height included
 		convertFromVRtoQ2(weaponoffset, cl.refdef.vieworg, gunorigin);
+        gunorigin[2] -= (QUAKE_MARINE_HEIGHT * vr_worldscale->value);
+        gunorigin[2] += ((hmdPosition[1] + vr_height_adjust->value) * vr_worldscale->value);
 		//gunorigin[2] += 1; // just add a little bit
 		AngleVectors(weaponangles, forward, right, NULL);
 

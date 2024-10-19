@@ -26,6 +26,8 @@
 
 #include "header/client.h"
 
+extern qboolean draw_item_wheel;
+
 void
 CL_ParseInventory(void)
 {
@@ -62,103 +64,103 @@ SetStringHighBit(char *s)
 void
 CL_DrawInventory(float separation)
 {
-	int i, j;
-	int num, selected_num, item;
-	int index[MAX_ITEMS];
-	char string[1024];
-	int x, y;
-	char binding[1024];
-	const char *bind;
-	int selected;
-	int top;
+    if(!draw_item_wheel) { // do not draw if weapon wheel is being drawn
+        Com_Printf("qiqiqiqi      inventory drawn at %i", Sys_Milliseconds());
+        int i, j;
+        int num, selected_num, item;
+        int index[MAX_ITEMS];
+        char string[1024];
+        int x, y;
+        char binding[1024];
+        const char *bind;
+        int selected;
+        int top;
 
-	selected = cl.frame.playerstate.stats[STAT_SELECTED_ITEM];
+        selected = cl.frame.playerstate.stats[STAT_SELECTED_ITEM];
 
-	int offset_stereo= (separation>0) ? -25 : 25;
-	num = 0;
-	selected_num = 0;
+        int offset_stereo = (separation > 0) ? -25 : 25;
+        num = 0;
+        selected_num = 0;
 
-	float scale = SCR_GetHUDScale();
+        float scale = SCR_GetHUDScale();
 
-	for (i = 0; i < MAX_ITEMS; i++)
-	{
-		if (i == selected)
-		{
-			selected_num = num;
-		}
+        for (i = 0; i < MAX_ITEMS; i++)
+        {
+            if (i == selected) {
+                selected_num = num;
+            }
 
-		if (cl.inventory[i])
-		{
-			index[num] = i;
-			num++;
-		}
-	}
+            if (cl.inventory[i]) {
+                index[num] = i;
+                num++;
+            }
+        }
 
-	/* determine scroll point */
-	top = selected_num - DISPLAY_ITEMS / 2;
+        /* determine scroll point */
+        top = selected_num - DISPLAY_ITEMS / 2;
 
-	if (num - top < DISPLAY_ITEMS)
-	{
-		top = num - DISPLAY_ITEMS;
-	}
+        if (num - top < DISPLAY_ITEMS)
+        {
+            top = num - DISPLAY_ITEMS;
+        }
 
-	if (top < 0)
-	{
-		top = 0;
-	}
+        if (top < 0)
+        {
+            top = 0;
+        }
 
-	x = (viddef.width - scale*256) / 2;
-	y = viddef.height/2;
+        x = (viddef.width - scale * 256) / 2;
+        y = viddef.height / 2;
 
-	/* repaint everything next frame */
-	SCR_DirtyScreen();
+        /* repaint everything next frame */
+        SCR_DirtyScreen();
 
-	Draw_PicScaled(x+offset_stereo, y + scale*8, "inventory", scale);
+        Draw_PicScaled(x + offset_stereo, y + scale * 8, "inventory", scale);
 
-	y += scale*24;
-	x += scale*24;
+        y += scale * 24;
+        x += scale * 24;
 
-	//Inv_DrawStringScaled(x, y, "hotkey ### item", scale);
-	//Inv_DrawStringScaled(x, y + scale*8, "------ --- ----", scale);
+        //Inv_DrawStringScaled(x, y, "hotkey ### item", scale);
+        //Inv_DrawStringScaled(x, y + scale*8, "------ --- ----", scale);
 
-	y += scale*16;
+        y += scale * 16;
 
-	for (i = top; i < num && i < top + DISPLAY_ITEMS; i++)
-	{
-		item = index[i];
-		/* search for a binding */
-		Com_sprintf(binding, sizeof(binding), "use %s",
-				cl.configstrings[CS_ITEMS + item]);
-		bind = "";
+        for (i = top; i < num && i < top + DISPLAY_ITEMS; i++)
+        {
+            item = index[i];
+            /* search for a binding */
+            Com_sprintf(binding, sizeof(binding), "use %s",
+                        cl.configstrings[CS_ITEMS + item]);
+            bind = "";
 
-		/*for (j = 0; j < 256; j++)
-		{
-			if (keybindings[j] && !Q_stricmp(keybindings[j], binding))
-			{
-				bind = Key_KeynumToString(j);
-				break;
-			}
-		}*/
+            /*for (j = 0; j < 256; j++)
+            {
+                if (keybindings[j] && !Q_stricmp(keybindings[j], binding))
+                {
+                    bind = Key_KeynumToString(j);
+                    break;
+                }
+            }*/
 
-		Com_sprintf(string, sizeof(string), "%6s %3i %s", bind,
-				cl.inventory[item], cl.configstrings[CS_ITEMS + item]);
+            Com_sprintf(string, sizeof(string), "%6s %3i %s", bind,
+                        cl.inventory[item], cl.configstrings[CS_ITEMS + item]);
 
-		if (item != selected)
-		{
-			SetStringHighBit(string);
-		}
-		else
-		{
-			/* draw a blinky cursor by the selected item */
-			if ((int)(cls.realtime * 10) & 1)
-			{
-				Draw_CharScaled(x + offset_stereo - scale*8, y, 15, scale);
-			}
-		}
+            if (item != selected)
+            {
+                SetStringHighBit(string);
+            }
+            else
+            {
+                /* draw a blinky cursor by the selected item */
+                if ((int) (cls.realtime * 10) & 1) {
+                    Draw_CharScaled(x + offset_stereo - scale * 8, y, 15, scale);
+                }
+            }
 
-		Inv_DrawStringScaled(x+offset_stereo, y, string, scale);
+            Inv_DrawStringScaled(x + offset_stereo, y, string, scale);
 
-		y += scale*8;
-	}
+            y += scale * 8;
+        }
+    }
 }
 

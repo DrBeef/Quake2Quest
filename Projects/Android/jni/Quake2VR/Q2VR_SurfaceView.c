@@ -115,6 +115,11 @@ cvar_t	*vr_worldscale;
 cvar_t	*vr_weaponscale;
 cvar_t	*vr_weapon_stabilised;
 cvar_t	*vr_comfort_mask;
+cvar_t	*vr_turn_deadzone;
+cvar_t	*vr_framerate;
+cvar_t	*vr_use_wheels;
+char     **refresh_names;
+float    *refresh_values;
 
 enum control_scheme {
 	RIGHT_HANDED_DEFAULT = 0,
@@ -1409,6 +1414,25 @@ void VR_Init()
     vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0.0", CVAR_LATCH);
 	vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_LATCH);
     vr_comfort_mask = Cvar_Get( "vr_comfort_mask", "0.0", CVAR_ARCHIVE);
+    vr_turn_deadzone = Cvar_Get( "vr_turn_deadzone", "0.2", CVAR_ARCHIVE);
+    vr_framerate = Cvar_Get( "vr_framerate", "0", CVAR_ARCHIVE);
+    vr_use_wheels = Cvar_Get( "vr_use_wheels", "0", CVAR_ARCHIVE);
+
+    //Acquire supported refresh rates to populate options in video menu where framerate is selected
+
+    int refresh_num = vrapi_GetSystemPropertyInt( &java, VRAPI_SYS_PROP_NUM_SUPPORTED_DISPLAY_REFRESH_RATES );
+    float  refresh_arr[refresh_num];
+    int total = vrapi_GetSystemPropertyFloatArray( &java, VRAPI_SYS_PROP_SUPPORTED_DISPLAY_REFRESH_RATES, refresh_arr, refresh_num );
+
+    refresh_names = malloc((total+1) * sizeof (char*));
+    refresh_values = malloc((total) * sizeof (float));
+    for (int i = 0; i < total; i++) {
+        refresh_names[i] = malloc(5 * sizeof (char*));
+        sprintf(refresh_names[i],"%.0fHz", refresh_arr[i]);
+        refresh_values[i] = refresh_arr[i];
+    }
+    refresh_names[total] = malloc(5 * sizeof (int));
+    refresh_names[total] = 0;
 
     //The Engine (which is a derivative of Quake) uses a very specific unit size:
     //Wolfenstein 3D, DOOM and QUAKE use the same coordinate/unit system:
@@ -1697,6 +1721,10 @@ void * AppThreadFunction( void * parm )
 			}
 
 			ovrSubmitFrameDescription2 frameDesc = { 0 };
+            if(vr_framerate->modified){
+                vrapi_SetDisplayRefreshRate(appState.Ovr, refresh_values[(int)vr_framerate->value]);
+                vr_framerate->modified = false;
+            }
 			if (!useScreenLayer()) {
 
                 ovrLayerProjection2 layer = vrapi_DefaultLayerProjection2();
